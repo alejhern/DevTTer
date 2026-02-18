@@ -1,5 +1,4 @@
 import { FirebaseError } from "firebase/app";
-import { GithubAuthProvider, signInWithPopup } from "firebase/auth";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -12,37 +11,27 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { GithubIcon, GoogleIcon } from "@/components/icons";
-import { auth } from "@/firebase/index.js";
+import { loginWithGithub } from "@/firebase/client";
+import { useUser } from "@/storage/user";
 interface LoginFormProps {
-  open: boolean;
   onClose: () => void;
 }
 
-const loginWithGithub = async () => {
-  try {
-    const provider = new GithubAuthProvider();
-    const result = await signInWithPopup(auth, provider);
-    // This gives you a GitHub Access Texportoken. You can use it to access the GitHub API.
-    const credential = GithubAuthProvider.credentialFromResult(result);
-    const token = credential?.accessToken;
-    // The signed-in user info.
-    const user = result.user;
-
-    console.log("User Info:", user);
-  } catch (error) {
-    console.error("Error during GitHub login:", error);
-  }
-};
-
-export function LoginForm({ open, onClose }: LoginFormProps) {
-  if (!open) return null;
+export function LoginForm({ onClose }: LoginFormProps) {
+  const setUser = useUser((state) => state.setUser);
 
   const handlerLoginGithub = async () => {
     try {
-      await loginWithGithub();
+      const user = await loginWithGithub();
+
+      if (user !== undefined) setUser(user);
     } catch (error) {
       const firebaseError = error as FirebaseError;
-      console.error("Firebase error:", firebaseError.code, firebaseError.message);
+      console.error(
+        "Firebase error:",
+        firebaseError.code,
+        firebaseError.message,
+      );
     } finally {
       onClose();
     }

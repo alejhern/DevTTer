@@ -20,6 +20,8 @@ import { ThemeSwitch } from "@/components/theme-switch";
 import { SearchIcon, Logo } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { LoginForm } from "@/components/loginForm";
+import { useUser } from "@/storage/user";
+
 const searchInput = (
   <Input
     aria-label="Search"
@@ -42,17 +44,22 @@ const searchInput = (
 );
 
 export const Navbar = () => {
-  const [isLogged, setIsLogged] = useState<boolean>(false);
   const [isLoggingOpen, setIsLoggingOpen] = useState<boolean>(false);
+  const user = useUser((state) => state.user);
+  const closeSession = useUser((state) => state.closeSession);
 
   const handlerLogin = () => {
     setIsLoggingOpen(true);
   };
 
+  const handlerLogout = () => {
+    closeSession();
+  };
+
   return (
     <>
       <HeroUINavbar
-        className="bg-default-100"
+        className="bg-default-100 border-b border-default-200"
         maxWidth="full"
         position="sticky"
       >
@@ -92,10 +99,15 @@ export const Navbar = () => {
             <ThemeSwitch />
           </NavbarItem>
           <NavbarItem className="hidden lg:flex">{searchInput}</NavbarItem>
-          {isLogged ? (
-            <Link color="primary" href="/profile" size="lg">
-              Profile
-            </Link>
+          {user !== undefined ? (
+            <Button
+              color="danger "
+              size="lg"
+              variant="link"
+              onClick={handlerLogout}
+            >
+              Logout
+            </Button>
           ) : (
             <Button
               color="primary"
@@ -136,12 +148,7 @@ export const Navbar = () => {
           </div>
         </NavbarMenu>
       </HeroUINavbar>
-      {isLoggingOpen && (
-        <LoginForm
-          open={isLoggingOpen}
-          onClose={() => setIsLoggingOpen(false)}
-        />
-      )}
+      {isLoggingOpen && <LoginForm onClose={() => setIsLoggingOpen(false)} />}
     </>
   );
 };
