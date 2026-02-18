@@ -1,3 +1,5 @@
+import type { User } from "@/types";
+
 import {
   Navbar as HeroUINavbar,
   NavbarContent,
@@ -13,14 +15,14 @@ import { Input } from "@heroui/input";
 import { link as linkStyles } from "@heroui/theme";
 import NextLink from "next/link";
 import clsx from "clsx";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { siteConfig } from "@/config/site";
 import { ThemeSwitch } from "@/components/theme-switch";
 import { SearchIcon, Logo } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { LoginForm } from "@/components/loginForm";
-import { useUser } from "@/storage/user";
+import { onAuthStateChanged } from "@/firebase/client";
 
 const searchInput = (
   <Input
@@ -45,16 +47,19 @@ const searchInput = (
 
 export const Navbar = () => {
   const [isLoggingOpen, setIsLoggingOpen] = useState<boolean>(false);
-  const user = useUser((state) => state.user);
-  const closeSession = useUser((state) => state.closeSession);
+  const [user, setUser] = useState<User | undefined>(undefined);
 
   const handlerLogin = () => {
     setIsLoggingOpen(true);
   };
 
   const handlerLogout = () => {
-    closeSession();
+    setUser(undefined);
   };
+
+  useEffect(() => {
+    onAuthStateChanged(setUser);
+  }, [isLoggingOpen]);
 
   return (
     <>

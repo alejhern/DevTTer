@@ -12,19 +12,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { GithubIcon, GoogleIcon } from "@/components/icons";
 import { loginWithGithub } from "@/firebase/client";
-import { useUser } from "@/storage/user";
 interface LoginFormProps {
   onClose: () => void;
 }
 
 export function LoginForm({ onClose }: LoginFormProps) {
-  const setUser = useUser((state) => state.setUser);
-
   const handlerLoginGithub = async () => {
     try {
-      const user = await loginWithGithub();
-
-      if (user !== undefined) setUser(user);
+      await loginWithGithub();
     } catch (error) {
       const firebaseError = error as FirebaseError;
       console.error(

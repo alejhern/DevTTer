@@ -18,6 +18,35 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
+export const onAuthStateChanged = (callback: (user: User | undefined) => void) => {
+  return auth.onAuthStateChanged((firebaseUser) => {
+    if (firebaseUser) {
+      const user: User = {
+        id: firebaseUser.uid,
+        name: firebaseUser.displayName || "GitHub User",
+        email: firebaseUser.email || "",
+      };
+      callback(user);
+    } else {
+      callback(undefined);
+    }
+  });
+};
+
+export const getCurrentUser = (): User | undefined => {
+  const firebaseUser = auth.currentUser;
+
+  if (firebaseUser) {
+    return {
+      id: firebaseUser.uid,
+      name: firebaseUser.displayName || "GitHub User",
+      email: firebaseUser.email || "",
+    };
+  }
+
+  return undefined;
+};
+
 export const loginWithGithub = async (): Promise<User | undefined> => {
   try {
     const provider = new GithubAuthProvider();
