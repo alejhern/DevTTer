@@ -17,3 +17,10 @@ export const siteConfig = {
   navItems: navItems,
   navMenuItems: navItems,
 };
+
+export interface NavItem {
+  label: string;
+  href: string;
+  icon?: string;
+  avatar?: string;
+}
