@@ -92,15 +92,15 @@ export default defineConfig([globalIgnores([
         "jsx-a11y/click-events-have-key-events": "warn",
         "jsx-a11y/interactive-supports-focus": "warn",
         "prettier/prettier": "warn",
-        "no-unused-vars": "error",
+        "no-unused-vars": ["error"
+            , {
+                args: "after-used",
+                ignoreRestSiblings: false,
+                argsIgnorePattern: "^_.*?$",
+            },
+        ],
         "unused-imports/no-unused-vars": "off",
         "unused-imports/no-unused-imports": "warn",
-
-        "@typescript-eslint/no-unused-vars": ["warn", {
-            args: "after-used",
-            ignoreRestSiblings: false,
-            argsIgnorePattern: "^_.*?$",
-        }],
 
         "import/order": ["warn", {
             groups: [
