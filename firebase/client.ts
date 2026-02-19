@@ -18,22 +18,24 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-export const onAuthStateChanged = (callback: (user: User | undefined) => void) => {
+export const onAuthStateChanged = (callback: (_user: User | null) => void) => {
   return auth.onAuthStateChanged((firebaseUser) => {
     if (firebaseUser) {
-      const user: User = {
+      const userAuth: User = {
         id: firebaseUser.uid,
-        name: firebaseUser.displayName || "GitHub User",
-        email: firebaseUser.email || "",
+        name: firebaseUser.displayName ?? "GitHub User",
+        email: firebaseUser.email ?? "",
+        photoURL: firebaseUser.photoURL ?? "",
       };
-      callback(user);
+
+      callback(userAuth);
     } else {
-      callback(undefined);
+      callback(null);
     }
   });
 };
 
-export const getCurrentUser = (): User | undefined => {
+export const getCurrentUser = (): User => {
   const firebaseUser = auth.currentUser;
 
   if (firebaseUser) {
@@ -41,19 +43,20 @@ export const getCurrentUser = (): User | undefined => {
       id: firebaseUser.uid,
       name: firebaseUser.displayName || "GitHub User",
       email: firebaseUser.email || "",
+      photoURL: firebaseUser.photoURL || "",
     };
   }
 
-  return undefined;
+  throw new Error("No user is currently signed in.");
 };
 
-export const loginWithGithub = async (): Promise<User | undefined> => {
+export const loginWithGithub = async (): Promise<User> => {
   try {
     const provider = new GithubAuthProvider();
     const result = await signInWithPopup(auth, provider);
     // This gives you a GitHub Access Texportoken. You can use it to access the GitHub API.
-    const credential = GithubAuthProvider.credentialFromResult(result);
-    const token = credential?.accessToken;
+    //const credential = GithubAuthProvider.credentialFromResult(result);
+    //const token = credential?.accessToken;
     // The signed-in user info.
     const userGithub = result.user;
 
@@ -63,10 +66,12 @@ export const loginWithGithub = async (): Promise<User | undefined> => {
       id: userGithub.uid,
       name: userGithub.displayName || "GitHub User",
       email: userGithub.email || "",
+      photoURL: userGithub.photoURL || "",
     };
 
     return user;
   } catch (error) {
     console.error("Error during GitHub login:", error);
+    throw error;
   }
 };
