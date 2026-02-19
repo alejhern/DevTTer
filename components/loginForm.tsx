@@ -22,6 +22,7 @@ export function LoginForm({ onClose }: LoginFormProps) {
       await loginWithGithub();
     } catch (error) {
       const firebaseError = error as FirebaseError;
+
       console.error(
         "Firebase error:",
         firebaseError.code,
