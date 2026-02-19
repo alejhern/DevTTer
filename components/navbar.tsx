@@ -1,4 +1,4 @@
-import type { User } from "@/types";
+import type { NavItem } from "@/config/site";
 
 import {
   Navbar as HeroUINavbar,
@@ -10,19 +10,17 @@ import {
   NavbarMenuItem,
 } from "@heroui/navbar";
 import { Kbd } from "@heroui/kbd";
-import { Link } from "@heroui/link";
 import { Input } from "@heroui/input";
 import { link as linkStyles } from "@heroui/theme";
 import NextLink from "next/link";
 import clsx from "clsx";
-import { useEffect, useState } from "react";
+import { Avatar } from "@heroui/react";
 
-import { siteConfig } from "@/config/site";
+import { useNavbar } from "@/hooks/useNavbar";
 import { ThemeSwitch } from "@/components/theme-switch";
 import { SearchIcon, Logo } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { LoginForm } from "@/components/loginForm";
-import { onAuthStateChanged } from "@/firebase/client";
 
 const searchInput = (
   <Input
@@ -45,21 +43,77 @@ const searchInput = (
   />
 );
 
+function NavLinks({
+  links,
+  isMenu = false,
+}: {
+  links: Array<NavItem>;
+  isMenu?: boolean;
+}) {
+  if (isMenu) {
+    return (
+      <>
+        {links.map((item) => (
+          <NavbarMenuItem key={item.href}>
+            <NextLink
+              className={clsx(
+                linkStyles({ color: "foreground" }),
+                "data-[active=true]:text-primary data-[active=true]:font-medium",
+              )}
+              color="foreground"
+              href={item.href}
+            >
+              {item.avatar && (
+                <Avatar
+                  alt={`${item.label} avatar`}
+                  className="w-6 h-6 mr-2"
+                  src={item.avatar}
+                />
+              )}
+              {item.label}
+            </NextLink>
+          </NavbarMenuItem>
+        ))}
+      </>
+    );
+  }
+
+  return (
+    <>
+      {links.map((item) => (
+        <NavbarItem key={item.href}>
+          <NextLink
+            className={clsx(
+              linkStyles({ color: "foreground" }),
+              "data-[active=true]:text-primary data-[active=true]:font-medium",
+            )}
+            color="foreground"
+            href={item.href}
+          >
+            {item.avatar && (
+              <Avatar
+                alt={`${item.label} avatar`}
+                className="w-6 h-6 mr-2"
+                src={item.avatar}
+              />
+            )}
+            {item.label}
+          </NextLink>
+        </NavbarItem>
+      ))}
+    </>
+  );
+}
+
 export const Navbar = () => {
-  const [isLoggingOpen, setIsLoggingOpen] = useState<boolean>(false);
-  const [user, setUser] = useState<User | undefined>(undefined);
-
-  const handlerLogin = () => {
-    setIsLoggingOpen(true);
-  };
-
-  const handlerLogout = () => {
-    setUser(undefined);
-  };
-
-  useEffect(() => {
-    onAuthStateChanged(setUser);
-  }, [isLoggingOpen]);
+  const {
+    user,
+    links,
+    handlerLogin,
+    handlerLogout,
+    isLoggingOpen,
+    closeLogin,
+  } = useNavbar();
 
   return (
     <>
@@ -68,7 +122,7 @@ export const Navbar = () => {
         maxWidth="full"
         position="sticky"
       >
-        <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
+        <NavbarContent className="basis-1/5 lg:basis-full" justify="start">
           <NavbarBrand className="gap-3 max-w-fit">
             <NextLink
               className="flex justify-start items-center gap-1"
@@ -79,32 +133,19 @@ export const Navbar = () => {
             </NextLink>
           </NavbarBrand>
           <div className="hidden lg:flex gap-4 justify-start ml-2">
-            {siteConfig.navItems.map((item) => (
-              <NavbarItem key={item.href}>
-                <NextLink
-                  className={clsx(
-                    linkStyles({ color: "foreground" }),
-                    "data-[active=true]:text-primary data-[active=true]:font-medium",
-                  )}
-                  color="foreground"
-                  href={item.href}
-                >
-                  {item.label}
-                </NextLink>
-              </NavbarItem>
-            ))}
+            <NavLinks links={links} />
           </div>
         </NavbarContent>
 
         <NavbarContent
-          className="hidden sm:flex basis-1/5 sm:basis-full"
+          className="hidden lg:flex basis-1/5 lg:basis-full"
           justify="end"
         >
-          <NavbarItem className="hidden sm:flex gap-2">
+          <NavbarItem className="hidden lg:flex gap-2">
             <ThemeSwitch />
           </NavbarItem>
           <NavbarItem className="hidden lg:flex">{searchInput}</NavbarItem>
-          {user !== undefined ? (
+          {user !== null ? (
             <Button
               color="danger "
               size="lg"
@@ -125,7 +166,7 @@ export const Navbar = () => {
           )}
         </NavbarContent>
 
-        <NavbarContent className="sm:hidden basis-1 pl-4" justify="end">
+        <NavbarContent className="lg:hidden basis-1 pl-4" justify="end">
           <ThemeSwitch />
           <NavbarMenuToggle />
         </NavbarContent>
@@ -133,27 +174,11 @@ export const Navbar = () => {
         <NavbarMenu>
           {searchInput}
           <div className="mx-4 mt-2 flex flex-col gap-2">
-            {siteConfig.navMenuItems.map((item, index) => (
-              <NavbarMenuItem key={`${item}-${index}`}>
-                <Link
-                  color={
-                    index === 2
-                      ? "primary"
-                      : index === siteConfig.navMenuItems.length - 1
-                        ? "danger"
-                        : "foreground"
-                  }
-                  href="#"
-                  size="lg"
-                >
-                  {item.label}
-                </Link>
-              </NavbarMenuItem>
-            ))}
+            <NavLinks isMenu links={links} />
           </div>
         </NavbarMenu>
       </HeroUINavbar>
-      {isLoggingOpen && <LoginForm onClose={() => setIsLoggingOpen(false)} />}
+      {isLoggingOpen && <LoginForm onClose={closeLogin} />}
     </>
   );
 };
