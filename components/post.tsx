@@ -1,4 +1,4 @@
-import type { DevtterPost } from "@/types";
+import type { Devit } from "@/types";
 
 import { Avatar } from "@heroui/react";
 import { useTheme } from "next-themes";
@@ -10,7 +10,7 @@ import {
 import { useEffect, useState } from "react";
 import { MessageCircle, Heart, Repeat2, Share } from "lucide-react";
 
-export default function Post(post: DevtterPost) {
+export default function Post(post: Devit) {
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 

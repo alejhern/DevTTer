@@ -12,7 +12,7 @@ export interface User {
   photoURL: string;
 }
 
-export interface DevtterPost {
+export interface Devit {
   id: string;
   title: string;
   content: string;

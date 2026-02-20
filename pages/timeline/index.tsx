@@ -1,9 +1,9 @@
-import type { DevtterPost } from "@/types";
+import type { Devit } from "@/types";
 
 import { title } from "@/components/primitives";
 import Post from "@/components/post";
 
-const mockPost: DevtterPost = {
+const mockPost: Devit = {
   id: "1",
   title: "Hello World",
   content: "This is my first post on Devtter!",
