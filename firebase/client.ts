@@ -18,36 +18,27 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
+const mapFirebaseUserToUser = (firebaseUser: any): User | null => {
+  if (!firebaseUser) return null;
+
+  return {
+    id: firebaseUser.uid,
+    name: firebaseUser.displayName || "GitHub User",
+    email: firebaseUser.email || "",
+    photoURL: firebaseUser.photoURL || "",
+  };
+};
+
 export const onAuthStateChanged = (callback: (_user: User | null) => void) => {
   return auth.onAuthStateChanged((firebaseUser) => {
-    if (firebaseUser) {
-      const userAuth: User = {
-        id: firebaseUser.uid,
-        name: firebaseUser.displayName ?? "GitHub User",
-        email: firebaseUser.email ?? "",
-        photoURL: firebaseUser.photoURL ?? "",
-      };
-
-      callback(userAuth);
-    } else {
-      callback(null);
-    }
+    callback(mapFirebaseUserToUser(firebaseUser));
   });
 };
 
 export const getCurrentUser = (): User => {
   const firebaseUser = auth.currentUser;
 
-  if (firebaseUser) {
-    return {
-      id: firebaseUser.uid,
-      name: firebaseUser.displayName || "GitHub User",
-      email: firebaseUser.email || "",
-      photoURL: firebaseUser.photoURL || "",
-    };
-  }
-
-  throw new Error("No user is currently signed in.");
+  return mapFirebaseUserToUser(firebaseUser) as User;
 };
 
 export const loginWithGithub = async (): Promise<User> => {
@@ -60,18 +51,16 @@ export const loginWithGithub = async (): Promise<User> => {
     // The signed-in user info.
     const userGithub = result.user;
 
-    console.log("User Info:", userGithub);
-
-    const user: User = {
-      id: userGithub.uid,
-      name: userGithub.displayName || "GitHub User",
-      email: userGithub.email || "",
-      photoURL: userGithub.photoURL || "",
-    };
-
-    return user;
+    return mapFirebaseUserToUser(userGithub) as User;
   } catch (error) {
-    console.error("Error during GitHub login:", error);
+    throw error;
+  }
+};
+
+export const logout = async (): Promise<void> => {
+  try {
+    await auth.signOut();
+  } catch (error) {
     throw error;
   }
 };

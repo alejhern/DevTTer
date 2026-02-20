@@ -3,7 +3,7 @@ import type { NavItem } from "@/config/site";
 
 import { useState, useEffect, useCallback } from "react";
 
-import { onAuthStateChanged } from "@/firebase/client";
+import { onAuthStateChanged, logout } from "@/firebase/client";
 import { siteConfig } from "@/config/site";
 
 export function useNavbar() {
@@ -15,8 +15,13 @@ export function useNavbar() {
     setIsLoggingOpen(true);
   }, []);
 
-  const handlerLogout = useCallback(() => {
-    setUser(null);
+  const handlerLogout = useCallback(async () => {
+    try {
+      await logout();
+      setUser(null);
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
   }, []);
 
   useEffect(() => {
