@@ -1,15 +1,24 @@
 import type { User } from "@/types";
 
 import { useEffect, useState } from "react";
-import { Avatar } from "@heroui/react";
 
-import { onAuthStateChanged } from "@/firebase/client";
+import { getCurrentUser, onAuthStateChanged } from "@/firebase/client";
+import { Profile } from "@/components/profile";
 
 export default function ProfilePage() {
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    onAuthStateChanged(setUser);
+    // 1️⃣ Cuando se monta, obtenemos el usuario actual
+    getCurrentUser().then(setUser);
+
+    // 2️⃣ Nos suscribimos a cambios de login/logout
+    const unsubscribe = onAuthStateChanged(() => {
+      getCurrentUser().then(setUser);
+    });
+
+    // 3️⃣ Cleanup al desmontar
+    return () => unsubscribe();
   }, []);
 
   if (!user) {
@@ -25,18 +34,5 @@ export default function ProfilePage() {
     );
   }
 
-  return (
-    <>
-      <div className="flex flex-col items-center justify-center gap-4 py-8 md:py-10">
-        <Avatar
-          alt={user.name || "User Avatar"}
-          className="rounded-full w-24 h-24"
-          size="lg"
-          src={user.photoURL || undefined}
-        />
-        <h1 className="text-2xl font-bold">{user.name}</h1>
-        <p className="text-muted-foreground">{user.email}</p>
-      </div>
-    </>
-  );
+  return <Profile user={user} />;
 }
