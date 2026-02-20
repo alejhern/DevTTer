@@ -8,7 +8,11 @@ import {
   NavbarBrand,
   NavbarItem,
   NavbarMenuItem,
-} from "@heroui/navbar";
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+} from "@heroui/react";
 import { Kbd } from "@heroui/kbd";
 import { Input } from "@heroui/input";
 import { link as linkStyles } from "@heroui/theme";
@@ -50,38 +54,12 @@ function NavLinks({
   links: Array<NavItem>;
   isMenu?: boolean;
 }) {
-  if (isMenu) {
-    return (
-      <>
-        {links.map((item) => (
-          <NavbarMenuItem key={item.href}>
-            <NextLink
-              className={clsx(
-                linkStyles({ color: "foreground" }),
-                "data-[active=true]:text-primary data-[active=true]:font-medium",
-              )}
-              color="foreground"
-              href={item.href}
-            >
-              {item.avatar && (
-                <Avatar
-                  alt={`${item.label} avatar`}
-                  className="w-6 h-6 mr-2"
-                  src={item.avatar}
-                />
-              )}
-              {item.label}
-            </NextLink>
-          </NavbarMenuItem>
-        ))}
-      </>
-    );
-  }
+  const Section = isMenu ? NavbarMenuItem : NavbarItem;
 
   return (
     <>
       {links.map((item) => (
-        <NavbarItem key={item.href}>
+        <Section key={item.href}>
           <NextLink
             className={clsx(
               linkStyles({ color: "foreground" }),
@@ -90,29 +68,82 @@ function NavLinks({
             color="foreground"
             href={item.href}
           >
-            {item.avatar && (
-              <Avatar
-                alt={`${item.label} avatar`}
-                className="w-6 h-6 mr-2"
-                src={item.avatar}
-              />
-            )}
             {item.label}
           </NextLink>
-        </NavbarItem>
+        </Section>
       ))}
     </>
   );
 }
 
+function AccountActios({
+  user,
+  handlerLogin,
+  handlerLogout,
+}: {
+  user: ReturnType<typeof useNavbar>["user"];
+  handlerLogin: ReturnType<typeof useNavbar>["handlerLogin"];
+  handlerLogout: ReturnType<typeof useNavbar>["handlerLogout"];
+}) {
+  if (user) {
+    return (
+      <NavbarItem className="flex items-center">
+        <Dropdown placement="bottom-end">
+          <DropdownTrigger>
+            <button className="flex items-center gap-2 px-2 py-1 rounded hover:bg-default-200 transition">
+              <Avatar
+                isBordered
+                color="secondary"
+                name={user.userName}
+                size="sm"
+                src={user.photoURL}
+              />
+              <span className="font-medium hidden sm:inline">
+                {user.userName}
+              </span>
+            </button>
+          </DropdownTrigger>
+          <DropdownMenu aria-label="User Menu" variant="flat">
+            <DropdownItem key="profile" className="h-14 gap-2">
+              <p className="font-semibold">Signed in as</p>
+              <p className="font-semibold">{user.email}</p>
+            </DropdownItem>
+            <DropdownItem key="profile">
+              <NextLink className="w-full block" href="/profile">
+                Profile
+              </NextLink>
+            </DropdownItem>
+            <DropdownItem key="logout" color="danger" onClick={handlerLogout}>
+              Logout
+            </DropdownItem>
+          </DropdownMenu>
+        </Dropdown>
+      </NavbarItem>
+    );
+  }
+
+  return (
+    <NavbarItem>
+      <Button
+        color="primary"
+        size="lg"
+        variant="outline"
+        onClick={handlerLogin}
+      >
+        Login
+      </Button>
+    </NavbarItem>
+  );
+}
+
 export default function Navbar() {
   const {
-    user,
     links,
-    handlerLogin,
-    handlerLogout,
     isLoggingOpen,
     closeLogin,
+    user,
+    handlerLogin,
+    handlerLogout,
   } = useNavbar();
 
   return (
@@ -122,6 +153,7 @@ export default function Navbar() {
         maxWidth="full"
         position="sticky"
       >
+        {/* LEFT */}
         <NavbarContent className="basis-1/5 lg:basis-full" justify="start">
           <NavbarBrand className="gap-3 max-w-fit">
             <NextLink
@@ -137,6 +169,7 @@ export default function Navbar() {
           </div>
         </NavbarContent>
 
+        {/* CENTER / RIGHT */}
         <NavbarContent
           className="hidden lg:flex basis-1/5 lg:basis-full"
           justify="end"
@@ -145,39 +178,33 @@ export default function Navbar() {
             <ThemeSwitch />
           </NavbarItem>
           <NavbarItem className="hidden lg:flex">{searchInput}</NavbarItem>
-          {user !== null ? (
-            <Button
-              color="danger "
-              size="lg"
-              variant="link"
-              onClick={handlerLogout}
-            >
-              Logout
-            </Button>
-          ) : (
-            <Button
-              color="primary"
-              size="lg"
-              variant="outline"
-              onClick={handlerLogin}
-            >
-              Login
-            </Button>
-          )}
+          <AccountActios
+            handlerLogin={handlerLogin}
+            handlerLogout={handlerLogout}
+            user={user}
+          />
         </NavbarContent>
 
+        {/* MOBILE */}
         <NavbarContent className="lg:hidden basis-1 pl-4" justify="end">
           <ThemeSwitch />
           <NavbarMenuToggle />
         </NavbarContent>
 
+        {/* MOBILE MENU */}
         <NavbarMenu>
           {searchInput}
           <div className="mx-4 mt-2 flex flex-col gap-2">
             <NavLinks isMenu links={links} />
+            <AccountActios
+              handlerLogin={handlerLogin}
+              handlerLogout={handlerLogout}
+              user={user}
+            />
           </div>
         </NavbarMenu>
       </HeroUINavbar>
+
       {isLoggingOpen && <LoginForm onClose={closeLogin} />}
     </>
   );

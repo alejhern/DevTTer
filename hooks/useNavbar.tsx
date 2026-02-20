@@ -1,14 +1,13 @@
 import type { User } from "@/types";
-import type { NavItem } from "@/config/site";
 
 import { useState, useEffect, useCallback } from "react";
 
-import { onAuthStateChanged, logout } from "@/firebase/client";
+import { onAuthStateChanged, logout, getCurrentUser } from "@/firebase/client";
 import { siteConfig } from "@/config/site";
 
 export function useNavbar() {
   const [user, setUser] = useState<User | null>(null);
-  const [links, setLinks] = useState<Array<NavItem>>(siteConfig.navItems);
+  const links = siteConfig.navItems;
   const [isLoggingOpen, setIsLoggingOpen] = useState<boolean>(false);
 
   const handlerLogin = useCallback(() => {
@@ -26,21 +25,12 @@ export function useNavbar() {
 
   useEffect(() => {
     if (isLoggingOpen) return;
-    const unsubscribe = onAuthStateChanged(setUser);
+    const unsubscribe = onAuthStateChanged(() => {
+      getCurrentUser().then(setUser);
+    });
 
     return () => unsubscribe();
   }, [isLoggingOpen]);
-
-  useEffect(() => {
-    if (user) {
-      setLinks(() => [
-        { href: "/profile", label: "Profile", avatar: user.photoURL },
-        ...siteConfig.navItems,
-      ]);
-    } else {
-      setLinks(siteConfig.navItems);
-    }
-  }, [user]);
 
   const closeLogin = useCallback(() => {
     setIsLoggingOpen(false);
