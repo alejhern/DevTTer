@@ -6,7 +6,7 @@ import { getCurrentUser, onAuthStateChanged } from "@/firebase/client";
 import { Profile } from "@/components/profile";
 
 export default function ProfilePage() {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null | undefined>(undefined);
 
   useEffect(() => {
     // 1️⃣ Cuando se monta, obtenemos el usuario actual
@@ -21,6 +21,18 @@ export default function ProfilePage() {
     return () => unsubscribe();
   }, []);
 
+  if (user === undefined) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
+        {/* Spinner animado */}
+        <div className="w-16 h-16 border-4 border-t-primary border-gray-300 rounded-full animate-spin" />
+
+        <span className="text-foreground text-lg font-medium mt-2">
+          Loading profile...
+        </span>
+      </div>
+    );
+  }
   if (!user) {
     return (
       <>

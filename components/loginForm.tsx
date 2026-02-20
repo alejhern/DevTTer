@@ -1,6 +1,5 @@
 import { FirebaseError } from "firebase/app";
 import { useCallback } from "react";
-import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -13,24 +12,17 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { GithubIcon, GoogleIcon } from "@/components/icons";
-import { loginWithGithub, getCurrentUser } from "@/firebase/client";
+import { loginWithGithub } from "@/firebase/client";
 
 interface LoginFormProps {
   onClose: () => void;
 }
 
 export function LoginForm({ onClose }: LoginFormProps) {
-  const router = useRouter();
   const handlerLoginGithub = useCallback(async () => {
     try {
       await loginWithGithub();
-      const user = getCurrentUser();
-
       onClose();
-      if (user) {
-        console.log("Logged in user:", user);
-        router.push("/profile");
-      }
     } catch (error) {
       const firebaseError = error as FirebaseError;
 
