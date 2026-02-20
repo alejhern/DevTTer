@@ -105,7 +105,7 @@ function NavLinks({
   );
 }
 
-export const Navbar = () => {
+export default function Navbar() {
   const {
     user,
     links,
@@ -181,4 +181,4 @@ export const Navbar = () => {
       {isLoggingOpen && <LoginForm onClose={closeLogin} />}
     </>
   );
-};
+}

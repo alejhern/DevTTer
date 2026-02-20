@@ -3,7 +3,6 @@ import type { User } from "@/types";
 import { useEffect, useState } from "react";
 import { Avatar } from "@heroui/react";
 
-import { Navbar } from "@/components/navbar";
 import { onAuthStateChanged } from "@/firebase/client";
 
 export default function ProfilePage() {
@@ -16,7 +15,6 @@ export default function ProfilePage() {
   if (!user) {
     return (
       <>
-        <Navbar />
         <div className="flex flex-col items-center justify-center gap-4 py-8 md:py-10">
           <h1 className="text-2xl font-bold">Unauthorized</h1>
           <p className="text-muted-foreground">
@@ -29,11 +27,10 @@ export default function ProfilePage() {
 
   return (
     <>
-      <Navbar />
       <div className="flex flex-col items-center justify-center gap-4 py-8 md:py-10">
         <Avatar
           alt={user.name || "User Avatar"}
-          className="rounded-full"
+          className="rounded-full w-24 h-24"
           size="lg"
           src={user.photoURL || undefined}
         />
