@@ -10,3 +10,16 @@ export interface User {
   email: string;
   photoURL: string;
 }
+
+export interface DevtterPost {
+  id: string;
+  title: string;
+  content: string;
+  author: User;
+  createdAt: Date;
+  code?: {
+    language: string;
+    content: string;
+  };
+  imageUrl?: string;
+}
