@@ -11,15 +11,25 @@ const navItems = [
   },
 ];
 
+const accountLinks = [
+  {
+    label: "Profile",
+    href: "/profile",
+  },
+  {
+    label: "Add Devit",
+    href: "/compose/devit",
+  },
+  {
+    label: "Settings",
+    href: "/settings",
+  },
+];
+
 export const siteConfig = {
   name: "Next.js + HeroUI",
   description: "Make beautiful websites regardless of your design experience.",
   navItems: navItems,
   navMenuItems: navItems,
+  accountLinks: accountLinks,
 };
-
-export interface NavItem {
-  label: string;
-  href: string;
-  icon?: string;
-}

@@ -1,5 +1,3 @@
-import type { NavItem } from "@/config/site";
-
 import {
   Navbar as HeroUINavbar,
   NavbarContent,
@@ -20,11 +18,16 @@ import NextLink from "next/link";
 import clsx from "clsx";
 import { Avatar } from "@heroui/react";
 
+import { useUser } from "@/hooks/useUser";
 import { useNavbar } from "@/hooks/useNavbar";
 import { ThemeSwitch } from "@/components/theme-switch";
 import { SearchIcon, Logo } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { LoginForm } from "@/components/loginForm";
+import { siteConfig } from "@/config/site";
+
+const links = siteConfig.navItems;
+const accountLinks = siteConfig.accountLinks;
 
 const searchInput = (
   <Input
@@ -47,13 +50,7 @@ const searchInput = (
   />
 );
 
-function NavLinks({
-  links,
-  isMenu = false,
-}: {
-  links: Array<NavItem>;
-  isMenu?: boolean;
-}) {
+function NavLinks({ isMenu = false }: { isMenu?: boolean }) {
   const Section = isMenu ? NavbarMenuItem : NavbarItem;
 
   return (
@@ -81,7 +78,7 @@ function AccountActios({
   handlerLogin,
   handlerLogout,
 }: {
-  user: ReturnType<typeof useNavbar>["user"];
+  user: ReturnType<typeof useUser>;
   handlerLogin: ReturnType<typeof useNavbar>["handlerLogin"];
   handlerLogout: ReturnType<typeof useNavbar>["handlerLogout"];
 }) {
@@ -108,12 +105,27 @@ function AccountActios({
               <p className="font-semibold">Signed in as</p>
               <p className="font-semibold">{user.email}</p>
             </DropdownItem>
-            <DropdownItem key="profile">
-              <NextLink className="w-full block" href="/profile">
-                Profile
-              </NextLink>
-            </DropdownItem>
-            <DropdownItem key="logout" color="danger" onClick={handlerLogout}>
+            <>
+              {accountLinks.map((item) => (
+                <DropdownItem key={item.href} className="h-12">
+                  <NextLink
+                    className={clsx(
+                      linkStyles({ color: "foreground" }),
+                      "w-full h-full",
+                    )}
+                    color="foreground"
+                    href={item.href}
+                  >
+                    {item.label}
+                  </NextLink>
+                </DropdownItem>
+              ))}
+            </>
+            <DropdownItem
+              key="logout"
+              className="h-12 text-red-500 hover:bg-red-50"
+              onClick={handlerLogout}
+            >
               Logout
             </DropdownItem>
           </DropdownMenu>
@@ -137,14 +149,9 @@ function AccountActios({
 }
 
 export default function Navbar() {
-  const {
-    links,
-    isLoggingOpen,
-    closeLogin,
-    user,
-    handlerLogin,
-    handlerLogout,
-  } = useNavbar();
+  const user = useUser();
+  const { isLoggingOpen, closeLogin, handlerLogin, handlerLogout } =
+    useNavbar();
 
   return (
     <>
@@ -165,7 +172,7 @@ export default function Navbar() {
             </NextLink>
           </NavbarBrand>
           <div className="hidden lg:flex gap-4 justify-start ml-2">
-            <NavLinks links={links} />
+            <NavLinks />
           </div>
         </NavbarContent>
 
@@ -195,7 +202,7 @@ export default function Navbar() {
         <NavbarMenu>
           {searchInput}
           <div className="mx-4 mt-2 flex flex-col gap-2">
-            <NavLinks isMenu links={links} />
+            <NavLinks isMenu />
             <AccountActios
               handlerLogin={handlerLogin}
               handlerLogout={handlerLogout}

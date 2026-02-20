@@ -1,5 +1,6 @@
 import { FirebaseError } from "firebase/app";
 import { useCallback } from "react";
+import { useRouter } from "next/router";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -19,10 +20,12 @@ interface LoginFormProps {
 }
 
 export function LoginForm({ onClose }: LoginFormProps) {
+  const router = useRouter();
   const handlerLoginGithub = useCallback(async () => {
     try {
       await loginWithGithub();
       onClose();
+      router.replace("/profile");
     } catch (error) {
       const firebaseError = error as FirebaseError;
 

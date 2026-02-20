@@ -1,25 +1,8 @@
-import type { User } from "@/types";
-
-import { useEffect, useState } from "react";
-
-import { getCurrentUser, onAuthStateChanged } from "@/firebase/client";
 import { Profile } from "@/components/profile";
+import { useUser } from "@/hooks/useUser";
 
 export default function ProfilePage() {
-  const [user, setUser] = useState<User | null | undefined>(undefined);
-
-  useEffect(() => {
-    // 1️⃣ Cuando se monta, obtenemos el usuario actual
-    getCurrentUser().then(setUser);
-
-    // 2️⃣ Nos suscribimos a cambios de login/logout
-    const unsubscribe = onAuthStateChanged(() => {
-      getCurrentUser().then(setUser);
-    });
-
-    // 3️⃣ Cleanup al desmontar
-    return () => unsubscribe();
-  }, []);
+  const user = useUser();
 
   if (user === undefined) {
     return (
