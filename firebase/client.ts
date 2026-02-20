@@ -1,9 +1,14 @@
 import type { User } from "../types/index";
 
 import { initializeApp } from "firebase/app";
-import { getAuth, GithubAuthProvider, signInWithPopup } from "firebase/auth";
+import {
+  getAuth,
+  GithubAuthProvider,
+  signInWithPopup,
+  onAuthStateChanged as firebaseOnAuthStateChanged,
+} from "firebase/auth";
 
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+// Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyCPNG8D9e6f6NUcY6xQVpUSQoU_d7iZTsE",
   authDomain: "devtter-c169a.firebaseapp.com",
@@ -18,49 +23,75 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-const mapFirebaseUserToUser = (firebaseUser: any): User | null => {
+// LOGIN con GitHub
+export const loginWithGithub = async () => {
+  const provider = new GithubAuthProvider();
+  const result = await signInWithPopup(auth, provider);
+
+  // Aquí sí tenemos el token
+  const credential = GithubAuthProvider.credentialFromResult(result);
+  const token = credential?.accessToken;
+
+  if (!token) throw new Error("No se pudo obtener token de GitHub");
+  sessionStorage.setItem("github_token", token);
+};
+
+export const getCurrentUser = async (): Promise<User | null> => {
+  const firebaseUser = auth.currentUser;
+
   if (!firebaseUser) return null;
 
+  // Recuperamos el token guardado
+  const token = sessionStorage.getItem("github_token");
+
+  if (token) {
+    // Llamamos a GitHub API
+    const response = await fetch("https://api.github.com/user", {
+      headers: { Authorization: `token ${token}` },
+    });
+    const githubUser = await response.json();
+
+    return {
+      id: firebaseUser.uid,
+      userName: githubUser.login,
+      name: firebaseUser.displayName || githubUser.name || "GitHub User",
+      email: firebaseUser.email || githubUser.email || "",
+      photoURL:
+        firebaseUser.photoURL ||
+        firebaseUser.photoURL ||
+        githubUser.avatar_url ||
+        "",
+    };
+  }
+
+  // Si no hay token, devolvemos UID temporal
   return {
     id: firebaseUser.uid,
-    name: firebaseUser.displayName || "GitHub User",
+    userName: firebaseUser.uid,
+    name: firebaseUser.displayName || "User",
     email: firebaseUser.email || "",
     photoURL: firebaseUser.photoURL || "",
   };
 };
 
+// ON AUTH STATE CHANGED
 export const onAuthStateChanged = (callback: (_user: User | null) => void) => {
-  return auth.onAuthStateChanged((firebaseUser) => {
-    callback(mapFirebaseUserToUser(firebaseUser));
+  return firebaseOnAuthStateChanged(auth, (firebaseUser) => {
+    if (!firebaseUser) {
+      callback(null);
+    } else {
+      callback({
+        id: firebaseUser.uid,
+        userName: firebaseUser.uid, // temporal
+        name: firebaseUser.displayName || "User",
+        email: firebaseUser.email || "",
+        photoURL: firebaseUser.photoURL || "",
+      });
+    }
   });
 };
 
-export const getCurrentUser = (): User => {
-  const firebaseUser = auth.currentUser;
-
-  return mapFirebaseUserToUser(firebaseUser) as User;
-};
-
-export const loginWithGithub = async (): Promise<User> => {
-  try {
-    const provider = new GithubAuthProvider();
-    const result = await signInWithPopup(auth, provider);
-    // This gives you a GitHub Access Texportoken. You can use it to access the GitHub API.
-    //const credential = GithubAuthProvider.credentialFromResult(result);
-    //const token = credential?.accessToken;
-    // The signed-in user info.
-    const userGithub = result.user;
-
-    return mapFirebaseUserToUser(userGithub) as User;
-  } catch (error) {
-    throw error;
-  }
-};
-
+// LOGOUT
 export const logout = async (): Promise<void> => {
-  try {
-    await auth.signOut();
-  } catch (error) {
-    throw error;
-  }
+  await auth.signOut();
 };

@@ -12,7 +12,8 @@ const mockPost: DevtterPost = {
     content: "console.log('Hello Devtter!');",
   },
   author: {
-    id: "1",
+    id: "123",
+    userName: "johndoe",
     name: "John Doe",
     email: "john.doe@example.com",
     photoURL: "https://randomuser.me/api/portraits/men/1.jpg",
