@@ -93,7 +93,7 @@ function AccountActios({
                 color="secondary"
                 name={user.userName}
                 size="sm"
-                src={user.photoURL}
+                src={user.avatar}
               />
               <span className="font-medium hidden sm:inline">
                 {user.userName}

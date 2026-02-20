@@ -36,7 +36,7 @@ export const loginWithGithub = async () => {
   sessionStorage.setItem("github_token", token);
 };
 
-export const getCurrentUser = async (): Promise<User | null> => {
+const getCurrentUser = async (): Promise<User | null> => {
   const firebaseUser = auth.currentUser;
 
   if (!firebaseUser) return null;
@@ -51,17 +51,15 @@ export const getCurrentUser = async (): Promise<User | null> => {
     });
     const githubUser = await response.json();
 
-    return {
+    const user: User = {
       id: firebaseUser.uid,
       userName: githubUser.login,
       name: firebaseUser.displayName || githubUser.name || "GitHub User",
       email: firebaseUser.email || githubUser.email || "",
-      photoURL:
-        firebaseUser.photoURL ||
-        firebaseUser.photoURL ||
-        githubUser.avatar_url ||
-        "",
+      avatar: firebaseUser.photoURL || githubUser.avatar_url || "",
     };
+
+    return user;
   }
 
   // Si no hay token, devolvemos UID temporal
@@ -70,24 +68,14 @@ export const getCurrentUser = async (): Promise<User | null> => {
     userName: firebaseUser.uid,
     name: firebaseUser.displayName || "User",
     email: firebaseUser.email || "",
-    photoURL: firebaseUser.photoURL || "",
+    avatar: firebaseUser.photoURL || "",
   };
 };
 
 // ON AUTH STATE CHANGED
 export const onAuthStateChanged = (callback: (_user: User | null) => void) => {
-  return firebaseOnAuthStateChanged(auth, (firebaseUser) => {
-    if (!firebaseUser) {
-      callback(null);
-    } else {
-      callback({
-        id: firebaseUser.uid,
-        userName: firebaseUser.uid, // temporal
-        name: firebaseUser.displayName || "User",
-        email: firebaseUser.email || "",
-        photoURL: firebaseUser.photoURL || "",
-      });
-    }
+  return firebaseOnAuthStateChanged(auth, () => {
+    return getCurrentUser().then(callback);
   });
 };
 

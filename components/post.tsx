@@ -55,7 +55,7 @@ export default function Post(post: Devit) {
         w-full
       "
     >
-      <Avatar className="w-10 h-10 flex-shrink-0" src={post.author.photoURL} />
+      <Avatar className="w-10 h-10 flex-shrink-0" src={post.author.avatar} />
 
       <div className="flex-1">
         {/* Header */}

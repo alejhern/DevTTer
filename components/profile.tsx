@@ -10,7 +10,7 @@ export function Profile({ user }: { user: User }) {
           alt={user.name || "User Avatar"}
           className="rounded-full w-24 h-24"
           size="lg"
-          src={user.photoURL || undefined}
+          src={user.avatar || undefined}
         />
         <h1 className="text-4xl font-semibold">@{user.userName}</h1>
         <h1 className="text-2xl font-bold">{user.name}</h1>

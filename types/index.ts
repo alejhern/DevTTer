@@ -9,7 +9,7 @@ export interface User {
   userName: string;
   name: string;
   email: string;
-  photoURL: string;
+  avatar: string;
 }
 
 export interface Devit {

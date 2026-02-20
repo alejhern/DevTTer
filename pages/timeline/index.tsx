@@ -16,7 +16,7 @@ const mockPost: Devit = {
     userName: "johndoe",
     name: "John Doe",
     email: "john.doe@example.com",
-    photoURL: "https://randomuser.me/api/portraits/men/1.jpg",
+    avatar: "https://randomuser.me/api/portraits/men/1.jpg",
   },
   createdAt: new Date(),
 };
