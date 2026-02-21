@@ -1,38 +1,31 @@
 import type { Devit } from "@/types";
 
-import {
-  collection,
-  addDoc,
-  query,
-  orderBy,
-  getDocs,
-} from "firebase/firestore";
+import { auth } from "./app";
 
-import { db, auth } from "./app";
-
-export const createDevit = async (devit: Devit) => {
+export const postDevit = async (devit: Devit) => {
   const user = auth.currentUser;
 
-  try {
-    if (!user) throw new Error("User not authenticated");
-
-    const docRef = await addDoc(collection(db, "devits"), devit);
-
-    return docRef.id;
-  } catch (error) {
-    console.error("Error creating devit:", error);
-    throw error;
+  if (!user) {
+    throw new Error("User is not authenticated");
   }
-};
 
-export const getDevits = async (): Promise<Devit[]> => {
-  try {
-    const q = query(collection(db, "devits"), orderBy("createdAt", "desc"));
-    const snapshot = await getDocs(q);
+  const token = await user.getIdToken();
 
-    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as Devit);
-  } catch (error) {
-    console.error("Error fetching devits:", error);
-    throw error;
+  const response = await fetch("/api/compose/devit", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(devit),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    console.error("API ERROR:", response.status, data);
+    throw new Error(data.message || "Failed to post devit");
   }
+
+  return data;
 };

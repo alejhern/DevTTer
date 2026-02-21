@@ -55,6 +55,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "firebase": "12.9.0",
+    "firebase-admin": "^13.6.1",
     "framer-motion": "11.18.2",
     "intl-messageformat": "10.7.16",
     "lucide-react": "^0.574.0",

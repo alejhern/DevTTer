@@ -2,13 +2,15 @@ import type { Devit, User } from "@/types";
 
 import { useState } from "react";
 import { Button } from "@heroui/button";
+import { useRouter } from "next/router";
 
 import AutorizePage from "@/components/autorizePage";
 import { useUser } from "@/hooks/useUser";
-import { createDevit } from "@/firebase/devit";
+import { postDevit } from "@/firebase/devit";
 
 export default function ComposeDevit() {
   const user = useUser();
+  const route = useRouter();
 
   const [devit, setDevit] = useState<Devit>({
     id: crypto.randomUUID(),
@@ -56,9 +58,11 @@ export default function ComposeDevit() {
     try {
       console.log("Posting:", devit);
 
-      await createDevit(devit);
+      await postDevit(devit);
+      console.log("Devit posted successfully");
+      route.push("/");
     } catch (error) {
-      console.error("Error posting:", error);
+      console.error("Error posting devit:", error);
     } finally {
       setIsPosting(false);
     }

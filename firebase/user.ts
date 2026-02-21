@@ -8,7 +8,7 @@ import {
 
 import { auth } from "./app";
 
-const getCurrentUser = async (): Promise<User | null> => {
+export const getCurrentUser = async (): Promise<User | null> => {
   const firebaseUser = auth.currentUser;
 
   if (!firebaseUser) return null;
