@@ -50,13 +50,18 @@ const searchInput = (
   />
 );
 
-function NavLinks({ isMenu = false }: { isMenu?: boolean }) {
+function NavLinks({
+  handlerClickOutside,
+}: {
+  handlerClickOutside?: ReturnType<typeof useNavbar>["handleClickOutside"];
+}) {
+  const isMenu = Boolean(handlerClickOutside);
   const Section = isMenu ? NavbarMenuItem : NavbarItem;
 
   return (
     <>
       {links.map((item) => (
-        <Section key={item.href}>
+        <Section key={item.label}>
           <NextLink
             className={clsx(
               linkStyles({ color: "foreground" }),
@@ -64,6 +69,7 @@ function NavLinks({ isMenu = false }: { isMenu?: boolean }) {
             )}
             color="foreground"
             href={item.href}
+            onClick={handlerClickOutside}
           >
             {item.label}
           </NextLink>
@@ -73,14 +79,18 @@ function NavLinks({ isMenu = false }: { isMenu?: boolean }) {
   );
 }
 
-function AccountActios({
+function AccountActions({
   handlerLogin,
   handlerLogout,
+  handlerClickOutside,
 }: {
   handlerLogin: ReturnType<typeof useNavbar>["handlerLogin"];
   handlerLogout: ReturnType<typeof useNavbar>["handlerLogout"];
+  handlerClickOutside?: ReturnType<typeof useNavbar>["handleClickOutside"];
 }) {
   const user = useUser();
+  const isMenu = Boolean(handlerClickOutside);
+  const hiddenOnMobile = !isMenu ? "hidden lg:flex" : "flex";
 
   if (user) {
     return (
@@ -100,14 +110,27 @@ function AccountActios({
               </span>
             </button>
           </DropdownTrigger>
-          <DropdownMenu aria-label="User Menu" variant="flat">
-            <DropdownItem key="profile" className="h-14 gap-2">
+          <DropdownMenu
+            aria-label="User Menu"
+            className={hiddenOnMobile}
+            variant="flat"
+          >
+            <DropdownItem
+              key="user-info"
+              className="h-14 gap-2"
+              textValue={user.email}
+            >
               <p className="font-semibold">Signed in as</p>
               <p className="font-semibold">{user.email}</p>
             </DropdownItem>
             <>
               {accountLinks.map((item) => (
-                <DropdownItem key={item.href} className="h-12">
+                <DropdownItem
+                  key={item.label}
+                  className="h-12"
+                  textValue={item.label}
+                  onClick={handlerClickOutside}
+                >
                   <NextLink
                     className={clsx(
                       linkStyles({ color: "foreground" }),
@@ -124,7 +147,10 @@ function AccountActios({
             <DropdownItem
               key="logout"
               className="h-12 text-red-500 hover:bg-red-50"
-              onClick={handlerLogout}
+              onClick={() => {
+                handlerLogout();
+                handlerClickOutside?.();
+              }}
             >
               Logout
             </DropdownItem>
@@ -140,7 +166,10 @@ function AccountActios({
         color="primary"
         size="lg"
         variant="outline"
-        onClick={handlerLogin}
+        onClick={() => {
+          handlerLogin();
+          handlerClickOutside?.();
+        }}
       >
         Login
       </Button>
@@ -149,8 +178,14 @@ function AccountActios({
 }
 
 export default function Navbar() {
-  const { isLoggingOpen, closeLogin, handlerLogin, handlerLogout } =
-    useNavbar();
+  const {
+    isLoggingOpen,
+    closeLogin,
+    handlerLogin,
+    handlerLogout,
+    menuToggleRef,
+    handleClickOutside,
+  } = useNavbar();
 
   return (
     <>
@@ -184,7 +219,7 @@ export default function Navbar() {
             <ThemeSwitch />
           </NavbarItem>
           <NavbarItem className="hidden lg:flex">{searchInput}</NavbarItem>
-          <AccountActios
+          <AccountActions
             handlerLogin={handlerLogin}
             handlerLogout={handlerLogout}
           />
@@ -193,15 +228,16 @@ export default function Navbar() {
         {/* MOBILE */}
         <NavbarContent className="lg:hidden basis-1 pl-4" justify="end">
           <ThemeSwitch />
-          <NavbarMenuToggle />
+          <NavbarMenuToggle ref={menuToggleRef} />
         </NavbarContent>
 
         {/* MOBILE MENU */}
         <NavbarMenu>
           {searchInput}
           <div className="mx-4 mt-2 flex flex-col gap-2">
-            <NavLinks isMenu />
-            <AccountActios
+            <NavLinks handlerClickOutside={handleClickOutside} />
+            <AccountActions
+              handlerClickOutside={handleClickOutside}
               handlerLogin={handlerLogin}
               handlerLogout={handlerLogout}
             />

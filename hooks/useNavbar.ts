@@ -1,9 +1,10 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 
 import { logout } from "@/firebase/user";
 
 export function useNavbar() {
   const [isLoggingOpen, setIsLoggingOpen] = useState<boolean>(false);
+  const menuToggleRef = useRef<HTMLButtonElement>(null);
 
   const handlerLogin = useCallback(() => {
     setIsLoggingOpen(true);
@@ -21,10 +22,18 @@ export function useNavbar() {
     setIsLoggingOpen(false);
   }, []);
 
+  const handleClickOutside = useCallback(() => {
+    if (menuToggleRef.current) {
+      menuToggleRef.current.click();
+    }
+  }, []);
+
   return {
     handlerLogin,
     handlerLogout,
     isLoggingOpen,
     closeLogin,
+    menuToggleRef,
+    handleClickOutside,
   };
 }
