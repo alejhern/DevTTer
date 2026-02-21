@@ -74,14 +74,14 @@ function NavLinks({ isMenu = false }: { isMenu?: boolean }) {
 }
 
 function AccountActios({
-  user,
   handlerLogin,
   handlerLogout,
 }: {
-  user: ReturnType<typeof useUser>;
   handlerLogin: ReturnType<typeof useNavbar>["handlerLogin"];
   handlerLogout: ReturnType<typeof useNavbar>["handlerLogout"];
 }) {
+  const user = useUser();
+
   if (user) {
     return (
       <NavbarItem className="flex items-center">
@@ -149,7 +149,6 @@ function AccountActios({
 }
 
 export default function Navbar() {
-  const user = useUser();
   const { isLoggingOpen, closeLogin, handlerLogin, handlerLogout } =
     useNavbar();
 
@@ -188,7 +187,6 @@ export default function Navbar() {
           <AccountActios
             handlerLogin={handlerLogin}
             handlerLogout={handlerLogout}
-            user={user}
           />
         </NavbarContent>
 
@@ -206,7 +204,6 @@ export default function Navbar() {
             <AccountActios
               handlerLogin={handlerLogin}
               handlerLogout={handlerLogout}
-              user={user}
             />
           </div>
         </NavbarMenu>

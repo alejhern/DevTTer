@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { GithubIcon, GoogleIcon } from "@/components/icons";
-import { loginWithGithub } from "@/firebase/client";
+import { loginWithGithub } from "@/firebase/user";
 
 interface LoginFormProps {
   onClose: () => void;

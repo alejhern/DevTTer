@@ -5,6 +5,7 @@ import { Button } from "@heroui/button";
 
 import AutorizePage from "@/components/autorizePage";
 import { useUser } from "@/hooks/useUser";
+import { createDevit } from "@/firebase/devit";
 
 export default function ComposeDevit() {
   const user = useUser();
@@ -55,15 +56,7 @@ export default function ComposeDevit() {
     try {
       console.log("Posting:", devit);
 
-      setDevit({
-        id: crypto.randomUUID(),
-        title: "",
-        content: "",
-        author: user as User,
-        createdAt: new Date(),
-        code: undefined,
-        imageUrl: "",
-      });
+      await createDevit(devit);
     } catch (error) {
       console.error("Error posting:", error);
     } finally {
@@ -121,7 +114,7 @@ export default function ComposeDevit() {
               <h1 className="text-sm text-zinc-500">Code (optional)</h1>
 
               <select
-                className="text-sm border rounded-md px-2 py-1"
+                className="text-sm border rounded-md px-2 py-1 dark:bg-zinc-800 dark:border-zinc-700"
                 value={devit.code?.language ?? "typescript"}
                 onChange={handleCodeChange("language")}
               >
