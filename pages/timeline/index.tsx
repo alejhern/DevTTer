@@ -1,55 +1,50 @@
 import type { Devit } from "@/types";
 
-import { title } from "@/components/primitives";
+import { useEffect, useState } from "react";
+
 import Post from "@/components/post";
+import { getDevits } from "@/firebase/devits";
 
-const mockPost: Devit = {
-  id: "1",
-  title: "Hello World",
-  content: "This is my first post on Devtter!",
-  code: {
-    language: "typescript",
-    content: "console.log('Hello Devtter!');",
-  },
-  author: {
-    id: "123",
-    userName: "johndoe",
-    name: "John Doe",
-    email: "john.doe@example.com",
-    avatar: "https://randomuser.me/api/portraits/men/1.jpg",
-  },
-  createdAt: new Date(),
-};
+export default function Timeline() {
+  const [devits, setDevits] = useState<Devit[]>([]);
 
-export default function Timeline({ userName }: { userName: string }) {
+  useEffect(() => {
+    getDevits()
+      .then(setDevits)
+      .catch((error) => console.error("Error fetching devits:", error));
+  }, []);
+
   return (
-    <section className="flex flex-col items-center justify-center gap-4 py-8 md:py-10">
-      <div className="inline-block max-w-lg text-center justify-center">
-        <h1 className={title()}>Timeline</h1>
-        <h1>{userName}</h1>
+    <section className="bg-transparent">
+      <div className="max-w-3xl mx-auto px-6 py-20">
+        {/* Header centrado */}
+        <header className="mb-20 text-center">
+          <h1 className="text-4xl md:text-5xl font-semibold tracking-tight">
+            Timeline
+          </h1>
+          <p className="mt-4 text-base text-zinc-500 dark:text-zinc-400">
+            See what people are sharing on Devtter.
+          </p>
+        </header>
+
+        {/* Feed más grande y alargado */}
+        <div className="flex flex-col space-y-20">
+          {devits.length === 0 ? (
+            <p className="text-base text-zinc-400 text-center py-24">
+              No devits yet.
+            </p>
+          ) : (
+            devits.map((devit) => (
+              <div
+                key={devit.id}
+                className="text-lg md:text-xl leading-relaxed transition-opacity hover:opacity-90"
+              >
+                <Post {...devit} />
+              </div>
+            ))
+          )}
+        </div>
       </div>
-      <Post {...mockPost} />
     </section>
   );
 }
-
-Timeline.getInitialProps = async () => {
-  return await fetch("http://localhost:3000/api/hello")
-    .then((res) => {
-      if (res.status !== 200) {
-        throw new Error("Failed to fetch data");
-      }
-
-      return res.json();
-    })
-    .then((data) => {
-      const { userName } = data;
-
-      return { userName };
-    })
-    .catch((err) => {
-      console.error(err);
-
-      return { userName: "Error" };
-    });
-};

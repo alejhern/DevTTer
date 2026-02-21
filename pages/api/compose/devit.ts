@@ -1,4 +1,4 @@
-// pages/api/compose/devit.ts
+import type { Devit, User } from "@/types";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 import { FieldValue } from "firebase-admin/firestore";
@@ -25,14 +25,16 @@ export default async function handler(
     const decodedToken = await adminAuth.verifyIdToken(idToken);
 
     // decodedToken.uid y decodedToken.email están disponibles
-    const currentUser = {
-      uid: decodedToken.uid,
-      email: decodedToken.email,
-      displayName: decodedToken.name || "Anonymous",
-      photoURL: decodedToken.picture || null,
+    const currentUser: User = {
+      id: decodedToken.uid,
+      userName: decodedToken.uid,
+      email: decodedToken.email || "",
+      name: decodedToken.name || "Anonymous",
+      avatar:
+        decodedToken.picture || "https://www.gravatar.com/avatar?d=mp&s=200", // Avatar por defecto
     };
 
-    const devitData = {
+    const devitData: Devit = {
       ...devit,
       author: currentUser,
       createdAt: FieldValue.serverTimestamp(), // Firestore timestamp
