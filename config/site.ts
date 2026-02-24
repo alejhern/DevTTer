@@ -27,8 +27,6 @@ const accountLinks = [
 ];
 
 export const siteConfig = {
-  name: "Next.js + HeroUI",
-  description: "Make beautiful websites regardless of your design experience.",
   navItems: navItems,
   navMenuItems: navItems,
   accountLinks: accountLinks,

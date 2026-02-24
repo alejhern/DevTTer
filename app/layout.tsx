@@ -4,8 +4,33 @@ import { HeroUIProvider } from "@heroui/system";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import clsx from "clsx";
 
-import DefaultLayout from "@/layouts/default";
 import { fontSans } from "@/config/fonts";
+import Navbar from "@/components/navbar";
+
+export const metadata = {
+  title: "DevTTer",
+  description: "A Twitter clone built with Next.js and HeroUI",
+  language: "en",
+  openGraph: {
+    title: "DevTTer",
+    description: "A Twitter clone built with Next.js and HeroUI",
+    url: "https://devtter.com",
+    siteName: "DevTTer",
+    images: [
+      {
+        url: "https://devtter.com/og-image.png",
+        width: 1200,
+        height: 630,
+      },
+    ],
+    type: "website",
+  },
+  icons: {
+    icon: "/favicon.ico",
+  },
+  viewport: "width=device-width, initial-scale=1",
+  robots: "index, follow",
+};
 
 export default function RootLayout({
   children,
@@ -19,7 +44,10 @@ export default function RootLayout({
       >
         <HeroUIProvider>
           <NextThemesProvider attribute="class" defaultTheme="light">
-            <DefaultLayout>{children}</DefaultLayout>
+            <Navbar />
+            <main className="container mx-auto max-w-7xl px-6 flex-grow pt-16">
+              {children}
+            </main>
           </NextThemesProvider>
         </HeroUIProvider>
       </body>
