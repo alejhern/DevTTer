@@ -10,8 +10,9 @@ export async function GET() {
       .get();
 
     const devits = devitsSnapshot.docs.map((doc) => ({
-      id: doc.id,
       ...doc.data(),
+      id: doc.id,
+      createdAt: doc.data().createdAt?.toDate?.(),
     }));
 
     return NextResponse.json(devits, { status: 200 });

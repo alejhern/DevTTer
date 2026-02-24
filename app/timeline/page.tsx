@@ -11,7 +11,13 @@ async function getDevitsFromServer(): Promise<Devit[]> {
       throw new Error("Failed to fetch devits");
     }
 
-    return response.json();
+    const data = await response.json();
+    const devits: Devit[] = data.map((devit: any) => ({
+      ...devit,
+      createdAt: new Date(devit.createdAt),
+    }));
+
+    return devits;
   } catch (error: any) {
     console.error("Error fetching devits:", error);
 

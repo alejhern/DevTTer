@@ -61,7 +61,7 @@ export default function ComposeDevit() {
 
       await postDevit(devit);
       console.log("Devit posted successfully");
-      route.push("/");
+      route.push("/timeline");
     } catch (error) {
       console.error("Error posting devit:", error);
     } finally {

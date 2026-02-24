@@ -18,6 +18,23 @@ import {
   Check,
 } from "lucide-react";
 
+const getTimeAgo = (date: Date) => {
+  const now = new Date();
+  const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+  if (seconds < 60) return `${seconds}sec`;
+  const minutes = Math.floor(seconds / 60);
+
+  if (minutes < 60) return `${minutes}min`;
+  const hours = Math.floor(minutes / 60);
+
+  if (hours < 24) return `${hours}hours`;
+
+  const days = Math.floor(hours / 24);
+
+  return `${days}days`;
+};
+
 export default function Post(post: Devit) {
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
@@ -65,7 +82,7 @@ export default function Post(post: Devit) {
             {post.author.name}
           </span>
           <span className="text-zinc-500">@{post.author.userName}</span>
-          <span className="text-zinc-400">· 2h</span>
+          <span className="text-zinc-400">{getTimeAgo(post.createdAt)}</span>
         </div>
 
         {/* Content */}
