@@ -1,6 +1,7 @@
+"use client";
 import { FirebaseError } from "firebase/app";
 import { useCallback } from "react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";

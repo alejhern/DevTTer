@@ -1,23 +1,30 @@
 import type { Devit } from "@/types";
 
-import { useEffect, useState } from "react";
-
 import Post from "@/components/post";
-import { getDevits } from "@/firebase/devits";
+import { GET } from "@/app/api/devits/route";
 
-export default function Timeline() {
-  const [devits, setDevits] = useState<Devit[]>([]);
+async function getDevitsFromServer(): Promise<Devit[]> {
+  try {
+    const response = await GET();
 
-  useEffect(() => {
-    getDevits()
-      .then(setDevits)
-      .catch((error) => console.error("Error fetching devits:", error));
-  }, []);
+    if (!response.ok) {
+      throw new Error("Failed to fetch devits");
+    }
+
+    return response.json();
+  } catch (error: any) {
+    console.error("Error fetching devits:", error);
+
+    return [];
+  }
+}
+
+export default async function Timeline() {
+  const devits: Devit[] = await getDevitsFromServer();
 
   return (
     <section className="bg-transparent">
       <div className="max-w-3xl mx-auto px-6 py-20">
-        {/* Header centrado */}
         <header className="mb-20 text-center">
           <h1 className="text-4xl md:text-5xl font-semibold tracking-tight">
             Timeline
@@ -27,7 +34,6 @@ export default function Timeline() {
           </p>
         </header>
 
-        {/* Feed más grande y alargado */}
         <div className="flex flex-col space-y-20">
           {devits.length === 0 ? (
             <p className="text-base text-zinc-400 text-center py-24">

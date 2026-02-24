@@ -1,8 +1,9 @@
+"use client";
 import type { Devit, User } from "@/types";
 
 import { useState } from "react";
 import { Button } from "@heroui/button";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 import AutorizePage from "@/components/autorizePage";
 import { useUser } from "@/hooks/useUser";

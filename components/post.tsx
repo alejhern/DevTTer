@@ -1,3 +1,4 @@
+"use client";
 import type { Devit } from "@/types";
 
 import { Avatar } from "@heroui/react";
