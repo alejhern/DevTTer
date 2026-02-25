@@ -1,4 +1,5 @@
 import "@/styles/globals.css";
+import type { Metadata, Viewport } from "next";
 
 import { HeroUIProvider } from "@heroui/system";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
@@ -7,29 +8,16 @@ import clsx from "clsx";
 import { fontSans } from "@/config/fonts";
 import Navbar from "@/components/navbar";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "DevTTer",
   description: "A Twitter clone built with Next.js and HeroUI",
-  language: "en",
-  openGraph: {
-    title: "DevTTer",
-    description: "A Twitter clone built with Next.js and HeroUI",
-    url: "https://devtter.com",
-    siteName: "DevTTer",
-    images: [
-      {
-        url: "https://devtter.com/og-image.png",
-        width: 1200,
-        height: 630,
-      },
-    ],
-    type: "website",
-  },
-  icons: {
-    icon: "/favicon.ico",
-  },
-  viewport: "width=device-width, initial-scale=1",
-  robots: "index, follow",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export default function RootLayout({
