@@ -72,6 +72,7 @@ function NavLinks({
             href={item.href}
             onClick={handlerClickOutside}
           >
+            {<item.icon className="mr-2" size={18} />}
             {item.label}
           </NextLink>
         </Section>
@@ -140,6 +141,7 @@ function AccountActions({
                     color="foreground"
                     href={item.href}
                   >
+                    {<item.icon className="mr-2" size={18} />}
                     {item.label}
                   </NextLink>
                 </DropdownItem>
