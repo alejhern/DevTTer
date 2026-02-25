@@ -2,7 +2,7 @@ import type { Devit } from "@/types";
 
 import { auth } from "./app";
 
-export const postDevit = async (devit: Devit) => {
+export const postDevit = async (devit: Devit, file: File | null) => {
   const user = auth.currentUser;
 
   if (!user) {
@@ -10,14 +10,17 @@ export const postDevit = async (devit: Devit) => {
   }
 
   const token = await user.getIdToken();
+  const formData = new FormData();
+
+  formData.append("devit", JSON.stringify(devit));
+  if (file) formData.append("image", file);
 
   const response = await fetch("/api/compose/devit", {
     method: "POST",
     headers: {
-      "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify(devit),
+    body: formData,
   });
 
   const data = await response.json();

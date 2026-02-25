@@ -90,6 +90,15 @@ export default function Post(post: Devit) {
           {post.content}
         </p>
 
+        {/* Image */}
+        {post.imageUrl && (
+          <img
+            alt={`Posted by ${post.author.name}`}
+            className="mt-4 rounded-lg w-full max-h-96 object-cover"
+            src={post.imageUrl}
+          />
+        )}
+
         {/* Code Block */}
         {post.code && (
           <div className="relative mt-4 rounded-lg border border-zinc-200 dark:border-zinc-700 overflow-hidden group">
@@ -121,19 +130,17 @@ export default function Post(post: Devit) {
         {/* Actions */}
         <div className="flex gap-6 mt-4 text-zinc-500 text-sm">
           <button className="flex items-center gap-1 hover:text-zinc-900 dark:hover:text-zinc-100 transition">
-            <MessageCircle size={16} />
-            12
-          </button>
-
-          <button className="flex items-center gap-1 hover:text-zinc-900 dark:hover:text-zinc-100 transition">
-            <Repeat2 size={16} />4
-          </button>
-
-          <button className="flex items-center gap-1 hover:text-zinc-900 dark:hover:text-zinc-100 transition">
             <Heart size={16} />
-            38
+            {post.likes ?? 0}
           </button>
-
+          <button className="flex items-center gap-1 hover:text-zinc-900 dark:hover:text-zinc-100 transition">
+            <MessageCircle size={16} />
+            {post.comments ?? 0}
+          </button>
+          <button className="flex items-center gap-1 hover:text-zinc-900 dark:hover:text-zinc-100 transition">
+            <Repeat2 size={16} />
+            {post.reDevs ?? 0}
+          </button>
           <button className="hover:text-zinc-900 dark:hover:text-zinc-100 transition">
             <Share size={16} />
           </button>

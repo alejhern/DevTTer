@@ -1,73 +1,22 @@
 "use client";
-import type { Devit, User } from "@/types";
-
-import { useState } from "react";
 import { Button } from "@heroui/button";
-import { useRouter } from "next/navigation";
 
 import AutorizePage from "@/components/autorizePage";
 import { useUser } from "@/hooks/useUser";
-import { postDevit } from "@/firebase/devit";
+import { useComposeDevit } from "@/hooks/useComposeDevit";
+import DragAndDropFile from "@/components/dragAndDropFile";
 
 export default function ComposeDevit() {
   const user = useUser();
-  const route = useRouter();
-
-  const [devit, setDevit] = useState<Devit>({
-    id: crypto.randomUUID(),
-    title: "",
-    content: "",
-    author: user as User,
-    createdAt: new Date(),
-    code: undefined,
-    imageUrl: "",
-  });
-
-  const [isPosting, setIsPosting] = useState(false);
-
-  const handleChange =
-    (field: keyof Devit) =>
-    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      setDevit((prev) => ({
-        ...prev,
-        [field]: e.target.value,
-      }));
-    };
-
-  const handleCodeChange =
-    (field: "language" | "content") =>
-    (
-      e: React.ChangeEvent<
-        HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-      >,
-    ) => {
-      setDevit((prev) => ({
-        ...prev,
-        code: {
-          language: prev.code?.language ?? "typescript",
-          content: prev.code?.content ?? "",
-          [field]: e.target.value,
-        },
-      }));
-    };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!devit.title.trim() || !devit.content.trim()) return;
-
-    setIsPosting(true);
-    try {
-      console.log("Posting:", devit);
-
-      await postDevit(devit);
-      console.log("Devit posted successfully");
-      route.push("/timeline");
-    } catch (error) {
-      console.error("Error posting devit:", error);
-    } finally {
-      setIsPosting(false);
-    }
-  };
+  const {
+    devit,
+    handleChange,
+    handleCodeChange,
+    handleSubmit,
+    file,
+    handlerOnchangeFile,
+    isPosting,
+  } = useComposeDevit(user);
 
   return (
     <AutorizePage user={user}>
@@ -141,13 +90,8 @@ export default function ComposeDevit() {
             />
           </div>
 
-          {/* Image URL */}
-          <input
-            className="w-full border rounded-lg px-4 py-2 outline-none"
-            placeholder="Image URL (optional)"
-            value={devit.imageUrl ?? ""}
-            onChange={handleChange("imageUrl")}
-          />
+          {/* Image Upload */}
+          <DragAndDropFile file={file} handlerOnchange={handlerOnchangeFile} />
         </form>
       </div>
     </AutorizePage>
