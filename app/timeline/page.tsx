@@ -1,6 +1,6 @@
 import type { Devit } from "@/types";
 
-import Post from "@/components/post";
+import { Post } from "@/components/post";
 import { GET } from "@/app/api/devits/route";
 
 async function getDevitsFromServer(): Promise<Devit[]> {
@@ -51,7 +51,7 @@ export default async function Timeline() {
                 key={devit.id}
                 className="text-lg md:text-xl leading-relaxed transition-opacity hover:opacity-90"
               >
-                <Post {...devit} />
+                <Post post={devit} />
               </div>
             ))
           )}
