@@ -89,6 +89,7 @@ export default function DragAndDropFile({
             </p>
             <Button
               color="primary"
+              type="button"
               variant="outline"
               onClick={() => document.getElementById("imageUpload")?.click()}
             >

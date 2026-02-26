@@ -9,22 +9,33 @@ import { adminDb, adminAuth } from "@/firebase/admin";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
-async function uploadImage(devit: Devit, fileBuffer: Buffer): Promise<string> {
-  const fileRef = ref(storage, `devit-images/${devit.id}`);
+async function uploadImage(
+  formData: FormData,
+  idDevit: string,
+): Promise<string> {
+  const imageFile = formData.get("image");
 
-  if (fileBuffer.length > MAX_FILE_SIZE) {
+  if (!(imageFile instanceof File)) {
+    throw new Error("Invalid image file");
+  }
+  const arrayBuffer = await imageFile.arrayBuffer();
+  const buffer = Buffer.from(arrayBuffer);
+
+  if (buffer.length > MAX_FILE_SIZE) {
     throw new Error("Image file must be less than 5MB");
   }
 
-  const mimeType = fileBuffer.toString("utf8", 0, 12); // Check file signature
-
-  if (!mimeType.includes("image")) {
+  if (!imageFile.type.startsWith("image/")) {
     throw new Error("Only image files are allowed");
   }
 
-  await uploadBytes(fileRef, fileBuffer);
+  const storageRef = ref(storage, `devits/${idDevit}/${imageFile.name}`);
 
-  return getDownloadURL(fileRef);
+  await uploadBytes(storageRef, buffer, {
+    contentType: imageFile.type,
+  });
+
+  return await getDownloadURL(storageRef);
 }
 
 export async function POST(req: Request) {
@@ -38,7 +49,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // Parse multipart safely using Next.js Request API
     const formData = await req.formData();
 
     const devitField = formData.get("devit");
@@ -61,23 +71,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // Optional image (expects form field name "image")
-    const imageField = formData.get("image");
-    let imageBuffer: Buffer | null = null;
-
-    if (imageField instanceof File) {
-      const arr = await imageField.arrayBuffer();
-
-      imageBuffer = Buffer.from(arr);
-
-      if (imageBuffer.length > MAX_FILE_SIZE) {
-        return NextResponse.json(
-          { message: "Image file must be less than 5MB" },
-          { status: 400 },
-        );
-      }
-    }
-
     const authHeader = req.headers.get("authorization");
 
     if (!authHeader?.startsWith("Bearer ")) {
@@ -96,9 +89,9 @@ export async function POST(req: Request) {
         decodedToken.picture || "https://www.gravatar.com/avatar?d=mp&s=200",
     };
 
-    const imageUrl = imageBuffer
-      ? await uploadImage(devitData, imageBuffer)
-      : undefined;
+    const imageUrl = formData.has("image")
+      ? await uploadImage(formData, devitData.id)
+      : null;
 
     const devitToSave = {
       ...devitData,
