@@ -1,11 +1,22 @@
 import type { Devit } from "@/types";
 
 import { Post } from "@/components/post";
-import { getDevits } from "@/firebase/devits";
+import { GET } from "@/app/api/devits/route";
 
 async function getDevitsFromServer(): Promise<Devit[]> {
   try {
-    return await getDevits();
+    const response = await GET();
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch devits");
+    }
+
+    const data = await response.json();
+
+    return data.map((devit: Devit) => ({
+      ...devit,
+      createdAt: new Date(devit.createdAt),
+    }));
   } catch (error: any) {
     console.error("Error fetching devits:", error);
 

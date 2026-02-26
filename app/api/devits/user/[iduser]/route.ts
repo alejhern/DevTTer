@@ -4,14 +4,13 @@ import { adminDb } from "@/firebase/admin";
 
 export async function GET(
   req: Request,
-  { params }: { params: { iduser: string } },
+  { params }: { params: Promise<{ iduser: string }> },
 ) {
   try {
-    const { iduser } = params;
-
+    const { iduser } = await params;
     const devitsSnapshot = await adminDb
       .collection("devits")
-      .where("idUser", "==", iduser)
+      .where("author.id", "==", iduser)
       .orderBy("createdAt", "desc")
       .get();
 
