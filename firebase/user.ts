@@ -1,10 +1,6 @@
 import type { User } from "@/types";
 
-import {
-  GithubAuthProvider,
-  signInWithPopup,
-  onAuthStateChanged as firebaseOnAuthStateChanged,
-} from "firebase/auth";
+import { onAuthStateChanged as firebaseOnAuthStateChanged } from "firebase/auth";
 
 import { auth } from "./app";
 
@@ -12,51 +8,23 @@ export const getCurrentUser = async (): Promise<User | null> => {
   const firebaseUser = auth.currentUser;
 
   if (!firebaseUser) return null;
+  const res = await fetch("/api/auth/42/intra/token"); // devuelve datos de usuario desde token en cookie
 
-  // Recuperamos el token guardado
-  const token = localStorage.getItem("github_token");
+  if (res.ok) {
+    const intraUser = await res.json();
 
-  if (token) {
-    // Llamamos a GitHub API
-    const response = await fetch("https://api.github.com/user", {
-      headers: { Authorization: `token ${token}` },
-    });
-    const githubUser = await response.json();
-
-    const user: User = {
+    return {
       id: firebaseUser.uid,
-      userName: githubUser.login,
-      name: firebaseUser.displayName || githubUser.name || "GitHub User",
-      email: firebaseUser.email || githubUser.email || "",
-      avatar: firebaseUser.photoURL || githubUser.avatar_url || "",
+      userName: intraUser.login,
+      name:
+        firebaseUser.displayName ||
+        `${intraUser.first_name} ${intraUser.last_name}`,
+      email: firebaseUser.email || intraUser.email,
+      avatar: firebaseUser.photoURL || intraUser.image?.link,
     };
-
-    return user;
   }
 
-  // Si no hay token, devolvemos UID temporal
-  return {
-    id: firebaseUser.uid,
-    userName: firebaseUser.uid,
-    name: firebaseUser.displayName || "User",
-    email: firebaseUser.email || "",
-    avatar: firebaseUser.photoURL || "",
-  };
-};
-
-// LOGIN con GitHub
-export const loginWithGithub = async () => {
-  const provider = new GithubAuthProvider();
-  const result = await signInWithPopup(auth, provider);
-
-  // Aquí sí tenemos el token
-  const credential = GithubAuthProvider.credentialFromResult(result);
-  const token = credential?.accessToken;
-
-  if (!token) throw new Error("No se pudo obtener token de GitHub");
-  localStorage.setItem("github_token", token);
-
-  return await getCurrentUser();
+  return null;
 };
 
 // ON AUTH STATE CHANGED
@@ -81,7 +49,8 @@ export const onAuthStateChanged = (callback: (_user: User | null) => void) => {
 export const logout = async (): Promise<void> => {
   try {
     await auth.signOut();
-    localStorage.removeItem("github_token");
+    await fetch("/api/auth/logout", { method: "DELETE" }); // elimina cookie de token
+    // localStorage.removeItem("github_token");
   } catch (error) {
     throw error;
   }

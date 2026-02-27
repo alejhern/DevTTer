@@ -1,6 +1,6 @@
 import type { Devit } from "@/types";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { v4 as uuidv4 } from "uuid";
 
@@ -20,6 +20,15 @@ export function useComposeDevit(user: ReturnType<typeof useUser>) {
     createdAt: new Date(),
     code: undefined,
   });
+
+  useEffect(() => {
+    if (user) {
+      setDevit((prev) => ({
+        ...prev,
+        author: user,
+      }));
+    }
+  }, [user]);
 
   const handleChange = useCallback(
     (field: keyof Devit) =>

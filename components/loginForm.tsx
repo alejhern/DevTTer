@@ -13,8 +13,46 @@ import {
   FieldSeparator,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { GithubIcon, GoogleIcon } from "@/components/icons";
-import { loginWithGithub } from "@/firebase/user";
+import { GithubIcon } from "@/components/icons";
+import { loginWithGithub } from "@/firebase/usergithub";
+import { Icon42 } from "@/components/icons";
+
+export default function Login42() {
+  const handleLogin = () => {
+    const clientId = process.env.NEXT_PUBLIC_FT_CLIENT_ID;
+    const redirectUri = process.env.NEXT_PUBLIC_FT_REDIRECT_URI;
+
+    if (!clientId || !redirectUri) {
+      console.error("Faltan variables de entorno FT_CLIENT_ID o REDIRECT_URI");
+
+      return;
+    }
+
+    const authUrl =
+      `https://api.intra.42.fr/oauth/authorize?` +
+      `client_id=${clientId}` +
+      `&redirect_uri=${encodeURIComponent(redirectUri)}` +
+      `&response_type=code&scope=public`;
+
+    window.location.href = authUrl;
+  };
+
+  return (
+    <Button
+      className="flex items-center justify-center gap-2"
+      type="button"
+      variant="outline"
+      onClick={handleLogin}
+    >
+      Authenticate with intra
+      {/* Logo 42 */}
+      <Icon42
+        className="w-5 h-5 transition-transform duration-300 group-hover:rotate-6"
+        fill="currentColor"
+      />
+    </Button>
+  );
+}
 
 interface LoginFormProps {
   onClose: () => void;
@@ -80,10 +118,7 @@ export function LoginForm({ onClose }: LoginFormProps) {
               <FieldSeparator>Or continue with</FieldSeparator>
 
               <Field className="grid grid-cols-2 gap-4">
-                <Button type="button" variant="outline">
-                  <GoogleIcon className="mr-2" />
-                  Google
-                </Button>
+                <Login42 />
                 <Button
                   type="button"
                   variant="outline"

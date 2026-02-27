@@ -82,11 +82,11 @@ export async function POST(req: Request) {
 
     const currentUser: User = {
       id: decodedToken.uid,
-      userName: decodedToken.uid,
+      userName: devitData.author.userName,
       email: decodedToken.email || "",
-      name: decodedToken.name || "Anonymous",
+      name: devitData.author.name || "Anonymous",
       avatar:
-        decodedToken.picture || "https://www.gravatar.com/avatar?d=mp&s=200",
+        devitData.author.avatar || "https://www.gravatar.com/avatar?d=mp&s=200",
     };
 
     const imageUrl = formData.has("image")

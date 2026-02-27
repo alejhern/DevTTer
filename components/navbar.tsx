@@ -23,8 +23,7 @@ import { useUser } from "@/hooks/useUser";
 import { useNavbar } from "@/hooks/useNavbar";
 import { ThemeSwitch } from "@/components/theme-switch";
 import { SearchIcon, Logo } from "@/components/icons";
-import { Button } from "@/components/ui/button";
-import { LoginForm } from "@/components/loginForm";
+import Login42 from "@/components/loginForm";
 import { siteConfig } from "@/config/site";
 
 const links = siteConfig.navItems;
@@ -82,11 +81,9 @@ function NavLinks({
 }
 
 function AccountActions({
-  handlerLogin,
   handlerLogout,
   handlerClickOutside,
 }: {
-  handlerLogin: ReturnType<typeof useNavbar>["handlerLogin"];
   handlerLogout: ReturnType<typeof useNavbar>["handlerLogout"];
   handlerClickOutside?: ReturnType<typeof useNavbar>["handleClickOutside"];
 }) {
@@ -165,30 +162,13 @@ function AccountActions({
 
   return (
     <NavbarItem>
-      <Button
-        color="primary"
-        size="lg"
-        variant="outline"
-        onClick={() => {
-          handlerLogin();
-          handlerClickOutside?.();
-        }}
-      >
-        Login
-      </Button>
+      <Login42 />
     </NavbarItem>
   );
 }
 
 export default function Navbar() {
-  const {
-    isLoggingOpen,
-    closeLogin,
-    handlerLogin,
-    handlerLogout,
-    menuToggleRef,
-    handleClickOutside,
-  } = useNavbar();
+  const { handlerLogout, menuToggleRef, handleClickOutside } = useNavbar();
 
   return (
     <>
@@ -222,10 +202,7 @@ export default function Navbar() {
             <ThemeSwitch />
           </NavbarItem>
           <NavbarItem className="hidden lg:flex">{searchInput}</NavbarItem>
-          <AccountActions
-            handlerLogin={handlerLogin}
-            handlerLogout={handlerLogout}
-          />
+          <AccountActions handlerLogout={handlerLogout} />
         </NavbarContent>
 
         {/* MOBILE */}
@@ -241,14 +218,11 @@ export default function Navbar() {
             <NavLinks handlerClickOutside={handleClickOutside} />
             <AccountActions
               handlerClickOutside={handleClickOutside}
-              handlerLogin={handlerLogin}
               handlerLogout={handlerLogout}
             />
           </div>
         </NavbarMenu>
       </HeroUINavbar>
-
-      {isLoggingOpen && <LoginForm onClose={closeLogin} />}
     </>
   );
 }
