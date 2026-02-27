@@ -1,50 +1,11 @@
 import type { Devit } from "@/types";
 
-import { MessageCircle, Heart, Repeat2, Share } from "lucide-react";
+import NextLink from "next/link";
 
 import CodeBlock from "./codeBlock";
+import DevitActions from "./devitActions";
 
-const getTimeAgo = (date: Date) => {
-  const now = new Date();
-  const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-
-  if (seconds < 60) return `${seconds}sec`;
-  const minutes = Math.floor(seconds / 60);
-
-  if (minutes < 60) return `${minutes}min`;
-  const hours = Math.floor(minutes / 60);
-
-  if (hours < 24) return `${hours}hours`;
-
-  const days = Math.floor(hours / 24);
-
-  return `${days}days`;
-};
-
-function PostActions({ post }: { post: Devit }) {
-  return (
-    <div className="flex gap-6 mt-4 text-zinc-500 text-sm">
-      <button className="flex items-center gap-1 hover:text-zinc-900 dark:hover:text-zinc-100 transition">
-        <Heart size={16} />
-        {post.likes ?? 0}
-      </button>
-
-      <button className="flex items-center gap-1 hover:text-zinc-900 dark:hover:text-zinc-100 transition">
-        <MessageCircle size={16} />
-        {post.comments ?? 0}
-      </button>
-
-      <button className="flex items-center gap-1 hover:text-zinc-900 dark:hover:text-zinc-100 transition">
-        <Repeat2 size={16} />
-        {post.reDevs ?? 0}
-      </button>
-
-      <button className="hover:text-zinc-900 dark:hover:text-zinc-100 transition">
-        <Share size={16} />
-      </button>
-    </div>
-  );
-}
+import getTimeAgo from "@/lib/utils";
 
 export function Post({ post }: { post: Devit }) {
   if (!post) return null;
@@ -64,7 +25,11 @@ export function Post({ post }: { post: Devit }) {
             </span>
             <span className="text-zinc-500">@{post.author.userName}</span>
           </div>
-          <span className="text-zinc-400">{getTimeAgo(post.createdAt)}</span>
+          <span className="text-zinc-400">
+            <NextLink className="hover:underline" href={`/devit/${post.id}`}>
+              {getTimeAgo(post.createdAt)}
+            </NextLink>
+          </span>
         </div>
 
         <p className="mt-2 text-[15px] leading-relaxed text-zinc-800 dark:text-zinc-200 whitespace-pre-wrap">
@@ -83,7 +48,7 @@ export function Post({ post }: { post: Devit }) {
           <CodeBlock code={post.code.content} language={post.code.language} />
         )}
 
-        <PostActions post={post} />
+        <DevitActions devit={post} />
       </div>
     </article>
   );
