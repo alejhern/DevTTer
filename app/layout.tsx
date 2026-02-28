@@ -3,7 +3,6 @@ import type { Metadata, Viewport } from "next";
 
 import { HeroUIProvider } from "@heroui/system";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
-import clsx from "clsx";
 
 import { fontSans } from "@/config/fonts";
 import Navbar from "@/components/navbar";
@@ -19,7 +18,6 @@ export const viewport: Viewport = {
   maximumScale: 1,
   userScalable: false,
 };
-
 export default function RootLayout({
   children,
 }: {
@@ -27,17 +25,19 @@ export default function RootLayout({
 }) {
   return (
     <html suppressHydrationWarning className={fontSans.variable} lang="en">
-      <body
-        className={clsx("min-h-screen bg-background font-sans antialiased")}
-      >
-        <HeroUIProvider>
-          <NextThemesProvider attribute="class" defaultTheme="light">
+      <body className="min-h-screen bg-background font-sans antialiased">
+        <NextThemesProvider
+          attribute="class"
+          defaultTheme="light"
+          enableSystem={false}
+        >
+          <HeroUIProvider>
             <Navbar />
             <main className="container mx-auto max-w-7xl px-6 flex-grow pt-16">
               {children}
             </main>
-          </NextThemesProvider>
-        </HeroUIProvider>
+          </HeroUIProvider>
+        </NextThemesProvider>
       </body>
     </html>
   );
