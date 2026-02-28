@@ -18,7 +18,10 @@ export function useComposeDevit(user: ReturnType<typeof useUser>) {
     content: "",
     author: user as NonNullable<typeof user>,
     createdAt: new Date(),
-    code: undefined,
+    code: {
+      language: "typescript",
+      content: "",
+    },
   });
 
   useEffect(() => {

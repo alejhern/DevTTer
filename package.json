@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
+    "dev-ofice": "next dev -H 192.168.1.60 --turbopack",
+    "dev-42": "next dev -H 10.19.200.181 --turbopack",
     "build": "next build",
     "start": "next start",
     "lint": "eslint --fix",
@@ -51,6 +53,7 @@
     "@heroui/toast": "2.0.21",
     "@heroui/tooltip": "2.2.28",
     "@heroui/user": "2.2.25",
+    "@monaco-editor/react": "^4.7.0",
     "@react-aria/visually-hidden": "3.8.30",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

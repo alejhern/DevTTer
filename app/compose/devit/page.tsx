@@ -5,6 +5,7 @@ import AutorizePage from "@/components/autorizePage";
 import { useUser } from "@/hooks/useUser";
 import { useComposeDevit } from "@/hooks/useComposeDevit";
 import DragAndDropFile from "@/components/dragAndDropFile";
+import CodeEditor from "@/components/codeEditor";
 
 export default function ComposeDevit() {
   const user = useUser();
@@ -47,6 +48,7 @@ export default function ComposeDevit() {
 
           {/* Title */}
           <input
+            required
             className="w-full text-4xl font-bold bg-transparent outline-none mb-6"
             placeholder="Title of your devit..."
             value={devit.title}
@@ -69,7 +71,7 @@ export default function ComposeDevit() {
 
               <select
                 className="text-sm border rounded-md px-2 py-1 dark:bg-zinc-800 dark:border-zinc-700"
-                value={devit.code?.language ?? "typescript"}
+                value={devit.code.language ?? "typescript"}
                 onChange={handleCodeChange("language")}
               >
                 <option value="typescript">TypeScript</option>
@@ -78,15 +80,20 @@ export default function ComposeDevit() {
                 <option value="python">Python</option>
                 <option value="css">CSS</option>
                 <option value="html">HTML</option>
+                <option value="c">C</option>
+                <option value="cpp">C++</option>
+                <option value="java">Java</option>
               </select>
             </div>
 
-            <textarea
-              className="w-full min-h-[180px] font-mono text-sm
-            bg-zinc-100 dark:bg-zinc-900 border rounded-lg p-4 outline-none resize-none"
-              placeholder="Paste your code..."
-              value={devit.code?.content ?? ""}
-              onChange={handleCodeChange("content")}
+            <CodeEditor
+              language={devit.code.language ?? "typescript"}
+              value={devit.code.content}
+              onChange={(value) => {
+                const event = { target: { value } } as any;
+
+                handleCodeChange("content")(event);
+              }}
             />
           </div>
 

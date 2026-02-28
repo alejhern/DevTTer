@@ -18,7 +18,7 @@ export interface Devit {
   content: string;
   author: User;
   createdAt: Date;
-  code?: {
+  code: {
     language: string;
     content: string;
   };

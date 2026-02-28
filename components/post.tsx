@@ -44,9 +44,7 @@ export function Post({ post }: { post: Devit }) {
           />
         )}
 
-        {post.code && (
-          <CodeBlock code={post.code.content} language={post.code.language} />
-        )}
+        <CodeBlock code={post.code.content} language={post.code.language} />
 
         <DevitActions devit={post} />
       </div>
