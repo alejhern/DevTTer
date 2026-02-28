@@ -20,7 +20,7 @@ import { Icon42 } from "@/components/icons";
 export default function Login42() {
   const handleLogin = () => {
     const clientId = process.env.NEXT_PUBLIC_FT_CLIENT_ID;
-    const redirectUri = process.env.NEXT_PUBLIC_FT_REDIRECT_URI;
+    const redirectUri = `${process.env.NEXT_PUBLIC_FT_PUBLIC_APP_URL}${process.env.NEXT_PUBLIC_FT_REDIRECT_URI}`;
 
     if (!clientId || !redirectUri) {
       console.error("Faltan variables de entorno FT_CLIENT_ID o REDIRECT_URI");

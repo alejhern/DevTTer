@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
       client_id: process.env.FT_CLIENT_ID!,
       client_secret: process.env.FT_CLIENT_SECRET!,
       code,
-      redirect_uri: process.env.FT_REDIRECT_URI!,
+      redirect_uri: `${process.env.NEXT_PUBLIC_FT_PUBLIC_APP_URL}${process.env.FT_REDIRECT_URI}`,
     }),
   });
 
@@ -59,10 +59,8 @@ export async function GET(req: NextRequest) {
       email: user42.email,
     },
   );
-
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-
-  const response = NextResponse.redirect(`${baseUrl}/succes`);
+  const baseUrl = process.env.NEXT_PUBLIC_FT_PUBLIC_APP_URL;
+  const response = NextResponse.redirect(`${baseUrl}/success`);
 
   // 🔐 Cookie Firebase
   response.cookies.set({
