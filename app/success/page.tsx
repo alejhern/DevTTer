@@ -31,7 +31,7 @@ export default function SuccessPage() {
         router.replace("/profile");
       } catch (err) {
         console.error("Error en success auth:", err);
-        router.replace("/home"); // fallback
+        router.replace("/"); // fallback
       } finally {
         setLoading(false);
       }
