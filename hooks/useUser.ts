@@ -1,17 +1,15 @@
 import type { User } from "@/types";
 
-import { useState, useEffect } from "react";
+import { useContext } from "react";
 
-import { onAuthStateChanged } from "@/firebase/user";
+import { UserContext } from "@/context/user";
 
 export function useUser(): User | null | undefined {
-  const [user, setUser] = useState<User | null | undefined>(undefined);
+  const context = useContext(UserContext);
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(setUser);
+  if (!context) {
+    throw new Error("useUser must be used within a UserProvider");
+  }
 
-    return () => unsubscribe();
-  }, []);
-
-  return user;
+  return context.user;
 }

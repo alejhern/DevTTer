@@ -21,7 +21,7 @@ export default function ComposeDevit() {
   } = useComposeDevit(user);
 
   return (
-    <AutorizePage user={user}>
+    <AutorizePage>
       <div className="w-full">
         <form
           className="

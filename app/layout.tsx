@@ -6,6 +6,7 @@ import { ThemeProvider as NextThemesProvider } from "next-themes";
 
 import { fontSans } from "@/config/fonts";
 import Navbar from "@/components/navbar";
+import { UserProvider } from "@/context/user";
 
 export const metadata: Metadata = {
   title: "DevTTer",
@@ -32,10 +33,12 @@ export default function RootLayout({
           enableSystem={false}
         >
           <HeroUIProvider>
-            <Navbar />
-            <main className="container mx-auto max-w-7xl px-6 flex-grow pt-16">
-              {children}
-            </main>
+            <UserProvider>
+              <Navbar />
+              <main className="container mx-auto max-w-7xl px-6 flex-grow pt-16">
+                {children}
+              </main>
+            </UserProvider>
           </HeroUIProvider>
         </NextThemesProvider>
       </body>

@@ -1,10 +1,13 @@
 import { Loading } from "./ui/Loading";
+
+import { useUser } from "@/hooks/useUser";
 interface AutorizePageProps {
-  user: any;
   children: React.ReactNode;
 }
 
-export default function AutorizePage({ user, children }: AutorizePageProps) {
+export default function AutorizePage({ children }: AutorizePageProps) {
+  const user = useUser();
+
   if (user === undefined) {
     return <Loading />;
   }

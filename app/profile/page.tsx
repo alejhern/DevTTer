@@ -29,7 +29,7 @@ export default function ProfilePage() {
   }, [user]);
 
   return (
-    <AutorizePage user={user}>
+    <AutorizePage>
       <Profile devits={devits} user={user as User} />
     </AutorizePage>
   );
