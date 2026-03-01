@@ -2,7 +2,10 @@ import type { Devit } from "@/types";
 
 import { auth } from "./app";
 
-export const postDevit = async (devit: Devit, file: File | null) => {
+export const postDevit = async (
+  devit: Omit<Devit, "id" | "createdAt">,
+  file: File | null,
+) => {
   const user = auth.currentUser;
 
   if (!user) {

@@ -3,6 +3,7 @@ import type { Devit, User } from "@/types";
 import { FieldValue } from "firebase-admin/firestore";
 import { NextResponse } from "next/server";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { v4 as uuidv4 } from "uuid";
 
 import { storage } from "@/firebase/app";
 import { adminDb, adminAuth } from "@/firebase/admin";
@@ -95,6 +96,7 @@ export async function POST(req: Request) {
 
     const devitToSave = {
       ...devitData,
+      id: uuidv4(),
       author: currentUser,
       imageUrl,
       createdAt: FieldValue.serverTimestamp(),

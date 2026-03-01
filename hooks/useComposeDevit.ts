@@ -2,7 +2,6 @@ import type { Devit } from "@/types";
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { v4 as uuidv4 } from "uuid";
 
 import { useUser } from "@/hooks/useUser";
 import { postDevit } from "@/firebase/devit";
@@ -12,12 +11,10 @@ export function useComposeDevit(user: ReturnType<typeof useUser>) {
   const [isPosting, setIsPosting] = useState(false);
   const route = useRouter();
 
-  const [devit, setDevit] = useState<Devit>({
-    id: uuidv4(),
+  const [devit, setDevit] = useState<Omit<Devit, "id" | "createdAt">>({
     title: "",
     content: "",
     author: user as NonNullable<typeof user>,
-    createdAt: new Date(),
     code: {
       language: "typescript",
       content: "",
