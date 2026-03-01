@@ -8,7 +8,10 @@ export const getCurrentUser = async (): Promise<User | null> => {
   const firebaseUser = auth.currentUser;
 
   if (!firebaseUser) return null;
-  const res = await fetch("/api/auth/42/intra/token"); // devuelve datos de usuario desde token en cookie
+  const res = await fetch("/api/auth/42/intra/token", {
+    method: "GET",
+    credentials: "include",
+  }); // devuelve datos de usuario desde token en cookie
 
   if (res.ok) {
     const intraUser = await res.json();
