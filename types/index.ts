@@ -23,7 +23,7 @@ export interface Devit {
     content: string;
   };
   imageUrl?: string;
-  likes?: number;
+  likes?: Array<string>;
   comments?: number;
   reDevs?: number;
 }
