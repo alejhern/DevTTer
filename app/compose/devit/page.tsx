@@ -6,6 +6,7 @@ import { useUser } from "@/hooks/useUser";
 import { useComposeDevit } from "@/hooks/useComposeDevit";
 import DragAndDropFile from "@/components/dragAndDropFile";
 import CodeEditor from "@/components/codeEditor";
+import CodeUser from "@/components/codeUser";
 
 export default function ComposeDevit() {
   const user = useUser();
@@ -67,7 +68,7 @@ export default function ComposeDevit() {
           {/* Code Section */}
           <div className="mb-8">
             <div className="flex gap-4 items-center mb-3">
-              <h1 className="text-sm text-zinc-500">Code (optional)</h1>
+              <h1 className="text-sm text-zinc-500">Code</h1>
 
               <select
                 className="text-sm border rounded-md px-2 py-1 dark:bg-zinc-800 dark:border-zinc-700"
@@ -85,16 +86,17 @@ export default function ComposeDevit() {
                 <option value="java">Java</option>
               </select>
             </div>
+            <CodeUser>
+              <CodeEditor
+                code={devit.code.content}
+                language={devit.code.language ?? "typescript"}
+                onChange={(value) => {
+                  const event = { target: { value } } as any;
 
-            <CodeEditor
-              language={devit.code.language ?? "typescript"}
-              value={devit.code.content}
-              onChange={(value) => {
-                const event = { target: { value } } as any;
-
-                handleCodeChange("content")(event);
-              }}
-            />
+                  handleCodeChange("content")(event);
+                }}
+              />
+            </CodeUser>
           </div>
 
           {/* Image Upload */}
