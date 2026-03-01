@@ -5,6 +5,7 @@ import getTimeAgo from "@/lib/utils";
 import DevitActions from "@/components/devitActions";
 import BackLink from "@/components/ui/backLink";
 import CodeUserServer from "@/components/codeUseServer";
+import CodeBlock from "@/components/codeBlock";
 
 async function fetchDevit(id: string): Promise<Devit> {
   try {
@@ -88,10 +89,12 @@ export default async function DevitPage({ params }: Props) {
               </p>
 
               {/* Code */}
-              <CodeUserServer
-                code={devit.code.content}
-                language={devit.code.language}
-              />
+              <CodeUserServer>
+                <CodeBlock
+                  code={devit.code.content}
+                  language={devit.code.language}
+                />
+              </CodeUserServer>
 
               {/* Image */}
               {devit.imageUrl && (

@@ -1,18 +1,13 @@
 "use client";
 import CodeUser from "./codeUser";
-import CodeBlock from "./codeBlock";
 
 interface CodeUserServerProps {
-  language: string;
-  code: string;
+  children: React.ReactElement<{
+    code: string;
+    language: string;
+    theme?: "light" | "dark";
+  }>;
 }
-export default function CodeUserServer({
-  language,
-  code,
-}: CodeUserServerProps) {
-  return (
-    <CodeUser>
-      <CodeBlock code={code} language={language} />
-    </CodeUser>
-  );
+export default function CodeUserServer({ children }: CodeUserServerProps) {
+  return <CodeUser>{children}</CodeUser>;
 }

@@ -1,17 +1,12 @@
-"use client";
 import type { Devit } from "@/types";
 
 import NextLink from "next/link";
-import dynamic from "next/dynamic";
 
+import CodeUserServer from "./codeUseServer";
 import CodeBlock from "./codeBlock";
 import DevitActions from "./devitActions";
 
 import getTimeAgo from "@/lib/utils";
-
-const CodeUser = dynamic(() => import("./codeUser"), {
-  ssr: false,
-});
 
 export function Post({ post }: { post: Devit }) {
   if (!post) return null;
@@ -49,9 +44,9 @@ export function Post({ post }: { post: Devit }) {
             src={post.imageUrl}
           />
         )}
-        <CodeUser>
+        <CodeUserServer>
           <CodeBlock code={post.code.content} language={post.code.language} />
-        </CodeUser>
+        </CodeUserServer>
         <DevitActions devit={post} />
       </div>
     </article>

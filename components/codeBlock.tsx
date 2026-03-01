@@ -1,13 +1,9 @@
-import dynamic from "next/dynamic";
+"use client";
 import {
   oneDark,
   oneLight,
 } from "react-syntax-highlighter/dist/esm/styles/prism";
-
-const SyntaxHighlighter = dynamic(
-  () => import("react-syntax-highlighter").then((mod) => mod.Prism),
-  { ssr: false },
-);
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 
 type CodeBlockProps = {
   code: string;
