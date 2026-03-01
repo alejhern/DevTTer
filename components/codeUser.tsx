@@ -1,6 +1,12 @@
 "use client";
 import { useTheme } from "next-themes";
-import { cloneElement, isValidElement, useCallback, useState } from "react";
+import {
+  cloneElement,
+  isValidElement,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 
 interface CodeUserProps {
   children: React.ReactElement<{
@@ -13,6 +19,7 @@ interface CodeUserProps {
 export default function CodeUser({ children }: CodeUserProps) {
   const { resolvedTheme } = useTheme();
   const [copied, setCopied] = useState<boolean>(false);
+  const [mounted, setMounted] = useState<boolean>(false);
 
   const handlerCopy = useCallback(async (targetValue: string) => {
     if (!navigator?.clipboard) {
@@ -24,6 +31,12 @@ export default function CodeUser({ children }: CodeUserProps) {
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
   }, []);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
 
   if (!isValidElement(children) || !resolvedTheme) {
     return null;
