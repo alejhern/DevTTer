@@ -9,12 +9,14 @@ type CodeBlockProps = {
   code: string;
   language: string;
   theme?: "light" | "dark";
+  fullScreen?: boolean;
 };
 
 export default function CodeBlock({
   code,
   language,
   theme = "dark",
+  fullScreen = false,
 }: CodeBlockProps) {
   return (
     <SyntaxHighlighter
@@ -27,6 +29,8 @@ export default function CodeBlock({
           theme === "dark" ? "4px solid #007acc" : "4px solid #007acc",
         fontSize: "0.875rem",
         lineHeight: "1.5",
+        height: fullScreen ? "100%" : "auto",
+        maxHeight: fullScreen ? "100vh" : "200px",
       }}
       language={language}
       lineNumberStyle={{
