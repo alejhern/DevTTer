@@ -5,13 +5,13 @@ import { getDevitWithNComments } from "@/lib/utils";
 
 export async function GET(
   req: Request,
-  { params }: { params: Promise<{ iduser: string }> },
+  { params }: { params: Promise<{ idUser: string }> },
 ) {
   try {
-    const { iduser } = await params;
+    const { idUser } = await params;
     const devitsSnapshot = await adminDb
       .collection("devits")
-      .where("author.id", "==", iduser)
+      .where("author.id", "==", idUser)
       .orderBy("createdAt", "desc")
       .get();
 

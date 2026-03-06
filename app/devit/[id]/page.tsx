@@ -1,6 +1,5 @@
 import type { Devit, Comment } from "@/types";
 
-import { GET } from "@/app/api/devits/[id]/route";
 import getTimeAgo from "@/lib/utils";
 import DevitActions from "@/components/devitActions";
 import BackLink from "@/components/ui/backLink";
@@ -9,7 +8,13 @@ import CodeBlock from "@/components/codeBlock";
 
 async function fetchDevit(id: string): Promise<Devit> {
   try {
-    const response = await GET({} as Request, { params: { id } });
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+    const response = await fetch(`${baseUrl}/api/devits/${id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
     if (!response.ok) {
       throw new Error(`Failed to fetch devit: ${response.statusText}`);

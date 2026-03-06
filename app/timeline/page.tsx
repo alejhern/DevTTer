@@ -1,29 +1,7 @@
 import type { Devit } from "@/types";
 
 import { Post } from "@/components/post";
-import { GET } from "@/app/api/devits/route";
-
-async function getDevitsFromServer(): Promise<Devit[]> {
-  try {
-    const response = await GET();
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch devits");
-    }
-
-    const data = await response.json();
-
-    return data.map((devit: Devit) => ({
-      ...devit,
-      createdAt: new Date(devit.createdAt),
-      comments: Number(devit.comments ?? 0), // Convert comments to number if it's not an array
-    }));
-  } catch (error: any) {
-    console.error("Error fetching devits:", error);
-
-    return [];
-  }
-}
+import { getDevitsFromServer } from "@/lib/utils";
 
 export default async function Timeline() {
   const devits: Devit[] = await getDevitsFromServer();
