@@ -27,12 +27,13 @@ export default function DevitActions({ devit }: { devit: Devit }) {
   const handlerLike = useCallback(async () => {
     if (!user) return;
     try {
-      await likeDevit(devit.id);
       setIsLiked((prev) => !prev);
       setLikesCount((prev) => (isLiked ? prev - 1 : prev + 1));
+      await likeDevit(devit.id);
     } catch (error) {
       console.error("Failed to like devit:", error);
       setIsLiked((prev) => !prev); // Revert like state on error
+      setLikesCount((prev) => (isLiked ? prev + 1 : prev - 1)); // Revert likes count on error
     }
   }, [isLiked, user]);
 
