@@ -37,7 +37,7 @@ export async function PUT(
     let comment: Omit<Comment, "id" | "createdAt">;
 
     try {
-      comment = JSON.parse(commentField);
+      comment = JSON.parse(commentField) as Omit<Comment, "id" | "createdAt">;
     } catch {
       return NextResponse.json(
         { message: "Invalid comment JSON" },
@@ -63,6 +63,12 @@ export async function PUT(
         email: comment.user.email,
         avatar: comment.user.avatar || "",
       },
+      code: comment.code?.content.trim()
+        ? {
+            language: comment.code.language,
+            content: comment.code.content,
+          }
+        : undefined,
       createdAt: FieldValue.serverTimestamp(),
     };
 

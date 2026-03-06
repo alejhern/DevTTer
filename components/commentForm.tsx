@@ -17,8 +17,6 @@ interface CommentFormProps {
   closeForm: () => void;
 }
 
-type CommentInput = Omit<DevitComment, "id" | "createdAt">;
-
 export default function CommentForm({
   devitId,
   showCommentForm,
@@ -27,7 +25,9 @@ export default function CommentForm({
   const user = useUser();
   const router = useRouter();
 
-  const [commentData, setCommentData] = useState<CommentInput>({
+  const [commentData, setCommentData] = useState<
+    Omit<DevitComment, "id" | "createdAt">
+  >({
     comment: "",
     code: undefined,
     user: user as User,
@@ -85,9 +85,7 @@ export default function CommentForm({
     async (e: React.FormEvent) => {
       e.preventDefault();
       if (!commentData.comment.trim()) return;
-
       setIsPosting(true);
-
       try {
         await commentOnDevit(
           devitId,
@@ -120,7 +118,7 @@ export default function CommentForm({
       <div className="fixed inset-0 z-[999]">
         {/* overlay */}
         <div
-          className="absolute inset-0 bg-black/40"
+          className="absolute inset-0 bg-white/40 dark:bg-black/40"
           role="button"
           tabIndex={0}
           onClick={closeForm}
@@ -133,12 +131,15 @@ export default function CommentForm({
 
         {/* panel */}
         <div
-          className={`absolute right-0 top-0 h-full w-[400px] bg-zinc-900 p-6 shadow-xl transform transition-transform duration-300 ${
+          className={`absolute right-0 top-0 h-full w-[800px] 
+          bg-white dark:bg-zinc-900
+          text-gray-900 dark:text-gray-100
+          p-6 shadow-xl transform transition-transform duration-300 ${
             showCommentForm ? "translate-x-0" : "translate-x-full"
           }`}
         >
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-semibold">Comment</h2>
+            <h2 className="text-lg font-semibold">Add Comment</h2>
 
             <Button
               size="icon"

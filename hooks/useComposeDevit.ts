@@ -63,7 +63,12 @@ export function useComposeDevit(user: ReturnType<typeof useUser>) {
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
-      if (!devit.title.trim() || !devit.content.trim()) return;
+      if (
+        !devit.title.trim() ||
+        !devit.content.trim() ||
+        !devit.code.content.trim()
+      )
+        return;
 
       setIsPosting(true);
       try {

@@ -5,6 +5,7 @@ import DevitActions from "@/components/devitActions";
 import BackLink from "@/components/ui/backLink";
 import CodeUserServer from "@/components/codeUseServer";
 import CodeBlock from "@/components/codeBlock";
+import { CommentItem } from "@/components/comment";
 
 async function fetchDevit(id: string): Promise<Devit> {
   try {
@@ -23,9 +24,7 @@ async function fetchDevit(id: string): Promise<Devit> {
     const data = await response.json();
     const comments: Array<Comment> = Array.isArray(data.comments)
       ? data.comments.map((comment: Comment) => ({
-          id: comment.id,
-          comment: comment.comment,
-          user: comment.user,
+          ...comment,
           createdAt: new Date(comment.createdAt),
         }))
       : [];
@@ -55,32 +54,36 @@ export default async function DevitPage({ params }: Props) {
 
   return (
     <>
-      <BackLink className="text-sm text-gray-500 dark:text-gray-400 mb-4 inline-block" />
-      <div className="h-full bg-white dark:bg-black text-gray-900 dark:text-gray-100 transition-colors rounded-2xl">
-        <div className="max-w-7xl mx-auto flex flex-col lg:flex-row rounded-2xl overflow-hidden">
+      <BackLink className="text-sm text-zinc-500 dark:text-zinc-400 mb-6 inline-block" />
+
+      <div className="min-h-full bg-white dark:bg-black text-zinc-900 dark:text-zinc-100 rounded-2xl transition-colors">
+        <div className="mx-auto flex flex-col lg:flex-row overflow-hidden">
           {/* LEFT - Devit */}
-          <main className="flex-1 border-b lg:border-b-0 lg:border-r border-gray-200 dark:border-gray-800 p-6 sm:p-10">
+          <main className="flex-1 border-b lg:border-b-0 lg:border-r border-zinc-200 dark:border-zinc-800 p-6 sm:p-8 lg:p-10">
             <article className="space-y-6">
               {/* Header */}
               <div className="flex items-start gap-4">
                 {devit.author && (
                   <img
                     alt={devit.author.name}
-                    className="rounded-full"
-                    height={48}
+                    className="rounded-full size-12 object-cover"
                     src={devit.author.avatar}
-                    width={48}
                   />
                 )}
 
-                <div className="flex flex-col">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <h2 className="font-bold text-lg">{devit.author.name}</h2>
-                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                <div className="flex flex-col gap-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h2 className="font-semibold text-lg">
+                      {devit.author.name}
+                    </h2>
+
+                    <span className="text-sm text-zinc-500">
                       @{devit.author.userName}
                     </span>
-                    <span className="text-gray-400">·</span>
-                    <span className="text-sm text-gray-500 dark:text-gray-400">
+
+                    <span className="text-zinc-400">·</span>
+
+                    <span className="text-sm text-zinc-500">
                       {getTimeAgo(devit.createdAt)}
                     </span>
                   </div>
@@ -88,7 +91,7 @@ export default async function DevitPage({ params }: Props) {
               </div>
 
               {/* Content */}
-              <p className="text-xl leading-relaxed whitespace-pre-wrap">
+              <p className="text-lg leading-relaxed whitespace-pre-wrap">
                 {devit.content}
               </p>
 
@@ -102,7 +105,7 @@ export default async function DevitPage({ params }: Props) {
 
               {/* Image */}
               {devit.imageUrl && (
-                <div className="rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-800">
+                <div className="rounded-xl overflow-hidden border border-zinc-200 dark:border-zinc-800">
                   <img
                     alt={`devit img posted by ${devit.author.name}`}
                     className="w-full object-cover"
@@ -112,35 +115,30 @@ export default async function DevitPage({ params }: Props) {
               )}
 
               {/* Actions */}
-              <div className="pt-4 border-t border-gray-200 dark:border-gray-800">
+              <div className="pt-4 border-t border-zinc-200 dark:border-zinc-800">
                 <DevitActions devit={devit} />
               </div>
             </article>
           </main>
 
           {/* RIGHT - Comments */}
-          <aside className="w-full lg:w-[420px] bg-gray-50 dark:bg-neutral-950 p-6 sm:p-8 overflow-y-auto rounded-r-2xl">
-            <h3 className="text-lg font-bold mb-6">
+          <aside
+            className="
+            w-full
+            lg:basis-[40%]
+            lg:max-w-lg
+            bg-zinc-50 dark:bg-neutral-950
+            p-6 sm:p-8
+            overflow-y-auto
+          "
+          >
+            <h3 className="text-lg font-semibold mb-6">
               Comments ({comments.length})
             </h3>
 
-            <div className="space-y-4">
+            <div className="flex flex-col gap-4">
               {comments.map((comment) => (
-                <div
-                  key={comment.id}
-                  className="bg-white dark:bg-neutral-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-4 transition-colors"
-                >
-                  <div className="flex justify-between items-center mb-1">
-                    <span className="font-semibold">{comment.user.name}</span>
-                    <span className="text-xs text-gray-500 dark:text-gray-400">
-                      {getTimeAgo(comment.createdAt)}
-                    </span>
-                  </div>
-
-                  <p className="text-sm text-gray-700 dark:text-gray-300">
-                    {comment.comment}
-                  </p>
-                </div>
+                <CommentItem key={comment.id} comment={comment} />
               ))}
             </div>
           </aside>
