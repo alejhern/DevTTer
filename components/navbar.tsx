@@ -111,12 +111,12 @@ function AccountActions({
           </DropdownTrigger>
           <DropdownMenu
             aria-label="User Menu"
-            className={hiddenOnMobile}
+            className={hiddenOnMobile + " bg-white dark:bg-black rounded-md "}
             variant="flat"
           >
             <DropdownItem
               key="user-info"
-              className="h-14 gap-2"
+              className={clsx(linkStyles({ color: "primary" }), "h-14 p-2")}
               textValue={user.email}
             >
               <p className="font-semibold">Signed in as</p>
@@ -126,7 +126,11 @@ function AccountActions({
               {accountLinks.map((item) => (
                 <DropdownItem
                   key={item.label}
-                  className="h-12"
+                  className={clsx(
+                    linkStyles({ color: "foreground" }),
+                    "h-12",
+                    "data-[active=true]:bg-default-100 data-[active=true]:text-primary",
+                  )}
                   textValue={item.label}
                   onClick={handlerClickOutside}
                 >
@@ -146,7 +150,12 @@ function AccountActions({
             </>
             <DropdownItem
               key="logout"
-              className="h-12 text-red-500 hover:bg-red-50"
+              className={clsx(
+                linkStyles({ color: "foreground" }),
+                "h-12 text-red-500 bg-dark hover:bg-red-500 hover:text-white",
+                "data-[active=true]:bg-red-500 data-[active=true]:text-white",
+              )}
+              textValue="Logout"
               onClick={() => {
                 handlerLogout();
                 handlerClickOutside?.();

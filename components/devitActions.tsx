@@ -66,6 +66,7 @@ export default function DevitActions({ devit }: { devit: Devit }) {
         </Button>
       </div>
       {showCommentForm &&
+        user &&
         createPortal(
           <CommentForm
             closeForm={() => setShowCommentForm(false)}
