@@ -10,6 +10,11 @@ export async function GET(
 
   try {
     const devitDoc = await adminDb.collection("devits").doc(id).get();
+    const commentsSnapshot = await devitDoc.ref.collection("comments").get();
+    const comments = commentsSnapshot.docs.map((doc) => ({
+      ...doc.data(),
+      createdAt: doc.data().createdAt?.toDate?.(),
+    }));
 
     if (!devitDoc.exists) {
       return NextResponse.json({ message: "Devit not found" }, { status: 404 });
@@ -19,6 +24,7 @@ export async function GET(
       ...devitDoc.data(),
       id: devitDoc.id,
       createdAt: devitDoc.data()?.createdAt?.toDate?.(),
+      comments: comments,
     };
 
     return NextResponse.json(devitData, { status: 200 });

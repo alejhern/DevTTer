@@ -21,3 +21,22 @@ export default function getTimeAgo(date: Date) {
 
   return `${days}days`;
 }
+
+export const getDevitWithNComments = async (
+  devitsSnapshot: FirebaseFirestore.QuerySnapshot<FirebaseFirestore.DocumentData>,
+) => {
+  return await Promise.all(
+    devitsSnapshot.docs.map(async (doc) => {
+      const commentsSnap = await doc.ref.collection("comments").count().get();
+
+      const commentsCount = commentsSnap.data().count ?? 0;
+
+      return {
+        ...doc.data(),
+        id: doc.id,
+        createdAt: doc.data().createdAt?.toDate?.(),
+        comments: commentsCount,
+      };
+    }),
+  );
+};

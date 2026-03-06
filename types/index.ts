@@ -12,18 +12,28 @@ export interface User {
   avatar: string;
 }
 
+export interface CodeSnippet {
+  language: string;
+  content: string;
+}
+
+export interface Comment {
+  id: string;
+  comment: string;
+  user: User;
+  code?: CodeSnippet;
+  createdAt: Date;
+}
+
 export interface Devit {
   id: string;
   title: string;
   content: string;
   author: User;
   createdAt: Date;
-  code: {
-    language: string;
-    content: string;
-  };
+  code: CodeSnippet;
   imageUrl?: string;
   likes?: Array<string>;
-  comments?: number;
+  comments?: Array<Comment> | Number;
   reDevs?: number;
 }

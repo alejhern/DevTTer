@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { adminDb } from "@/firebase/admin";
+import { getDevitWithNComments } from "@/lib/utils";
 
 export async function GET() {
   try {
@@ -9,11 +10,7 @@ export async function GET() {
       .orderBy("createdAt", "desc")
       .get();
 
-    const devits = devitsSnapshot.docs.map((doc) => ({
-      ...doc.data(),
-      id: doc.id,
-      createdAt: doc.data().createdAt?.toDate?.(),
-    }));
+    const devits = await getDevitWithNComments(devitsSnapshot);
 
     return NextResponse.json(devits, { status: 200 });
   } catch (error: any) {

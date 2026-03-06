@@ -78,3 +78,37 @@ export const likeDevit = async (devitId: string) => {
 
   return data;
 };
+
+export const commentOnDevit = async (
+  devitId: string,
+  comment: Omit<Comment, "id" | "createdAt">,
+) => {
+  const user = auth.currentUser;
+
+  if (!user) {
+    throw new Error("User is not authenticated");
+  }
+
+  const token = await user.getIdToken();
+
+  const formData = new FormData();
+
+  formData.append("comment", JSON.stringify(comment));
+
+  const response = await fetch(`/api/compose/devit/${devitId}/comment`, {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: formData,
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    console.error("API ERROR:", response.status, data);
+    throw new Error(data.message || "Failed to comment on devit");
+  }
+
+  return data;
+};

@@ -16,6 +16,7 @@ async function getDevitsFromServer(): Promise<Devit[]> {
     return data.map((devit: Devit) => ({
       ...devit,
       createdAt: new Date(devit.createdAt),
+      comments: Number(devit.comments ?? 0), // Convert comments to number if it's not an array
     }));
   } catch (error: any) {
     console.error("Error fetching devits:", error);

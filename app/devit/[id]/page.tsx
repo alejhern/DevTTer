@@ -1,4 +1,4 @@
-import type { Devit } from "@/types";
+import type { Devit, Comment } from "@/types";
 
 import { GET } from "@/app/api/devits/[id]/route";
 import getTimeAgo from "@/lib/utils";
@@ -16,8 +16,18 @@ async function fetchDevit(id: string): Promise<Devit> {
     }
 
     const data = await response.json();
+    const comments: Array<Comment> = Array.isArray(data.comments)
+      ? data.comments.map((comment: Comment) => ({
+          id: comment.id,
+          comment: comment.comment,
+          user: comment.user,
+          createdAt: new Date(comment.createdAt),
+        }))
+      : [];
+
     const devit: Devit = {
       ...data,
+      comments,
       createdAt: new Date(data.createdAt),
     };
 
@@ -28,26 +38,15 @@ async function fetchDevit(id: string): Promise<Devit> {
   }
 }
 
-async function fetchComments() {
-  // Placeholder for fetching comments related to the devit
-  return [
-    {
-      id: "comment1",
-      author: "Alice",
-      text: "This is a great devit!",
-      timestamp: "2023-01-01T00:00:00Z",
-    },
-  ];
-}
-type Props = {
+interface Props {
   params: Promise<{ id: string }>;
-};
+}
 
 export default async function DevitPage({ params }: Props) {
   const { id } = await params;
 
   const devit = await fetchDevit(id);
-  const comments = await fetchComments();
+  const comments = Array.isArray(devit.comments) ? devit.comments : [];
 
   return (
     <>
@@ -127,14 +126,14 @@ export default async function DevitPage({ params }: Props) {
                   className="bg-white dark:bg-neutral-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-4 transition-colors"
                 >
                   <div className="flex justify-between items-center mb-1">
-                    <span className="font-semibold">{comment.author}</span>
+                    <span className="font-semibold">{comment.user.name}</span>
                     <span className="text-xs text-gray-500 dark:text-gray-400">
-                      {getTimeAgo(new Date(comment.timestamp))}
+                      {getTimeAgo(comment.createdAt)}
                     </span>
                   </div>
 
                   <p className="text-sm text-gray-700 dark:text-gray-300">
-                    {comment.text}
+                    {comment.comment}
                   </p>
                 </div>
               ))}
