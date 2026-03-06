@@ -20,7 +20,7 @@ async function getUserDevits(userId: string): Promise<Devit[]> {
 
 export default function ProfilePage() {
   const user = useUser();
-  const [devits, setDevits] = useState<Devit[]>([]);
+  const [devits, setDevits] = useState<Devit[] | undefined>(undefined);
 
   useEffect(() => {
     if (!user) return;

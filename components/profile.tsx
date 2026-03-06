@@ -3,8 +3,15 @@ import type { User, Devit } from "@/types";
 import { Avatar } from "@heroui/react";
 
 import { Post } from "./post";
+import { Loading } from "./ui/loading";
 
-export function Profile({ user, devits }: { user: User; devits: Devit[] }) {
+export function Profile({
+  user,
+  devits,
+}: {
+  user: User;
+  devits: Devit[] | undefined;
+}) {
   return (
     <>
       <div className="flex flex-col items-center justify-center gap-4 py-8 md:py-10">
@@ -20,7 +27,9 @@ export function Profile({ user, devits }: { user: User; devits: Devit[] }) {
       </div>
       <div className="max-w-3xl mx-auto px-6 py-10">
         <h2 className="text-2xl font-semibold mb-6">My Devits</h2>
-        {devits.length === 0 ? (
+        {devits == undefined ? (
+          <Loading />
+        ) : devits.length === 0 ? (
           <p className="text-center text-zinc-500">No devits yet.</p>
         ) : (
           <div className="flex flex-col space-y-6">

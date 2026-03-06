@@ -1,4 +1,4 @@
-import { Loading } from "./ui/Loading";
+import { Loading } from "./ui/loading";
 
 import { useUser } from "@/hooks/useUser";
 interface AutorizePageProps {
