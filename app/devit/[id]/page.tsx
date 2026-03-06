@@ -1,46 +1,10 @@
-import type { Devit, Comment } from "@/types";
-
 import getTimeAgo from "@/lib/utils";
 import DevitActions from "@/components/devitActions";
 import BackLink from "@/components/ui/backLink";
 import CodeUserServer from "@/components/codeUseServer";
 import CodeBlock from "@/components/codeBlock";
 import { CommentItem } from "@/components/comment";
-
-async function fetchDevit(id: string): Promise<Devit> {
-  try {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
-    const response = await fetch(`${baseUrl}/api/devits/${id}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch devit: ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    const comments: Array<Comment> = Array.isArray(data.comments)
-      ? data.comments.map((comment: Comment) => ({
-          ...comment,
-          createdAt: new Date(comment.createdAt),
-        }))
-      : [];
-
-    const devit: Devit = {
-      ...data,
-      comments,
-      createdAt: new Date(data.createdAt),
-    };
-
-    return devit;
-  } catch (error: any) {
-    console.error("Error fetching devit:", error);
-    throw error;
-  }
-}
+import { fetchDevit } from "@/firebase/devit";
 
 interface Props {
   params: Promise<{ id: string }>;

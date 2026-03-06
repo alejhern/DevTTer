@@ -1,4 +1,4 @@
-import type { Devit } from "@/types";
+import type { Comment as DevitComment, Devit } from "@/types";
 
 import { auth } from "./app";
 
@@ -37,20 +37,38 @@ export const postDevit = async (
 };
 
 export const fetchDevit = async (devitId: string): Promise<Devit> => {
-  const response = await fetch(`/api/devits/${devitId}`);
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+    const response = await fetch(`${baseUrl}/api/devits/${devitId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
-  if (!response.ok) {
-    throw new Error("Failed to fetch devit");
+    if (!response.ok) {
+      throw new Error(`Failed to fetch devit: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    const comments: Array<DevitComment> = Array.isArray(data.comments)
+      ? data.comments.map((comment: DevitComment) => ({
+          ...comment,
+          createdAt: new Date(comment.createdAt),
+        }))
+      : [];
+
+    const devit: Devit = {
+      ...data,
+      comments,
+      createdAt: new Date(data.createdAt),
+    };
+
+    return devit;
+  } catch (error: any) {
+    console.error("Error fetching devit:", error);
+    throw error;
   }
-
-  const data = await response.json();
-
-  const devit: Devit = {
-    ...data,
-    createdAt: new Date(data.createdAt),
-  };
-
-  return devit;
 };
 
 export const likeDevit = async (devitId: string) => {
@@ -81,7 +99,7 @@ export const likeDevit = async (devitId: string) => {
 
 export const commentOnDevit = async (
   devitId: string,
-  comment: Omit<Comment, "id" | "createdAt">,
+  comment: Omit<DevitComment, "id" | "createdAt">,
 ) => {
   const user = auth.currentUser;
 

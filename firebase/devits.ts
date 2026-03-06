@@ -1,22 +1,32 @@
 import type { Devit } from "@/types";
 
 export const getDevits = async (extraQuery?: string): Promise<Devit[]> => {
-  const response = await fetch(
-    `/api/devits/${extraQuery ? `${extraQuery}` : ""}`,
-    {
-      method: "GET",
-    },
-  );
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+    const response = await fetch(
+      `${baseUrl}/api/devits/${extraQuery ? `${extraQuery}` : ""}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      },
+    );
 
-  if (!response.ok) {
-    throw new Error("Failed to fetch devits");
+    if (!response.ok) {
+      throw new Error("Failed to fetch devits");
+    }
+
+    const data = await response.json();
+
+    return data.map((devit: Devit) => ({
+      ...devit,
+      createdAt: new Date(devit.createdAt),
+      comments: Number(devit.comments ?? 0), // Convert comments to number if it's not an array
+    }));
+  } catch (error: any) {
+    console.error("Error fetching devits:", error);
+
+    return [];
   }
-
-  const data = await response.json();
-  const devits: Devit[] = data.map((devit: any) => ({
-    ...devit,
-    createdAt: new Date(devit.createdAt),
-  }));
-
-  return devits;
 };

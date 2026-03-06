@@ -1,10 +1,10 @@
 import type { Devit } from "@/types";
 
 import { Post } from "@/components/post";
-import { getDevitsFromServer } from "@/lib/utils";
+import { getDevits } from "@/firebase/devits";
 
 export default async function Timeline() {
-  const devits: Devit[] = await getDevitsFromServer();
+  const devits: Devit[] = await getDevits();
 
   return (
     <section className="bg-transparent">
