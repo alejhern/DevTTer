@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { signInWithCustomToken } from "firebase/auth";
 
+import { saveUser } from "@/firebase/user";
 import { auth } from "@/firebase/app";
 
 export default function SuccessPage() {
@@ -26,6 +27,7 @@ export default function SuccessPage() {
         }
 
         await signInWithCustomToken(auth, token);
+        await saveUser();
 
         // 🔥 una vez logueado → redirigir
         router.replace("/profile");

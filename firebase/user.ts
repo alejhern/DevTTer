@@ -30,6 +30,34 @@ export const getCurrentUser = async (): Promise<User | null> => {
   return null;
 };
 
+export const saveUser = async (): Promise<void> => {
+  try {
+    const token = await auth.currentUser?.getIdToken();
+    const user = await getCurrentUser();
+
+    if (!token || !user) {
+      throw new Error("User is not authenticated");
+    }
+
+    const res = await fetch("/api/user", {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify({ user }),
+    });
+
+    if (!res.ok) {
+      throw new Error("Failed to save user data");
+    }
+  } catch (error) {
+    console.error("Error saving user data:", error);
+    throw error;
+  }
+};
+
 // ON AUTH STATE CHANGED
 export const onAuthStateChanged = (callback: (_user: User | null) => void) => {
   return firebaseOnAuthStateChanged(auth, async (firebaseUser) => {
