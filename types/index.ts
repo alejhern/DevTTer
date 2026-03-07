@@ -10,6 +10,7 @@ export interface User {
   name: string;
   email: string;
   avatar: string;
+  lastLogin?: Date | string;
 }
 
 export interface CodeSnippet {
@@ -29,7 +30,7 @@ export interface Devit {
   id: string;
   title: string;
   content: string;
-  author: User;
+  author: string;
   createdAt: Date;
   code: CodeSnippet;
   imageUrl?: string;

@@ -2,9 +2,18 @@ import type { Devit } from "@/types";
 
 import { Post } from "@/components/post";
 import { getDevits } from "@/firebase/devits";
+import { getUser } from "@/firebase/user";
 
 export default async function Timeline() {
   const devits: Devit[] = await getDevits();
+
+  const posts = await Promise.all(
+    devits.map(async (devit) => {
+      const author = await getUser(devit.author);
+
+      return { devit, author };
+    }),
+  );
 
   return (
     <section className="bg-transparent">
@@ -24,12 +33,12 @@ export default async function Timeline() {
               No devits yet.
             </p>
           ) : (
-            devits.map((devit) => (
+            posts.map(({ devit, author }) => (
               <div
                 key={devit.id}
                 className="text-lg md:text-xl leading-relaxed transition-opacity hover:opacity-90"
               >
-                <Post post={devit} />
+                <Post author={author} post={devit} />
               </div>
             ))
           )}

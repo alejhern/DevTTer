@@ -11,7 +11,7 @@ export async function GET(
     const { idUser } = await params;
     const devitsSnapshot = await adminDb
       .collection("devits")
-      .where("author.id", "==", idUser)
+      .where("author", "==", idUser)
       .orderBy("createdAt", "desc")
       .get();
 

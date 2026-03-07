@@ -1,34 +1,25 @@
 import type { Devit } from "@/types";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
 
-import { useUser } from "@/hooks/useUser";
 import { postDevit } from "@/firebase/devit";
 
-export function useComposeDevit(user: ReturnType<typeof useUser>) {
+export function useComposeDevit() {
   const [file, setFile] = useState<File | null>(null);
   const [isPosting, setIsPosting] = useState(false);
   const route = useRouter();
 
-  const [devit, setDevit] = useState<Omit<Devit, "id" | "createdAt">>({
+  const [devit, setDevit] = useState<
+    Omit<Devit, "id" | "author" | "createdAt">
+  >({
     title: "",
     content: "",
-    author: user as NonNullable<typeof user>,
     code: {
       language: "typescript",
       content: "",
     },
   });
-
-  useEffect(() => {
-    if (user) {
-      setDevit((prev) => ({
-        ...prev,
-        author: user,
-      }));
-    }
-  }, [user]);
 
   const handleChange = useCallback(
     (field: keyof Devit) =>

@@ -38,7 +38,9 @@ export function Profile({
                 No devits yet.
               </p>
             ) : (
-              devits.map((devit) => <Post key={devit.id} post={devit} />)
+              devits.map((devit) => (
+                <Post key={devit.id} author={user} post={devit} />
+              ))
             )}
           </div>
         )}

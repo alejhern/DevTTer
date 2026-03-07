@@ -10,7 +10,7 @@ import { getDevits } from "@/firebase/devits";
 
 async function getUserDevits(userId: string): Promise<Devit[]> {
   try {
-    return await getDevits(`user/${userId}`);
+    return await getDevits(`users/${userId}`);
   } catch (error: any) {
     console.error("Error fetching user devits:", error);
 

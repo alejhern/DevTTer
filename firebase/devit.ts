@@ -3,7 +3,7 @@ import type { Comment as DevitComment, Devit } from "@/types";
 import { auth } from "./app";
 
 export const postDevit = async (
-  devit: Omit<Devit, "id" | "createdAt">,
+  devit: Omit<Devit, "id" | "author" | "createdAt">,
   file: File | null,
 ) => {
   const user = auth.currentUser;

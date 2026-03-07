@@ -4,6 +4,21 @@ import { onAuthStateChanged as firebaseOnAuthStateChanged } from "firebase/auth"
 
 import { auth } from "./app";
 
+export const getUser = async (id: string): Promise<User> => {
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+  const res = await fetch(`${baseUrl}/api/users/${id}`, {
+    method: "GET",
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch user data");
+  }
+  const data = await res.json();
+  const user = data.user as User;
+
+  return user;
+};
+
 export const getCurrentUser = async (): Promise<User | null> => {
   const firebaseUser = auth.currentUser;
 
@@ -39,7 +54,7 @@ export const saveUser = async (): Promise<void> => {
       throw new Error("User is not authenticated");
     }
 
-    const res = await fetch("/api/user", {
+    const res = await fetch("/api/users", {
       method: "PUT",
       headers: {
         Authorization: `Bearer ${token}`,

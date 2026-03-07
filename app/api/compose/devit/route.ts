@@ -1,4 +1,4 @@
-import type { Devit, User } from "@/types";
+import type { Devit } from "@/types";
 
 import { FieldValue } from "firebase-admin/firestore";
 import { NextResponse } from "next/server";
@@ -81,15 +81,6 @@ export async function POST(req: Request) {
     const idToken = authHeader.split(" ")[1];
     const decodedToken = await adminAuth.verifyIdToken(idToken);
 
-    const currentUser: User = {
-      id: decodedToken.uid,
-      userName: devitData.author.userName,
-      email: decodedToken.email || "",
-      name: devitData.author.name || "Anonymous",
-      avatar:
-        devitData.author.avatar || "https://www.gravatar.com/avatar?d=mp&s=200",
-    };
-
     const imageUrl = formData.has("image")
       ? await uploadImage(formData, devitData.id)
       : null;
@@ -97,7 +88,7 @@ export async function POST(req: Request) {
     const devitToSave = {
       ...devitData,
       id: uuidv4(),
-      author: currentUser,
+      author: decodedToken.uid,
       imageUrl,
       createdAt: FieldValue.serverTimestamp(),
     };

@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 import getTimeAgo from "@/lib/utils";
 import DevitActions from "@/components/devitActions";
 import BackLink from "@/components/ui/backLink";
@@ -5,6 +7,7 @@ import CodeUserServer from "@/components/codeUseServer";
 import CodeBlock from "@/components/codeBlock";
 import { CommentItem } from "@/components/comment";
 import { fetchDevit } from "@/firebase/devit";
+import { getUser } from "@/firebase/user";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -14,6 +17,7 @@ export default async function DevitPage({ params }: Props) {
   const { id } = await params;
 
   const devit = await fetchDevit(id);
+  const author = await getUser(devit.author);
   const comments = Array.isArray(devit.comments) ? devit.comments : [];
 
   return (
@@ -27,22 +31,22 @@ export default async function DevitPage({ params }: Props) {
             <article className="space-y-6">
               {/* Header */}
               <div className="flex items-start gap-4">
-                {devit.author && (
-                  <img
-                    alt={devit.author.name}
+                {author && (
+                  <Image
+                    alt={author.name}
                     className="rounded-full size-12 object-cover"
-                    src={devit.author.avatar}
+                    height={48}
+                    src={author.avatar}
+                    width={48}
                   />
                 )}
 
                 <div className="flex flex-col gap-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <h2 className="font-semibold text-lg">
-                      {devit.author.name}
-                    </h2>
+                    <h2 className="font-semibold text-lg">{author.name}</h2>
 
                     <span className="text-sm text-zinc-500">
-                      @{devit.author.userName}
+                      @{author.userName}
                     </span>
 
                     <span className="text-zinc-400">·</span>
@@ -70,10 +74,12 @@ export default async function DevitPage({ params }: Props) {
               {/* Image */}
               {devit.imageUrl && (
                 <div className="rounded-xl overflow-hidden border border-zinc-200 dark:border-zinc-800">
-                  <img
-                    alt={`devit img posted by ${devit.author.name}`}
+                  <Image
+                    alt={`devit img posted by ${author.name}`}
                     className="w-full object-cover"
+                    height={400}
                     src={devit.imageUrl}
+                    width={600}
                   />
                 </div>
               )}
