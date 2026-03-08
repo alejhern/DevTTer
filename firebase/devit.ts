@@ -99,7 +99,7 @@ export const likeDevit = async (devitId: string) => {
 
 export const commentOnDevit = async (
   devitId: string,
-  comment: Omit<DevitComment, "id" | "createdAt">,
+  comment: Omit<DevitComment, "id" | "author" | "createdAt">,
 ) => {
   const user = auth.currentUser;
 

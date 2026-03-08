@@ -34,10 +34,13 @@ export async function PUT(
       );
     }
 
-    let comment: Omit<Comment, "id" | "createdAt">;
+    let comment: Omit<Comment, "id" | "author" | "createdAt">;
 
     try {
-      comment = JSON.parse(commentField) as Omit<Comment, "id" | "createdAt">;
+      comment = JSON.parse(commentField) as Omit<
+        Comment,
+        "id" | "author" | "createdAt"
+      >;
     } catch {
       return NextResponse.json(
         { message: "Invalid comment JSON" },
@@ -56,13 +59,7 @@ export async function PUT(
     const newComment = {
       id: `${id}-${Date.now()}`, // Generar un ID único para el comentario
       comment: comment.comment,
-      user: {
-        id: userId,
-        name: comment.user.name,
-        userName: comment.user.userName,
-        email: comment.user.email,
-        avatar: comment.user.avatar || "",
-      },
+      author: userId,
       code: comment.code?.content.trim()
         ? {
             language: comment.code.language,

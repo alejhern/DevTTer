@@ -1,8 +1,8 @@
 "use client";
-import type { Comment as DevitComment, User } from "@/types";
+import type { Comment as DevitComment } from "@/types";
 
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -26,23 +26,13 @@ export default function CommentForm({
   const router = useRouter();
 
   const [commentData, setCommentData] = useState<
-    Omit<DevitComment, "id" | "createdAt">
+    Omit<DevitComment, "id" | "author" | "createdAt">
   >({
     comment: "",
     code: undefined,
-    user: user as User,
   });
 
   const [isPosting, setIsPosting] = useState<boolean>(false);
-
-  useEffect(() => {
-    if (user) {
-      setCommentData((prev) => ({
-        ...prev,
-        user: user as User,
-      }));
-    }
-  }, [user]);
 
   const handleCommentChange = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -87,14 +77,10 @@ export default function CommentForm({
       if (!commentData.comment.trim()) return;
       setIsPosting(true);
       try {
-        await commentOnDevit(
-          devitId,
-          commentData as unknown as Parameters<typeof commentOnDevit>[1],
-        );
+        await commentOnDevit(devitId, commentData);
         setCommentData({
           comment: "",
           code: undefined,
-          user: user as User,
         });
         router.push(`/devit/${devitId}`);
         closeForm();

@@ -18,7 +18,15 @@ export default async function DevitPage({ params }: Props) {
 
   const devit = await fetchDevit(id);
   const author = await getUser(devit.author);
-  const comments = Array.isArray(devit.comments) ? devit.comments : [];
+  const comments = await Promise.all(
+    devit.comments && Array.isArray(devit.comments)
+      ? devit.comments.map(async (comment) => {
+          const commentAuthor = await getUser(comment.author);
+
+          return { comment, author: commentAuthor };
+        })
+      : [],
+  );
 
   return (
     <>
@@ -107,9 +115,19 @@ export default async function DevitPage({ params }: Props) {
             </h3>
 
             <div className="flex flex-col gap-4">
-              {comments.map((comment) => (
-                <CommentItem key={comment.id} comment={comment} />
-              ))}
+              {comments.length === 0 ? (
+                <p className="text-sm text-zinc-400 text-center py-12">
+                  No comments yet.
+                </p>
+              ) : (
+                comments.map(({ comment, author }) => (
+                  <CommentItem
+                    key={comment.id}
+                    author={author}
+                    comment={comment}
+                  />
+                ))
+              )}
             </div>
           </aside>
         </div>

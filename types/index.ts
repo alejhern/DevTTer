@@ -21,7 +21,7 @@ export interface CodeSnippet {
 export interface Comment {
   id: string;
   comment: string;
-  user: User;
+  author: string;
   code?: CodeSnippet;
   createdAt: Date;
 }
