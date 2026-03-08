@@ -5,7 +5,8 @@ import { onAuthStateChanged as firebaseOnAuthStateChanged } from "firebase/auth"
 import { auth } from "./app";
 
 export const getUser = async (id: string): Promise<User> => {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+  const baseUrl =
+    process.env.NEXT_PUBLIC_FT_PUBLIC_APP_URL || "http://localhost:3000";
   const res = await fetch(`${baseUrl}/api/users/${id}`, {
     method: "GET",
   });

@@ -38,7 +38,8 @@ export const postDevit = async (
 
 export const fetchDevit = async (devitId: string): Promise<Devit> => {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+    const baseUrl =
+      process.env.NEXT_PUBLIC_FT_PUBLIC_APP_URL || "http://localhost:3000";
     const response = await fetch(`${baseUrl}/api/devits/${devitId}`, {
       method: "GET",
       headers: {
