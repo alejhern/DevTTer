@@ -4,6 +4,22 @@ import { onAuthStateChanged as firebaseOnAuthStateChanged } from "firebase/auth"
 
 import { auth } from "./app";
 
+export const searchUsers = async (q: string): Promise<User[]> => {
+  const baseUrl =
+    process.env.NEXT_PUBLIC_FT_PUBLIC_APP_URL || "http://localhost:3000";
+  const res = await fetch(`${baseUrl}/api/search?q=${encodeURIComponent(q)}`, {
+    method: "GET",
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to search users");
+  }
+
+  const data = await res.json();
+
+  return data as User[];
+};
+
 export const getUser = async (id: string): Promise<User> => {
   const baseUrl =
     process.env.NEXT_PUBLIC_FT_PUBLIC_APP_URL || "http://localhost:3000";

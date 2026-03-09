@@ -12,8 +12,6 @@ import {
   DropdownMenu,
   DropdownItem,
 } from "@heroui/react";
-import { Kbd } from "@heroui/kbd";
-import { Input } from "@heroui/input";
 import { link as linkStyles } from "@heroui/theme";
 import NextLink from "next/link";
 import clsx from "clsx";
@@ -22,33 +20,13 @@ import { Avatar } from "@heroui/react";
 import { useUser } from "@/hooks/useUser";
 import { useNavbar } from "@/hooks/useNavbar";
 import { ThemeSwitch } from "@/components/theme-switch";
-import { SearchIcon, Logo } from "@/components/icons";
+import { Logo } from "@/components/icons";
 import Login42 from "@/components/loginForm";
 import { siteConfig } from "@/config/site";
+import Searcher from "@/components/searcher";
 
 const links = siteConfig.navItems;
 const accountLinks = siteConfig.accountLinks;
-
-const searchInput = (
-  <Input
-    aria-label="Search"
-    classNames={{
-      inputWrapper: "bg-default-100",
-      input: "text-sm",
-    }}
-    endContent={
-      <Kbd className="hidden lg:inline-block" keys={["command"]}>
-        K
-      </Kbd>
-    }
-    labelPlacement="outside"
-    placeholder="Search..."
-    startContent={
-      <SearchIcon className="text-base text-default-400 pointer-events-none flex-shrink-0" />
-    }
-    type="search"
-  />
-);
 
 function NavLinks({
   handlerClickOutside,
@@ -210,7 +188,9 @@ export default function Navbar() {
           <NavbarItem className="hidden lg:flex gap-2">
             <ThemeSwitch />
           </NavbarItem>
-          <NavbarItem className="hidden lg:flex">{searchInput}</NavbarItem>
+          <NavbarItem className="hidden lg:flex">
+            <Searcher />
+          </NavbarItem>
           <AccountActions handlerLogout={handlerLogout} />
         </NavbarContent>
 
@@ -222,7 +202,7 @@ export default function Navbar() {
 
         {/* MOBILE MENU */}
         <NavbarMenu>
-          {searchInput}
+          <Searcher />
           <div className="mx-4 mt-2 flex flex-col gap-2">
             <NavLinks handlerClickOutside={handleClickOutside} />
             <AccountActions

@@ -31,3 +31,13 @@ export const getDevits = async (extraQuery?: string): Promise<Devit[]> => {
     return [];
   }
 };
+
+export const getUserDevits = async (userId: string): Promise<Devit[]> => {
+  try {
+    return await getDevits(`users/${userId}`);
+  } catch (error: any) {
+    console.error("Error fetching user devits:", error);
+
+    return [];
+  }
+};

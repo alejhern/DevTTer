@@ -1,6 +1,6 @@
 import type { User, Devit } from "@/types";
 
-import { Avatar } from "@heroui/react";
+import Image from "next/image";
 
 import { Post } from "./post";
 import { Loading } from "./ui/loading";
@@ -15,12 +15,15 @@ export function Profile({
   return (
     <>
       <div className="flex flex-col items-center justify-center gap-4 py-8 md:py-10">
-        <Avatar
-          alt={user.name || "User Avatar"}
-          className="rounded-full w-24 h-24"
-          size="lg"
-          src={user.avatar || undefined}
-        />
+        <div className="relative w-36 h-36 rounded-full overflow-hidden shadow-2xl border-2 border-blue-400">
+          <Image
+            alt={user.name || "User Avatar"}
+            className="object-cover w-full h-full"
+            height={140}
+            src={user.avatar}
+            width={140}
+          />
+        </div>
         <h1 className="text-4xl font-semibold">@{user.userName}</h1>
         <h1 className="text-2xl font-bold">{user.name}</h1>
         <p className="text-muted-foreground">{user.email}</p>
