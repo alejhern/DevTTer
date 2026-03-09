@@ -33,7 +33,7 @@ export function Post({ post, author }: { post: Devit; author: User }) {
           </div>
 
           <span className="text-zinc-400">
-            <NextLink className="hover:underline" href={`/devit/${post.id}`}>
+            <NextLink className="hover:underline" href={`/devits/${post.id}`}>
               {getTimeAgo(post.createdAt)}
             </NextLink>
           </span>

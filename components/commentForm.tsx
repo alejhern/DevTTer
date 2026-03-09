@@ -82,7 +82,7 @@ export default function CommentForm({
           comment: "",
           code: undefined,
         });
-        router.push(`/devit/${devitId}`);
+        router.push(`/devits/${devitId}`);
         closeForm();
       } catch (error) {
         console.error("Error posting comment:", error);
