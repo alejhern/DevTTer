@@ -3,8 +3,9 @@ import { getUserDevits } from "@/firebase/devits";
 import { getUser } from "@/firebase/user";
 
 export default async function UserPage({ params }: { params: { id: string } }) {
-  const user = await getUser(params.id);
-  const devits = await getUserDevits(params.id);
+  const { id } = await params;
+  const user = await getUser(id);
+  const devits = await getUserDevits(id);
 
   return (
     <div>

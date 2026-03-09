@@ -83,6 +83,11 @@ export default function Searcher() {
     };
   }, []);
 
+  const onRedirect = useCallback(() => {
+    setResults(undefined);
+    if (inputRef.current) inputRef.current.value = "";
+  }, []);
+
   return (
     <>
       {searchInput(inputRef)}
@@ -94,6 +99,7 @@ export default function Searcher() {
                 key={user.id}
                 className="flex items-center px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
                 href={`/users/${user.id}`}
+                onClick={onRedirect}
               >
                 <Avatar
                   isBordered
