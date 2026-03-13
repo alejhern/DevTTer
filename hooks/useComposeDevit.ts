@@ -65,9 +65,11 @@ export function useComposeDevit() {
       try {
         console.log("Posting:", devit);
 
-        await postDevit(devit, file);
+        const res = await postDevit(devit, file);
+        const idDevit = res.id;
+
         console.log("Devit posted successfully");
-        route.push("/timeline");
+        route.push("/devits/" + idDevit);
       } catch (error) {
         console.error("Error posting devit:", error);
       } finally {
