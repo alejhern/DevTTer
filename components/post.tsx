@@ -9,7 +9,13 @@ import DevitActions from "./devitActions";
 
 import getTimeAgo from "@/lib/utils";
 
-export function Post({ post, author }: { post: Devit; author: User }) {
+interface PostProps {
+  post: Devit;
+  author: User;
+  dissableActions?: boolean;
+}
+
+export function Post({ post, author, dissableActions = false }: PostProps) {
   if (!post) return null;
 
   return (
@@ -55,12 +61,12 @@ export function Post({ post, author }: { post: Devit; author: User }) {
         )}
 
         {post.code && (
-          <CodeUserServer>
+          <CodeUserServer dissableActions={dissableActions}>
             <CodeBlock code={post.code.content} language={post.code.language} />
           </CodeUserServer>
         )}
 
-        <DevitActions devit={post} />
+        {!dissableActions && <DevitActions devit={post} />}
       </div>
     </article>
   );

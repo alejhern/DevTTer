@@ -7,7 +7,11 @@ interface CodeUserServerProps {
     language: string;
     theme?: "light" | "dark";
   }>;
+  dissableActions?: boolean;
 }
-export default function CodeUserServer({ children }: CodeUserServerProps) {
-  return <CodeUser>{children}</CodeUser>;
+export default function CodeUserServer({
+  children,
+  dissableActions = false,
+}: CodeUserServerProps) {
+  return <CodeUser dissableActions={dissableActions}>{children}</CodeUser>;
 }

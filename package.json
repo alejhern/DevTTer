@@ -106,5 +106,9 @@
       "eslint --fix",
       "prettier --write"
     ]
+  },
+  "overrides": {
+    "dompurify": "^3.3.2",
+    "@tootallnate/once": "3.0.1"
   }
 }

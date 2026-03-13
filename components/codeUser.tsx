@@ -17,9 +17,13 @@ interface CodeUserProps {
     language: string;
     theme?: "light" | "dark";
   }>;
+  dissableActions?: boolean;
 }
 
-export default function CodeUser({ children }: CodeUserProps) {
+export default function CodeUser({
+  children,
+  dissableActions = false,
+}: CodeUserProps) {
   const { resolvedTheme } = useTheme();
   const [copied, setCopied] = useState<boolean>(false);
   const [mounted, setMounted] = useState<boolean>(false);
@@ -39,6 +43,10 @@ export default function CodeUser({ children }: CodeUserProps) {
     }
   }, [fullScreen]);
 
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const handlerCopy = useCallback(async (targetValue: string) => {
     if (!navigator?.clipboard) {
       console.warn("Clipboard API not available");
@@ -50,15 +58,10 @@ export default function CodeUser({ children }: CodeUserProps) {
     setTimeout(() => setCopied(false), 1500);
   }, []);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) return null;
-
-  if (!isValidElement(children) || !resolvedTheme) {
+  if (!mounted || !isValidElement(children) || !resolvedTheme) {
     return null;
   }
+
   const props = children.props as Record<string, unknown>;
   const language = props.language as string;
   const code = props.code as string;
@@ -77,26 +80,27 @@ export default function CodeUser({ children }: CodeUserProps) {
             {language}
           </span>
         </div>
-
-        <div className="flex items-center gap-2">
-          <Button
-            disabled={copied}
-            size="icon"
-            type="button"
-            variant="ghost"
-            onClick={() => handlerCopy(code)}
-          >
-            {copied ? "yanked!" : "yank"}
-          </Button>
-          <Button
-            size="icon"
-            type="button"
-            variant="ghost"
-            onClick={() => setFullScreen((prev) => !prev)}
-          >
-            <FullscreenIcon size={16} />
-          </Button>
-        </div>
+        {!dissableActions && (
+          <div className="flex items-center gap-2">
+            <Button
+              disabled={copied}
+              size="icon"
+              type="button"
+              variant="ghost"
+              onClick={() => handlerCopy(code)}
+            >
+              {copied ? "yanked!" : "yank"}
+            </Button>
+            <Button
+              size="icon"
+              type="button"
+              variant="ghost"
+              onClick={() => setFullScreen((prev) => !prev)}
+            >
+              <FullscreenIcon size={16} />
+            </Button>
+          </div>
+        )}
       </div>
       {/* Código */}
       {cloneElement(children, {
