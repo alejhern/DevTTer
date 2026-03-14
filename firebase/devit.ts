@@ -36,6 +36,41 @@ export const postDevit = async (
   return data;
 };
 
+export const putDevit = async (
+  devitId: string,
+  devit: Omit<Devit, "id" | "author" | "createdAt">,
+  file: File | null,
+) => {
+  const user = auth.currentUser;
+
+  if (!user) {
+    throw new Error("User is not authenticated");
+  }
+
+  const token = await user.getIdToken();
+  const formData = new FormData();
+
+  formData.append("devit", JSON.stringify(devit));
+  if (file) formData.append("image", file);
+
+  const response = await fetch(`/api/compose/devit/${devitId}`, {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: formData,
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    console.error("API ERROR:", response.status, data);
+    throw new Error(data.message || "Failed to update devit");
+  }
+
+  return data;
+};
+
 export const fetchDevit = async (devitId: string): Promise<Devit> => {
   try {
     const baseUrl =

@@ -3,9 +3,10 @@ import type { Devit } from "@/types";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
-import { fetchDevit, postDevit } from "@/firebase/devit";
+import { fetchDevit, postDevit, putDevit } from "@/firebase/devit";
 
 export function useComposeDevit(idDevit?: string) {
+  const [id, setId] = useState<string | null>(null);
   const [devit, setDevit] = useState<
     Omit<Devit, "id" | "author" | "createdAt">
   >({
@@ -33,6 +34,7 @@ export function useComposeDevit(idDevit?: string) {
           code: devitDB.code,
           imageUrl: devitDB.imageUrl,
         });
+        setId(devitDB.id);
       } catch (error) {
         console.error("Error fetching devit:", error);
       }
@@ -83,9 +85,13 @@ export function useComposeDevit(idDevit?: string) {
 
       setIsPosting(true);
       try {
-        console.log("Posting:", devit);
+        let res;
 
-        const res = await postDevit(devit, file);
+        if (id) {
+          res = await putDevit(id, devit, file);
+        } else {
+          res = await postDevit(devit, file);
+        }
         const idDevit = res.id;
 
         console.log("Devit posted successfully");

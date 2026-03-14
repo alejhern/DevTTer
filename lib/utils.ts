@@ -1,5 +1,13 @@
 import { clsx, type ClassValue } from "clsx";
+import {
+  deleteObject,
+  getDownloadURL,
+  ref,
+  uploadBytes,
+} from "firebase/storage";
 import { twMerge } from "tailwind-merge";
+
+import { storage } from "@/firebase/app";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -40,3 +48,45 @@ export const getDevitWithNComments = async (
     }),
   );
 };
+
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+
+export async function uploadImage(
+  formData: FormData,
+  idDevit: string,
+): Promise<string> {
+  const imageFile = formData.get("image");
+
+  if (!(imageFile instanceof File)) {
+    throw new Error("Invalid image file");
+  }
+  const arrayBuffer = await imageFile.arrayBuffer();
+  const buffer = Buffer.from(arrayBuffer);
+
+  if (buffer.length > MAX_FILE_SIZE) {
+    throw new Error("Image file must be less than 5MB");
+  }
+
+  if (!imageFile.type.startsWith("image/")) {
+    throw new Error("Only image files are allowed");
+  }
+
+  const storageRef = ref(storage, `devits/${idDevit}/${imageFile.name}`);
+
+  await uploadBytes(storageRef, buffer, {
+    contentType: imageFile.type,
+  });
+
+  return await getDownloadURL(storageRef);
+}
+
+export async function deleteImage(imageUrl: string): Promise<void> {
+  try {
+    const storageRef = ref(storage, imageUrl);
+
+    await deleteObject(storageRef);
+  } catch (error) {
+    console.error("Error deleting image:", error);
+    throw new Error("Failed to delete image");
+  }
+}

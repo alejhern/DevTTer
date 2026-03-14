@@ -2,42 +2,10 @@ import type { Devit } from "@/types";
 
 import { FieldValue } from "firebase-admin/firestore";
 import { NextResponse } from "next/server";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { v4 as uuidv4 } from "uuid";
 
-import { storage } from "@/firebase/app";
-import { adminDb, adminAuth } from "@/firebase/admin";
-
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-
-async function uploadImage(
-  formData: FormData,
-  idDevit: string,
-): Promise<string> {
-  const imageFile = formData.get("image");
-
-  if (!(imageFile instanceof File)) {
-    throw new Error("Invalid image file");
-  }
-  const arrayBuffer = await imageFile.arrayBuffer();
-  const buffer = Buffer.from(arrayBuffer);
-
-  if (buffer.length > MAX_FILE_SIZE) {
-    throw new Error("Image file must be less than 5MB");
-  }
-
-  if (!imageFile.type.startsWith("image/")) {
-    throw new Error("Only image files are allowed");
-  }
-
-  const storageRef = ref(storage, `devits/${idDevit}/${imageFile.name}`);
-
-  await uploadBytes(storageRef, buffer, {
-    contentType: imageFile.type,
-  });
-
-  return await getDownloadURL(storageRef);
-}
+import { adminAuth, adminDb } from "@/firebase/admin";
+import { uploadImage } from "@/lib/utils";
 
 export async function POST(req: Request) {
   try {
