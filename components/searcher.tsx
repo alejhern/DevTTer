@@ -2,7 +2,7 @@
 import type { User } from "@/types";
 
 import { Avatar, Input, Kbd } from "@heroui/react";
-import NextLink from "next/link";
+import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { SearchIcon } from "@/components/icons";
@@ -95,7 +95,7 @@ export default function Searcher() {
         <div className="absolute top-full mt-2 w-full max-w-xs bg-white dark:bg-gray-900 rounded-lg shadow-xl z-20 overflow-hidden border border-gray-200 dark:border-gray-700">
           {results.length > 0 ? (
             results.map((user) => (
-              <NextLink
+              <Link
                 key={user.id}
                 className="flex items-center px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
                 href={`/users/${user.id}`}
@@ -112,7 +112,7 @@ export default function Searcher() {
                 <span className="text-sm font-medium text-gray-800 dark:text-gray-200">
                   @{user.userName}
                 </span>
-              </NextLink>
+              </Link>
             ))
           ) : (
             <p className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">

@@ -15,7 +15,7 @@ import {
 } from "@heroui/react";
 import { link as linkStyles } from "@heroui/theme";
 import clsx from "clsx";
-import NextLink from "next/link";
+import Link from "next/link";
 
 import { Logo } from "@/components/icons";
 import Login42 from "@/components/loginForm";
@@ -40,7 +40,7 @@ function NavLinks({
     <>
       {links.map((item) => (
         <Section key={item.label}>
-          <NextLink
+          <Link
             className={clsx(
               linkStyles({ color: "foreground" }),
               "data-[active=true]:text-primary data-[active=true]:font-medium",
@@ -51,7 +51,7 @@ function NavLinks({
           >
             {<item.icon className="mr-2" size={18} />}
             {item.label}
-          </NextLink>
+          </Link>
         </Section>
       ))}
     </>
@@ -112,7 +112,7 @@ function AccountActions({
                   textValue={item.label}
                   onClick={handlerClickOutside}
                 >
-                  <NextLink
+                  <Link
                     className={clsx(
                       linkStyles({ color: "foreground" }),
                       "w-full h-full",
@@ -122,7 +122,7 @@ function AccountActions({
                   >
                     {<item.icon className="mr-2" size={18} />}
                     {item.label}
-                  </NextLink>
+                  </Link>
                 </DropdownItem>
               ))}
             </>
@@ -167,13 +167,10 @@ export default function Navbar() {
         {/* LEFT */}
         <NavbarContent className="basis-1/5 lg:basis-full" justify="start">
           <NavbarBrand className="gap-3 max-w-fit">
-            <NextLink
-              className="flex justify-start items-center gap-1"
-              href="/"
-            >
+            <Link className="flex justify-start items-center gap-1" href="/">
               <Logo />
               <p className="font-bold text-inherit">DEVTTER</p>
-            </NextLink>
+            </Link>
           </NavbarBrand>
           <div className="hidden lg:flex gap-4 justify-start ml-2">
             <NavLinks />

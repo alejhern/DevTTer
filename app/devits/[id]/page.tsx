@@ -1,4 +1,6 @@
+import { X } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 import CodeBlock from "@/components/codeBlock";
 import CodeUserServer from "@/components/codeUseServer";
@@ -13,10 +15,40 @@ interface Props {
   params: Promise<{ id: string }>;
 }
 
+function DevitNotFound() {
+  return (
+    <div className="flex flex-col items-center justify-center py-24 text-center gap-4">
+      {/* Icono */}
+      <div className="flex items-center justify-center w-16 h-16 rounded-full bg-zinc-100 dark:bg-zinc-800">
+        <X className="w-8 h-8 text-zinc-400" />
+      </div>
+
+      {/* Título */}
+      <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
+        Devit not found
+      </h1>
+
+      {/* Descripción */}
+      <p className="text-sm text-zinc-500 max-w-sm">
+        The devit you are looking for does not exist or has been removed.
+      </p>
+
+      {/* Botón volver */}
+      <Link
+        className="mt-6 inline-block px-6 py-3 bg-black text-white dark:bg-white dark:text-black rounded-xl font-semibold hover:bg-zinc-900 dark:hover:bg-zinc-200 transition-colors"
+        href="/"
+      >
+        Back to Home
+      </Link>
+    </div>
+  );
+}
 export default async function DevitPage({ params }: Props) {
   const { id } = await params;
 
   const devit = await fetchDevit(id);
+
+  if (!devit) return <DevitNotFound />;
   const author = await getUser(devit.author);
   const comments = await Promise.all(
     devit.comments && Array.isArray(devit.comments)

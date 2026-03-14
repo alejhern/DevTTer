@@ -72,40 +72,57 @@ export const putDevit = async (
   return data;
 };
 
-export const fetchDevit = async (devitId: string): Promise<Devit> => {
-  try {
-    const baseUrl =
-      process.env.NEXT_PUBLIC_FT_PUBLIC_APP_URL || "http://localhost:3000";
-    const response = await fetch(`${baseUrl}/api/devits/${devitId}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+export const deleteDevit = async (devitId: string) => {
+  const user = auth.currentUser;
 
-    if (!response.ok) {
-      throw new Error(`Failed to fetch devit: ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    const comments: Array<DevitComment> = Array.isArray(data.comments)
-      ? data.comments.map((comment: DevitComment) => ({
-          ...comment,
-          createdAt: new Date(comment.createdAt),
-        }))
-      : [];
-
-    const devit: Devit = {
-      ...data,
-      comments,
-      createdAt: new Date(data.createdAt),
-    };
-
-    return devit;
-  } catch (error: any) {
-    console.error("Error fetching devit:", error);
-    throw error;
+  if (!user) {
+    throw new Error("User is not authenticated");
   }
+
+  const token = await user.getIdToken();
+
+  const response = await fetch(`/api/compose/devit/${devitId}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    console.error("API ERROR:", response.status, data);
+    throw new Error(data.message || "Failed to delete devit");
+  }
+
+  return data;
+};
+
+export const fetchDevit = async (devitId: string): Promise<Devit> => {
+  const baseUrl =
+    process.env.NEXT_PUBLIC_FT_PUBLIC_APP_URL || "http://localhost:3000";
+  const response = await fetch(`${baseUrl}/api/devits/${devitId}`);
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    return data.devit as Devit; // Intentamos devolver el devit aunque haya un error, para manejarlo en la UI
+  }
+
+  const comments: Array<DevitComment> = Array.isArray(data.comments)
+    ? data.comments.map((comment: DevitComment) => ({
+        ...comment,
+        createdAt: new Date(comment.createdAt),
+      }))
+    : [];
+
+  const devit: Devit = {
+    ...data,
+    comments,
+    createdAt: new Date(data.createdAt),
+  };
+
+  return devit;
 };
 
 export const likeDevit = async (devitId: string) => {

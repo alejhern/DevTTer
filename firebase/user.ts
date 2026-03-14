@@ -28,7 +28,7 @@ export const getUser = async (id: string): Promise<User> => {
   });
 
   if (!res.ok) {
-    throw new Error("Failed to fetch user data");
+    console.error(`Failed to fetch user with id ${id}:`, res.statusText);
   }
   const data = await res.json();
   const user = data.user as User;

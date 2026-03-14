@@ -17,6 +17,7 @@ export function Profile({
       <div className="flex flex-col items-center justify-center gap-4 py-8 md:py-10">
         <div className="relative w-36 h-36 rounded-full overflow-hidden shadow-2xl border-2 border-blue-400">
           <Image
+            priority
             alt={user.name || "User Avatar"}
             className="object-cover w-full h-full"
             height={140}
