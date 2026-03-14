@@ -3,51 +3,34 @@ import type { User } from "@/types";
 
 import { Avatar, Input, Kbd } from "@heroui/react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { SearchIcon } from "@/components/icons";
 import { searchUsers } from "@/firebase/user";
 
-const searchInput = (ref: React.RefObject<HTMLInputElement>) => (
-  <Input
-    ref={ref}
-    aria-label="Search"
-    classNames={{
-      inputWrapper: "bg-default-100",
-      input: "text-sm",
-    }}
-    endContent={
-      <Kbd className="hidden lg:inline-block" keys={["ctrl"]}>
-        K
-      </Kbd>
-    }
-    labelPlacement="outside"
-    placeholder="Search..."
-    startContent={
-      <SearchIcon className="text-base text-default-400 pointer-events-none flex-shrink-0" />
-    }
-    type="search"
-  />
-);
-
 export default function Searcher() {
   const inputRef = useRef<HTMLInputElement>(null);
+  const resultsRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
-  const [results, setResults] = useState<User[] | undefined>(undefined);
 
+  const [results, setResults] = useState<User[] | undefined>(undefined);
+  const path = usePathname();
+
+  // Función de búsqueda
   const performSearch = useCallback(async (query: string) => {
     if (query.trim() === "") return setResults(undefined);
 
     try {
       const results = await searchUsers(query);
 
-      console.log("Search results:", results);
       setResults(results);
     } catch (error) {
       console.error("Search error:", error);
     }
   }, []);
 
+  // Debounce del input
   useEffect(() => {
     const input = inputRef.current;
 
@@ -63,11 +46,10 @@ export default function Searcher() {
 
     input.addEventListener("input", handleInput);
 
-    return () => {
-      input.removeEventListener("input", handleInput);
-    };
+    return () => input.removeEventListener("input", handleInput);
   }, [performSearch]);
 
+  // Ctrl/Cmd + K para enfocar input
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
@@ -78,28 +60,76 @@ export default function Searcher() {
 
     document.addEventListener("keydown", handleKeyDown);
 
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-    };
+    return () => document.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  const onRedirect = useCallback(() => {
+  // Limpiar input y resultados al cambiar de ruta
+  useEffect(() => {
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current);
+      debounceRef.current = null;
+    }
+
     setResults(undefined);
-    if (inputRef.current) inputRef.current.value = "";
+    if (inputRef.current) {
+      inputRef.current.value = "";
+      inputRef.current.blur(); // opcional: quita el foco al navegar
+    }
+  }, [path]);
+
+  // Cerrar dropdown al hacer click fuera
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Node;
+
+      if (
+        resultsRef.current &&
+        !resultsRef.current.contains(target) &&
+        inputRef.current &&
+        !inputRef.current.contains(target)
+      ) {
+        setResults(undefined);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   return (
     <>
-      {searchInput(inputRef)}
+      <Input
+        ref={inputRef}
+        aria-label="Search"
+        classNames={{
+          inputWrapper: "bg-default-100",
+          input: "text-sm",
+        }}
+        endContent={
+          <Kbd className="hidden lg:inline-block" keys={["ctrl"]}>
+            K
+          </Kbd>
+        }
+        labelPlacement="outside"
+        placeholder="Search..."
+        startContent={
+          <SearchIcon className="text-base text-default-400 pointer-events-none flex-shrink-0" />
+        }
+        type="search"
+      />
+
       {results && (
-        <div className="absolute top-full mt-2 w-full max-w-xs bg-white dark:bg-gray-900 rounded-lg shadow-xl z-20 overflow-hidden border border-gray-200 dark:border-gray-700">
+        <div
+          ref={resultsRef}
+          className="absolute top-full mt-2 w-full max-w-xs bg-white dark:bg-gray-900 rounded-lg shadow-xl z-20 overflow-hidden border border-gray-200 dark:border-gray-700"
+        >
           {results.length > 0 ? (
             results.map((user) => (
               <Link
                 key={user.id}
                 className="flex items-center px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
                 href={`/users/${user.id}`}
-                onClick={onRedirect}
               >
                 <Avatar
                   isBordered
