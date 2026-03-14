@@ -4,8 +4,8 @@ import type { Metadata, Viewport } from "next";
 import { HeroUIProvider } from "@heroui/system";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 
-import { fontSans } from "@/config/fonts";
 import Navbar from "@/components/navbar";
+import { fontSans } from "@/config/fonts";
 import { UserProvider } from "@/context/user";
 
 export const metadata: Metadata = {

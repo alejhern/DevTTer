@@ -1,4 +1,4 @@
-import type { User, Devit } from "@/types";
+import type { Devit, User } from "@/types";
 
 import Image from "next/image";
 

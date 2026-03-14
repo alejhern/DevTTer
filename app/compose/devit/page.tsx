@@ -1,15 +1,16 @@
 "use client";
 import { Button } from "@heroui/button";
+import { useSearchParams } from "next/navigation";
 
 import AutorizePage from "@/components/autorizePage";
-import { useUser } from "@/hooks/useUser";
-import { useComposeDevit } from "@/hooks/useComposeDevit";
-import DragAndDropFile from "@/components/dragAndDropFile";
 import CodeEditor from "@/components/codeEditor";
 import CodeUser from "@/components/codeUser";
+import DragAndDropFile from "@/components/dragAndDropFile";
+import { useComposeDevit } from "@/hooks/useComposeDevit";
 
 export default function ComposeDevit() {
-  const user = useUser();
+  const searchParams = useSearchParams();
+  const idDevit = searchParams.get("edit") || undefined;
   const {
     devit,
     handleChange,
@@ -18,7 +19,7 @@ export default function ComposeDevit() {
     file,
     handlerOnchangeFile,
     isPosting,
-  } = useComposeDevit(user);
+  } = useComposeDevit(idDevit);
 
   return (
     <AutorizePage>
@@ -100,7 +101,11 @@ export default function ComposeDevit() {
           </div>
 
           {/* Image Upload */}
-          <DragAndDropFile file={file} handlerOnchange={handlerOnchangeFile} />
+          <DragAndDropFile
+            devitImg={devit.imageUrl}
+            file={file}
+            handlerOnchange={handlerOnchangeFile}
+          />
         </form>
       </div>
     </AutorizePage>

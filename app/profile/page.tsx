@@ -1,12 +1,12 @@
 "use client";
-import type { User, Devit } from "@/types";
+import type { Devit, User } from "@/types";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
-import { useUser } from "@/hooks/useUser";
-import { Profile } from "@/components/profile";
 import AutorizePage from "@/components/autorizePage";
+import { Profile } from "@/components/profile";
 import { getUserDevits } from "@/firebase/devits";
+import { useUser } from "@/hooks/useUser";
 
 export default function ProfilePage() {
   const user = useUser();

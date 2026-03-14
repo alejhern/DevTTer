@@ -7,6 +7,7 @@ import { Button } from "./ui/button";
 interface DragAndDropFileProps {
   file: File | null;
   handlerOnchange: (_file: File | null) => void;
+  devitImg?: string; // URL de imagen existente (Firebase)
 }
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
@@ -14,25 +15,33 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 export default function DragAndDropFile({
   file,
   handlerOnchange,
+  devitImg,
 }: DragAndDropFileProps) {
-  const [preview, setPreview] = useState<string | null>(null);
+  const [preview, setPreview] = useState<string | null>(devitImg || null);
   const [dragActive, setDragActive] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Generar preview cuando cambia el archivo
   useEffect(() => {
-    if (!file) return setPreview(null);
+    if (file) {
+      // Imagen local seleccionada
+      const objectUrl = URL.createObjectURL(file);
 
-    const objectUrl = URL.createObjectURL(file);
+      setPreview(objectUrl);
 
-    setPreview(objectUrl);
+      return () => URL.revokeObjectURL(objectUrl);
+    }
 
-    return () => {
-      URL.revokeObjectURL(objectUrl);
-    };
-  }, [file]);
+    // Si no hay archivo local, mostrar imagen existente
+    if (!file && devitImg) {
+      setPreview(devitImg);
 
-  // Validar archivo
+      return;
+    }
+
+    // Si no hay nada
+    setPreview(null);
+  }, [file, devitImg]);
+
   const validateFile = (file: File) => {
     if (!file.type.startsWith("image/")) {
       setError("Only image files are allowed.");
@@ -51,7 +60,6 @@ export default function DragAndDropFile({
     return true;
   };
 
-  // Manejar archivo seleccionado
   const handleFile = (file: File) => {
     if (validateFile(file)) {
       handlerOnchange(file);
@@ -82,7 +90,7 @@ export default function DragAndDropFile({
           }
         }}
       >
-        {!file ? (
+        {!file && !preview ? (
           <>
             <p className="text-sm text-zinc-500 mb-3">
               Drag & drop your image here (max 5MB)
@@ -121,12 +129,22 @@ export default function DragAndDropFile({
               {/* REMOVE BUTTON */}
               <button
                 className="absolute -top-2 -right-2 bg-red-500 text-white w-6 h-6 rounded-full text-xs flex items-center justify-center shadow hover:scale-110 transition"
+                type="button"
                 onClick={() => handlerOnchange(null)}
               >
                 ✕
               </button>
             </div>
-            <p className="text-sm text-green-500 font-medium">✓ {file.name}</p>
+            {file && (
+              <p className="text-sm text-green-500 font-medium">
+                ✓ {file.name}
+              </p>
+            )}
+            {!file && preview && (
+              <p className="text-sm text-blue-500 font-medium">
+                {preview.split("/").pop()} (existing image)
+              </p>
+            )}
           </div>
         )}
       </div>

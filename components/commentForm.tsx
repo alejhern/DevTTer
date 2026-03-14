@@ -1,15 +1,15 @@
 "use client";
 import type { Comment as DevitComment } from "@/types";
 
+import { X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
-import { X } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
-import { useUser } from "@/hooks/useUser";
 import CodeEditor from "@/components/codeEditor";
 import CodeUser from "@/components/codeUser";
+import { Button } from "@/components/ui/button";
 import { commentOnDevit } from "@/firebase/devit";
+import { useUser } from "@/hooks/useUser";
 
 interface CommentFormProps {
   devitId: string;

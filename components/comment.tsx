@@ -1,4 +1,4 @@
-import type { Comment, CodeSnippet, User } from "@/types";
+import type { CodeSnippet, Comment, User } from "@/types";
 
 import CodeBlock from "./codeBlock";
 import CodeUserServer from "./codeUseServer";

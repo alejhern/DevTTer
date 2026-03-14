@@ -1,13 +1,13 @@
 import Image from "next/image";
 
-import getTimeAgo from "@/lib/utils";
+import CodeBlock from "@/components/codeBlock";
+import CodeUserServer from "@/components/codeUseServer";
+import { CommentItem } from "@/components/comment";
 import DevitActions from "@/components/devitActions";
 import BackLink from "@/components/ui/backLink";
-import CodeUserServer from "@/components/codeUseServer";
-import CodeBlock from "@/components/codeBlock";
-import { CommentItem } from "@/components/comment";
 import { fetchDevit } from "@/firebase/devit";
 import { getUser } from "@/firebase/user";
+import getTimeAgo from "@/lib/utils";
 
 interface Props {
   params: Promise<{ id: string }>;

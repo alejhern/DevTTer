@@ -2,8 +2,8 @@
 
 import type { Devit, User } from "@/types";
 
-import Link from "next/link";
 import { motion } from "framer-motion";
+import Link from "next/link";
 
 import { Post } from "@/components/post";
 import { useUser } from "@/hooks/useUser";

@@ -1,29 +1,29 @@
 "use client";
 import {
-  Navbar as HeroUINavbar,
-  NavbarContent,
-  NavbarMenu,
-  NavbarMenuToggle,
-  NavbarBrand,
-  NavbarItem,
-  NavbarMenuItem,
+  Avatar,
   Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
   DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
+  Navbar as HeroUINavbar,
+  NavbarBrand,
+  NavbarContent,
+  NavbarItem,
+  NavbarMenu,
+  NavbarMenuItem,
+  NavbarMenuToggle,
 } from "@heroui/react";
 import { link as linkStyles } from "@heroui/theme";
-import NextLink from "next/link";
 import clsx from "clsx";
-import { Avatar } from "@heroui/react";
+import NextLink from "next/link";
 
-import { useUser } from "@/hooks/useUser";
-import { useNavbar } from "@/hooks/useNavbar";
-import { ThemeSwitch } from "@/components/theme-switch";
 import { Logo } from "@/components/icons";
 import Login42 from "@/components/loginForm";
-import { siteConfig } from "@/config/site";
 import Searcher from "@/components/searcher";
+import { ThemeSwitch } from "@/components/theme-switch";
+import { siteConfig } from "@/config/site";
+import { useNavbar } from "@/hooks/useNavbar";
+import { useUser } from "@/hooks/useUser";
 
 const links = siteConfig.navItems;
 const accountLinks = siteConfig.accountLinks;

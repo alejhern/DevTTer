@@ -1,15 +1,11 @@
 import type { Devit } from "@/types";
 
-import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
 
-import { postDevit } from "@/firebase/devit";
+import { fetchDevit, postDevit } from "@/firebase/devit";
 
-export function useComposeDevit() {
-  const [file, setFile] = useState<File | null>(null);
-  const [isPosting, setIsPosting] = useState(false);
-  const route = useRouter();
-
+export function useComposeDevit(idDevit?: string) {
   const [devit, setDevit] = useState<
     Omit<Devit, "id" | "author" | "createdAt">
   >({
@@ -20,6 +16,30 @@ export function useComposeDevit() {
       content: "",
     },
   });
+  const [file, setFile] = useState<File | null>(null);
+  const [isPosting, setIsPosting] = useState(false);
+  const route = useRouter();
+
+  useEffect(() => {
+    if (idDevit === undefined) return;
+
+    const loadDevit = async () => {
+      try {
+        const devitDB = await fetchDevit(idDevit);
+
+        setDevit({
+          title: devitDB.title,
+          content: devitDB.content,
+          code: devitDB.code,
+          imageUrl: devitDB.imageUrl,
+        });
+      } catch (error) {
+        console.error("Error fetching devit:", error);
+      }
+    };
+
+    loadDevit();
+  }, [idDevit]);
 
   const handleChange = useCallback(
     (field: keyof Devit) =>

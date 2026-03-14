@@ -1,8 +1,9 @@
 "use client";
 import { FirebaseError } from "firebase/app";
-import { useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { useCallback } from "react";
 
+import { GithubIcon, Icon42 } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -13,9 +14,7 @@ import {
   FieldSeparator,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { GithubIcon } from "@/components/icons";
 import { loginWithGithub } from "@/firebase/usergithub";
-import { Icon42 } from "@/components/icons";
 
 export default function Login42() {
   const handleLogin = () => {

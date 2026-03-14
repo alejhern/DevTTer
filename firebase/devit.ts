@@ -1,4 +1,4 @@
-import type { Comment as DevitComment, Devit } from "@/types";
+import type { Devit, Comment as DevitComment } from "@/types";
 
 import { auth } from "./app";
 

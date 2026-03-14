@@ -1,10 +1,10 @@
 import type { Devit, User } from "@/types";
 
-import NextLink from "next/link";
 import Image from "next/image";
+import NextLink from "next/link";
 
-import CodeUserServer from "./codeUseServer";
 import CodeBlock from "./codeBlock";
+import CodeUserServer from "./codeUseServer";
 import DevitActions from "./devitActions";
 
 import getTimeAgo from "@/lib/utils";

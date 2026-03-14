@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { signInWithCustomToken } from "firebase/auth";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
-import { saveUser } from "@/firebase/user";
 import { auth } from "@/firebase/app";
+import { saveUser } from "@/firebase/user";
 
 export default function SuccessPage() {
   const router = useRouter();

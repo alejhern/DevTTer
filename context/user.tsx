@@ -1,7 +1,7 @@
 "use client";
 import type { User } from "@/types";
 
-import { createContext, useEffect, useState, ReactNode } from "react";
+import { createContext, ReactNode, useEffect, useState } from "react";
 
 import { onAuthStateChanged } from "@/firebase/user";
 
