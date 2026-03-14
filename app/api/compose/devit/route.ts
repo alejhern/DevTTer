@@ -49,9 +49,12 @@ export async function POST(req: Request) {
     const idToken = authHeader.split(" ")[1];
     const decodedToken = await adminAuth.verifyIdToken(idToken);
 
-    const imageUrl = formData.has("image")
-      ? await uploadImage(formData, devitData.id)
-      : null;
+    const imageFile = formData.get("image");
+    let imageUrl: string | null = null;
+
+    if (imageFile instanceof File) {
+      imageUrl = await uploadImage(imageFile, uuidv4());
+    }
 
     const devitToSave = {
       ...devitData,

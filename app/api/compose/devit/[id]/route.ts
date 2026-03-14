@@ -70,14 +70,20 @@ export async function PUT(
     }
 
     // 4️⃣ Manejar imagen
-    let imageUrl = existingDevit.imageUrl;
+    let imageUrl: string | null | undefined = existingDevit.imageUrl;
 
     if (formData.has("image")) {
       // Si hay una nueva imagen, subirla y eliminar la anterior
       if (imageUrl) {
         await deleteImage(imageUrl);
       }
-      imageUrl = await uploadImage(formData, id);
+      const imageFile = formData.get("image");
+
+      if (imageFile instanceof File) {
+        imageUrl = await uploadImage(imageFile, id);
+      } else {
+        imageUrl = null; // Si se envía un valor pero no es un archivo, se asume que se quiere eliminar la imagen
+      }
     }
 
     await devitRef.update({

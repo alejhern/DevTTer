@@ -22,6 +22,7 @@ export default function DragAndDropFile({
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (file === null) return setPreview(null);
     if (file) {
       // Imagen local seleccionada
       const objectUrl = URL.createObjectURL(file);
@@ -130,7 +131,10 @@ export default function DragAndDropFile({
               <button
                 className="absolute -top-2 -right-2 bg-red-500 text-white w-6 h-6 rounded-full text-xs flex items-center justify-center shadow hover:scale-110 transition"
                 type="button"
-                onClick={() => handlerOnchange(null)}
+                onClick={() => {
+                  handlerOnchange(null);
+                  setPreview(null);
+                }}
               >
                 ✕
               </button>

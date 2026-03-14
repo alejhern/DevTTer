@@ -52,14 +52,9 @@ export const getDevitWithNComments = async (
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
 export async function uploadImage(
-  formData: FormData,
+  imageFile: File,
   idDevit: string,
 ): Promise<string> {
-  const imageFile = formData.get("image");
-
-  if (!(imageFile instanceof File)) {
-    throw new Error("Invalid image file");
-  }
   const arrayBuffer = await imageFile.arrayBuffer();
   const buffer = Buffer.from(arrayBuffer);
 

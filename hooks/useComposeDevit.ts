@@ -17,7 +17,7 @@ export function useComposeDevit(idDevit?: string) {
       content: "",
     },
   });
-  const [file, setFile] = useState<File | null>(null);
+  const [file, setFile] = useState<File | null | undefined>(undefined);
   const [isPosting, setIsPosting] = useState(false);
   const route = useRouter();
 
@@ -105,7 +105,7 @@ export function useComposeDevit(idDevit?: string) {
     [devit, file, route],
   );
 
-  const handlerOnchangeFile = useCallback((file: File | null) => {
+  const handlerOnchangeFile = useCallback((file: File | null | undefined) => {
     setFile(file);
   }, []);
 

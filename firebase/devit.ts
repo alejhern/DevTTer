@@ -4,7 +4,7 @@ import { auth } from "./app";
 
 export const postDevit = async (
   devit: Omit<Devit, "id" | "author" | "createdAt">,
-  file: File | null,
+  file: File | null | undefined,
 ) => {
   const user = auth.currentUser;
 
@@ -39,7 +39,7 @@ export const postDevit = async (
 export const putDevit = async (
   devitId: string,
   devit: Omit<Devit, "id" | "author" | "createdAt">,
-  file: File | null,
+  file: File | null | undefined,
 ) => {
   const user = auth.currentUser;
 
@@ -52,6 +52,7 @@ export const putDevit = async (
 
   formData.append("devit", JSON.stringify(devit));
   if (file) formData.append("image", file);
+  if (file === null) formData.append("image", ""); // Indicate that the image should be removed
 
   const response = await fetch(`/api/compose/devit/${devitId}`, {
     method: "PUT",
