@@ -69,6 +69,7 @@ export function useComposeDevit(idDevit?: string) {
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
+      if (isPosting) return;
       e.preventDefault();
       if (!devit.content.trim() || !devit.code.content.trim()) return;
 
@@ -87,7 +88,6 @@ export function useComposeDevit(idDevit?: string) {
         route.push("/devits/" + idDevit);
       } catch (error) {
         console.error("Error posting devit:", error);
-      } finally {
         setIsPosting(false);
       }
     },
