@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 
 interface DragAndDropFileProps {
-  file: File | null;
+  file: File | null | undefined;
   handlerOnchange: (_file: File | null) => void;
   devitImg?: string; // URL de imagen existente (Firebase)
 }

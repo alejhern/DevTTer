@@ -13,7 +13,7 @@ export default function ComposeDevit() {
   const idDevit = searchParams.get("edit") || undefined;
   const {
     devit,
-    handleChange,
+    handleContentChange,
     handleCodeChange,
     handleSubmit,
     file,
@@ -47,23 +47,12 @@ export default function ComposeDevit() {
               {isPosting ? "Posting..." : "Post"}
             </Button>
           </div>
-
-          {/* Title */}
-          <input
-            required
-            className="w-full text-4xl font-bold bg-transparent outline-none mb-6"
-            placeholder="Title of your devit..."
-            value={devit.title}
-            onChange={handleChange("title")}
-          />
-
           {/* Content */}
           <textarea
-            className="w-full min-h-[200px] text-lg bg-transparent 
-          outline-none resize-none mb-8 leading-relaxed"
+            className="w-full min-h-[200px] text-lg bg-transparent outline-none resize-none mb-8 leading-relaxed"
             placeholder="Write your thoughts..."
             value={devit.content}
-            onChange={handleChange("content")}
+            onChange={(e) => handleContentChange(e)}
           />
 
           {/* Code Section */}

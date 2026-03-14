@@ -19,7 +19,6 @@ const mockUser: User = {
 
 const mockPost: Devit = {
   id: "demo-devit",
-  title: "Just launched Devtter!",
   content:
     "🚀 Just launched Devtter!\n\nA social network built for developers to share ideas, code snippets and projects.\n\nBuilt with Next.js + Firebase.",
   createdAt: new Date("2026-01-01"),

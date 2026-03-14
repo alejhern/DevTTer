@@ -28,7 +28,6 @@ export interface Comment {
 
 export interface Devit {
   id: string;
-  title: string;
   content: string;
   author: string;
   createdAt: Date;

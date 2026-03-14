@@ -66,11 +66,6 @@ export default async function DevitPage({ params }: Props) {
                 </div>
               </div>
 
-              {/* Content */}
-              <p className="text-lg leading-relaxed whitespace-pre-wrap">
-                {devit.content}
-              </p>
-
               {/* Code */}
               <CodeUserServer>
                 <CodeBlock
@@ -78,6 +73,11 @@ export default async function DevitPage({ params }: Props) {
                   language={devit.code.language}
                 />
               </CodeUserServer>
+
+              {/* Content */}
+              <p className="text-lg leading-relaxed whitespace-pre-wrap">
+                {devit.content}
+              </p>
 
               {/* Image */}
               {devit.imageUrl && (

@@ -87,7 +87,6 @@ export async function PUT(
     }
 
     await devitRef.update({
-      title: devit.title,
       content: devit.content,
       code: devit.code,
       imageUrl: imageUrl || FieldValue.delete(),

@@ -10,7 +10,6 @@ export function useComposeDevit(idDevit?: string) {
   const [devit, setDevit] = useState<
     Omit<Devit, "id" | "author" | "createdAt">
   >({
-    title: "",
     content: "",
     code: {
       language: "typescript",
@@ -29,7 +28,6 @@ export function useComposeDevit(idDevit?: string) {
         const devitDB = await fetchDevit(idDevit);
 
         setDevit({
-          title: devitDB.title,
           content: devitDB.content,
           code: devitDB.code,
           imageUrl: devitDB.imageUrl,
@@ -43,14 +41,10 @@ export function useComposeDevit(idDevit?: string) {
     loadDevit();
   }, [idDevit]);
 
-  const handleChange = useCallback(
-    (field: keyof Devit) =>
-      (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        setDevit((prev) => ({
-          ...prev,
-          [field]: e.target.value,
-        }));
-      },
+  const handleContentChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      setDevit((prev) => ({ ...prev, content: e.target.value }));
+    },
     [],
   );
 
@@ -76,12 +70,7 @@ export function useComposeDevit(idDevit?: string) {
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
-      if (
-        !devit.title.trim() ||
-        !devit.content.trim() ||
-        !devit.code.content.trim()
-      )
-        return;
+      if (!devit.content.trim() || !devit.code.content.trim()) return;
 
       setIsPosting(true);
       try {
@@ -111,7 +100,7 @@ export function useComposeDevit(idDevit?: string) {
 
   return {
     devit,
-    handleChange,
+    handleContentChange,
     handleCodeChange,
     handleSubmit,
     file,
