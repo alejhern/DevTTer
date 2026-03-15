@@ -17,7 +17,13 @@ import CommentForm from "@/components/commentForm";
 import { Button } from "@/components/ui/button";
 import { useDevitActions } from "@/hooks/useDevitActions";
 
-export default function DevitActions({ devit }: { devit: Devit }) {
+export default function DevitActions({
+  devit,
+  handleDeleteEffect,
+}: {
+  devit: Devit;
+  handleDeleteEffect?: (_devitId: string) => void;
+}) {
   const {
     user,
     isLiked,
@@ -112,7 +118,7 @@ export default function DevitActions({ devit }: { devit: Devit }) {
                 <button
                   className="flex w-full items-center gap-2 px-4 py-2 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40"
                   type="button"
-                  onClick={handleDelete}
+                  onClick={() => handleDelete(handleDeleteEffect)}
                 >
                   <Trash2 size={16} />
                   Eliminar

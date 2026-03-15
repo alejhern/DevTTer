@@ -2,19 +2,19 @@ import type { PostDevit } from "@/types";
 
 import Image from "next/image";
 import Link from "next/link";
+import { cloneElement } from "react";
 
 import CodeBlock from "./codeBlock";
 import CodeUserServer from "./codeUseServer";
-import DevitActions from "./devitActions";
 
 import getTimeAgo from "@/lib/utils";
 
 interface PostProps {
   post: PostDevit;
-  dissableActions?: boolean;
+  children?: React.ReactElement<{ devit: PostDevit["devit"] }>;
 }
 
-export function Post({ post, dissableActions = false }: PostProps) {
+export function Post({ post, children }: PostProps) {
   if (!post) return null;
 
   return (
@@ -53,7 +53,7 @@ export function Post({ post, dissableActions = false }: PostProps) {
         </div>
 
         {post.devit.code && (
-          <CodeUserServer dissableActions={dissableActions}>
+          <CodeUserServer dissableActions={children ? false : true}>
             <CodeBlock
               code={post.devit.code.content}
               language={post.devit.code.language}
@@ -75,7 +75,7 @@ export function Post({ post, dissableActions = false }: PostProps) {
           />
         )}
 
-        {!dissableActions && <DevitActions devit={post.devit} />}
+        {children && cloneElement(children, { devit: post.devit })}
       </div>
     </article>
   );

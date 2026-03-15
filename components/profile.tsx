@@ -2,6 +2,7 @@ import type { Devit, User } from "@/types";
 
 import Image from "next/image";
 
+import DevitActions from "./devitActions";
 import { Post } from "./post";
 import { Loading } from "./ui/loading";
 
@@ -43,7 +44,9 @@ export function Profile({
               </p>
             ) : (
               devits.map((devit) => (
-                <Post key={devit.id} post={{ devit, author: user }} />
+                <Post key={devit.id} post={{ devit, author: user }}>
+                  <DevitActions devit={devit} />
+                </Post>
               ))
             )}
           </div>

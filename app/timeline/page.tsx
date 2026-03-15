@@ -1,5 +1,6 @@
 import type { Devit, PostDevit } from "@/types";
 
+import DevitActions from "@/components/devitActions";
 import { DevitsDisplayer } from "@/components/devitsDisplayer";
 import { Post } from "@/components/post";
 import { getDevits } from "@/firebase/devits";
@@ -36,7 +37,9 @@ export default async function Timeline() {
           ) : (
             <DevitsDisplayer devitsWithAuthors={posts}>
               {posts.map((post) => (
-                <Post key={post.devit.id} post={post} />
+                <Post key={post.devit.id} post={post}>
+                  <DevitActions devit={post.devit} />
+                </Post>
               ))}
             </DevitsDisplayer>
           )}
