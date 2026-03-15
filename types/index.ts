@@ -37,3 +37,8 @@ export interface Devit {
   comments?: Array<Comment> | Number;
   reDevs?: number;
 }
+
+export interface PostDevit {
+  devit: Devit;
+  author: User;
+}

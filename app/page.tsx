@@ -1,6 +1,6 @@
 "use client";
 
-import type { Devit, User } from "@/types";
+import type { Devit, PostDevit, User } from "@/types";
 
 import { motion } from "framer-motion";
 import Link from "next/link";
@@ -27,6 +27,11 @@ const mockPost: Devit = {
     content: `const devit = "Hello Devtter 🚀"`,
     language: "javascript",
   },
+};
+
+const demoDevit: PostDevit = {
+  devit: mockPost,
+  author: mockUser,
 };
 
 const clientId = process.env.NEXT_PUBLIC_FT_CLIENT_ID;
@@ -108,7 +113,7 @@ export default function IndexPage() {
             delay: 0.4,
           }}
         >
-          <Post dissableActions author={mockUser} post={mockPost} />
+          <Post dissableActions post={demoDevit} />
         </motion.div>
       </section>
 

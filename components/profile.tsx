@@ -43,7 +43,7 @@ export function Profile({
               </p>
             ) : (
               devits.map((devit) => (
-                <Post key={devit.id} author={user} post={devit} />
+                <Post key={devit.id} post={{ devit, author: user }} />
               ))
             )}
           </div>
