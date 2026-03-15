@@ -108,3 +108,57 @@ export async function PUT(
     );
   }
 }
+
+export async function DELETE(
+  request: Request,
+  { params }: { params: { id: string } },
+) {
+  try {
+    const { id } = await params;
+
+    // 1️⃣ Autenticación
+    const authHeader = request.headers.get("Authorization");
+
+    if (!authHeader?.startsWith("Bearer ")) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
+    const token = authHeader.split(" ")[1];
+    const decodedToken = await adminAuth.verifyIdToken(token);
+    const userId = decodedToken.uid;
+
+    // 2️⃣ Obtener devit
+    const devitRef = adminDb.collection("devits").doc(id);
+    const devitDoc = await devitRef.get();
+
+    if (!devitDoc.exists) {
+      return NextResponse.json({ message: "Devit not found" }, { status: 404 });
+    }
+
+    const devitData = devitDoc.data() as Devit;
+
+    if (devitData.author !== userId) {
+      return NextResponse.json({ message: "Forbidden" }, { status: 403 });
+    }
+
+    // 3️⃣ Eliminar imagen si existe
+    if (devitData.imageUrl) {
+      await deleteImage(devitData.imageUrl);
+    }
+
+    // 4️⃣ Eliminar devit
+    await devitRef.delete();
+
+    return NextResponse.json(
+      { message: "Devit deleted successfully" },
+      { status: 200 },
+    );
+  } catch (error) {
+    console.error("Error deleting devit:", error);
+
+    return NextResponse.json(
+      { message: "Internal Server Error" },
+      { status: 500 },
+    );
+  }
+}

@@ -2,7 +2,7 @@ import type { Devit } from "@/types";
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { likeDevit } from "@/firebase/devit";
+import { deleteDevit, likeDevit } from "@/firebase/devit";
 import { useUser } from "@/hooks/useUser";
 
 export function useDevitActions(devit: Devit) {
@@ -56,10 +56,18 @@ export function useDevitActions(devit: Devit) {
     setShowCommentForm((prev) => !prev);
   }, []);
 
-  const handleDelete = () => {
-    console.log("Eliminar devit");
-    setShowMenu(false);
-  };
+  const handleDelete = useCallback(
+    async (effect?: (_devitId: string) => void) => {
+      setShowMenu(false);
+      try {
+        await deleteDevit(devit.id);
+        if (effect) effect(devit.id);
+      } catch (error) {
+        console.error("Failed to delete devit:", error);
+      }
+    },
+    [devit.id],
+  );
 
   return {
     user,

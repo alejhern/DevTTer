@@ -2,9 +2,10 @@
 
 import type { PostDevit } from "@/types";
 
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 
+import DevitActions from "./devitActions";
 import { Post } from "./post";
 import { Loading } from "./ui/loading";
 
@@ -75,23 +76,36 @@ export function DevitsDisplayer({
     }
   };
 
+  const devitRemovedEffect = (id: string) => {
+    setDevits((prev) => prev.filter((post) => post.devit.id !== id));
+  };
+
   if (!mounted) return children;
 
   return (
     <div className="flex flex-col gap-4">
       {isUpdating && <Loading />}
 
-      {devits.map((post) => (
-        <motion.div
-          key={post.devit.id}
-          initial={{ opacity: 0, y: 40 }}
-          transition={{ duration: 0.35, ease: "easeOut" }}
-          viewport={{ once: true, margin: "-80px" }}
-          whileInView={{ opacity: 1, y: 0 }}
-        >
-          <Post post={post} />
-        </motion.div>
-      ))}
+      <AnimatePresence>
+        {devits.map((post) => (
+          <motion.div
+            key={post.devit.id}
+            layout
+            exit={{ opacity: 0, x: 120 }}
+            initial={{ opacity: 0, y: 30 }}
+            transition={{ duration: 0.35, ease: "easeOut" }}
+            viewport={{ margin: "-120px" }}
+            whileInView={{ opacity: 1, y: 0 }}
+          >
+            <Post post={post}>
+              <DevitActions
+                devit={post.devit}
+                handleDeleteEffect={devitRemovedEffect}
+              />
+            </Post>
+          </motion.div>
+        ))}
+      </AnimatePresence>
     </div>
   );
 }
