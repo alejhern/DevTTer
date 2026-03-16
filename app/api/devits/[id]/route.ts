@@ -10,7 +10,10 @@ export async function GET(
 
   try {
     const devitDoc = await adminDb.collection("devits").doc(id).get();
-    const commentsSnapshot = await devitDoc.ref.collection("comments").get();
+    const commentsSnapshot = await devitDoc.ref
+      .collection("comments")
+      .orderBy("createdAt", "desc")
+      .get();
     const comments = commentsSnapshot.docs.map((doc) => ({
       ...doc.data(),
       createdAt: doc.data().createdAt?.toDate?.(),

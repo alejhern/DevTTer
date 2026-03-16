@@ -1,9 +1,9 @@
 import type { Comment } from "@/types";
 
-import { NextResponse } from "next/server";
 import { FieldValue } from "firebase-admin/firestore";
+import { NextResponse } from "next/server";
 
-import { adminDb, adminAuth } from "@/firebase/admin";
+import { adminAuth, adminDb } from "@/firebase/admin";
 
 export async function PUT(
   request: Request,
@@ -68,6 +68,11 @@ export async function PUT(
         : undefined,
       createdAt: FieldValue.serverTimestamp(),
     };
+
+    // eliminar campo code undefined
+    if (newComment["code"] === undefined) {
+      delete newComment["code"];
+    }
 
     // 4️⃣ Guardar en subcolección de comentarios
     await adminDb
