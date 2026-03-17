@@ -11,6 +11,7 @@ import { Loading } from "./ui/loading";
 
 import { getDevits } from "@/firebase/devits";
 import { getUser } from "@/firebase/user";
+import useMounted from "@/hooks/useMounted";
 
 interface DevitsDisplayerProps {
   devitsWithAuthors: PostDevit[];
@@ -21,15 +22,11 @@ export function DevitsDisplayer({
   devitsWithAuthors,
   children,
 }: DevitsDisplayerProps) {
-  const [mounted, setMounted] = useState(false);
+  const mounted = useMounted();
   const [devits, setDevits] = useState<PostDevit[]>([]);
   const [isUpdating, setIsUpdating] = useState(false);
 
   const lastScrollY = useRef(0);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   useEffect(() => {
     setDevits(devitsWithAuthors);

@@ -10,6 +10,7 @@ import {
 } from "react";
 
 import { Button } from "@/components/ui/button";
+import useMounted from "@/hooks/useMounted";
 
 interface WindowVSCodeProps {
   children: React.ReactElement<{
@@ -21,13 +22,9 @@ interface WindowVSCodeProps {
 }
 
 function WindowVSCode({ children, dissableActions }: WindowVSCodeProps) {
-  const [mounted, setMounted] = useState<boolean>(false);
+  const mounted = useMounted();
   const [copied, setCopied] = useState<boolean>(false);
   const [fullScreen, setFullScreen] = useState<boolean>(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
