@@ -2,10 +2,11 @@ import type { PostDevit } from "@/types";
 
 import Image from "next/image";
 import Link from "next/link";
-import { cloneElement } from "react";
+import { isValidElement } from "react";
 
 import CodeBlock from "./codeBlock";
 import CodeUser from "./codeUser";
+import DevitActions from "./devitActions";
 
 import getTimeAgo from "@/lib/utils";
 
@@ -16,6 +17,17 @@ interface PostProps {
 
 export function Post({ post, children }: PostProps) {
   if (!post) return null;
+
+  if (children) {
+    // Validamos que sea un elemento React
+    if (!isValidElement(children) || children.type !== DevitActions) {
+      throw new Error("El children debe ser un DevitActions o undefined");
+    }
+  }
+
+  const devitActions = children as
+    | React.ReactElement<typeof DevitActions>
+    | undefined;
 
   return (
     <article className="flex gap-8 p-7 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl w-full">
@@ -53,7 +65,7 @@ export function Post({ post, children }: PostProps) {
         </div>
 
         {post.devit.code && (
-          <CodeUser dissableActions={children ? false : true}>
+          <CodeUser>
             <CodeBlock
               code={post.devit.code.content}
               language={post.devit.code.language}
@@ -75,7 +87,7 @@ export function Post({ post, children }: PostProps) {
           />
         )}
 
-        {children && cloneElement(children, { devit: post.devit })}
+        {devitActions}
       </div>
     </article>
   );

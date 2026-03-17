@@ -18,10 +18,9 @@ interface WindowVSCodeProps {
     language: string;
     theme?: "light" | "dark";
   }>;
-  dissableActions?: boolean;
 }
 
-function WindowVSCode({ children, dissableActions }: WindowVSCodeProps) {
+function WindowVSCode({ children }: WindowVSCodeProps) {
   const mounted = useMounted();
   const [copied, setCopied] = useState<boolean>(false);
   const [fullScreen, setFullScreen] = useState<boolean>(false);
@@ -69,7 +68,7 @@ function WindowVSCode({ children, dissableActions }: WindowVSCodeProps) {
             {language}
           </span>
         </div>
-        {!dissableActions && mounted && (
+        {mounted && (
           <div className="flex items-center gap-2">
             <Button
               disabled={copied}
@@ -92,9 +91,12 @@ function WindowVSCode({ children, dissableActions }: WindowVSCodeProps) {
         )}
       </div>
       {/* Código */}
-      {cloneElement(children, {
-        fullScreen: fullScreen,
-      } as Record<string, unknown>)}
+      {fullScreen
+        ? cloneElement(children, {
+            theme: "dark",
+            fullScreen: true,
+          } as Record<string, unknown>)
+        : children}
     </div>
   );
 }
@@ -108,18 +110,15 @@ interface CodeUserProps {
   dissableActions?: boolean;
 }
 
-export default function CodeUser({
-  children,
-  dissableActions = false,
-}: CodeUserProps) {
+export default function CodeUser({ children }: CodeUserProps) {
   const { resolvedTheme } = useTheme();
 
-  if (!isValidElement(children)) {
-    return null;
+  if (!children || !isValidElement(children)) {
+    throw new Error("CodeUser requires a single React element as children");
   }
 
   return (
-    <WindowVSCode dissableActions={dissableActions}>
+    <WindowVSCode>
       {resolvedTheme
         ? cloneElement(children, {
             theme: resolvedTheme,
