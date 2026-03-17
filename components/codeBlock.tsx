@@ -1,11 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import {
-  oneDark,
-  oneLight,
-} from "react-syntax-highlighter/dist/esm/styles/prism";
+import { use } from "react";
+import { codeToHtml } from "shiki";
 
 type CodeBlockProps = {
   code: string;
@@ -14,39 +10,50 @@ type CodeBlockProps = {
   fullScreen?: boolean;
 };
 
+const highlightCache = new Map<string, Promise<string>>();
+
+function getHighlightedHtml(
+  code: string,
+  language: string,
+  theme: "light" | "dark",
+) {
+  const key = `${code}:${language}:${theme}`;
+
+  if (!highlightCache.has(key)) {
+    highlightCache.set(
+      key,
+      codeToHtml(code, {
+        lang: language,
+        theme: theme === "dark" ? "one-dark-pro" : "one-light",
+      }),
+    );
+  }
+
+  return highlightCache.get(key)!;
+}
+
 export default function CodeBlock({
   code,
   language,
   theme = "dark",
   fullScreen = false,
 }: CodeBlockProps) {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  const resolvedTheme = mounted ? theme : "light";
-
-  const isDark = resolvedTheme === "dark";
+  const html = use(getHighlightedHtml(code, language, theme));
 
   return (
-    <SyntaxHighlighter
-      showLineNumbers
-      wrapLines
-      customStyle={{
+    <div
+      dangerouslySetInnerHTML={{ __html: html }}
+      suppressHydrationWarning
+      style={{
         margin: 0,
         padding: "0.75rem 1rem",
         borderRadius: "0.5rem",
         fontSize: "0.875rem",
         maxHeight: fullScreen ? "none" : "200px",
+        height: fullScreen ? "85vh" : "auto",
         overflow: "auto",
-        background: isDark ? "#1e1e1e" : "#f5f5f5",
+        background: theme === "dark" ? "#1e1e1e" : "#f5f5f5",
       }}
-      language={language}
-      style={isDark ? oneDark : oneLight}
-    >
-      {code}
-    </SyntaxHighlighter>
+    />
   );
 }
