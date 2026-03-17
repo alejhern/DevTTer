@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import CodeBlock from "@/components/codeBlock";
-import CodeUserServer from "@/components/codeUseServer";
+import CodeUser from "@/components/codeUser";
 import { CommentItem } from "@/components/comment";
 import DevitActions from "@/components/devitActions";
 import BackLink from "@/components/ui/backLink";
@@ -99,12 +99,12 @@ export default async function DevitPage({ params }: Props) {
               </div>
 
               {/* Code */}
-              <CodeUserServer>
+              <CodeUser>
                 <CodeBlock
                   code={devit.code.content}
                   language={devit.code.language}
                 />
-              </CodeUserServer>
+              </CodeUser>
 
               {/* Content */}
               <p className="text-lg leading-relaxed whitespace-pre-wrap">

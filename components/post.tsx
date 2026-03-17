@@ -5,7 +5,7 @@ import Link from "next/link";
 import { cloneElement } from "react";
 
 import CodeBlock from "./codeBlock";
-import CodeUserServer from "./codeUseServer";
+import CodeUser from "./codeUser";
 
 import getTimeAgo from "@/lib/utils";
 
@@ -53,12 +53,12 @@ export function Post({ post, children }: PostProps) {
         </div>
 
         {post.devit.code && (
-          <CodeUserServer dissableActions={children ? false : true}>
+          <CodeUser dissableActions={children ? false : true}>
             <CodeBlock
               code={post.devit.code.content}
               language={post.devit.code.language}
             />
-          </CodeUserServer>
+          </CodeUser>
         )}
         <p className="mt-3 text-[17px] leading-relaxed text-zinc-800 dark:text-zinc-200 whitespace-pre-wrap">
           {post.devit.content}
