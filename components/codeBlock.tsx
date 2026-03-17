@@ -1,4 +1,6 @@
 "use client";
+
+import { useEffect, useState } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import {
   oneDark,
@@ -18,27 +20,31 @@ export default function CodeBlock({
   theme = "dark",
   fullScreen = false,
 }: CodeBlockProps) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const resolvedTheme = mounted ? theme : "light";
+
+  const isDark = resolvedTheme === "dark";
+
   return (
     <SyntaxHighlighter
-      key={theme}
+      showLineNumbers
+      wrapLines
       customStyle={{
         margin: 0,
         padding: "0.75rem 1rem",
-        background: theme === "dark" ? "#1e1e1e" : "#f5f5f5",
-        borderLeft:
-          theme === "dark" ? "4px solid #007acc" : "4px solid #007acc",
+        borderRadius: "0.5rem",
         fontSize: "0.875rem",
-        lineHeight: "1.5",
-        height: fullScreen ? "100%" : "auto",
-        maxHeight: fullScreen ? "100vh" : "200px",
+        maxHeight: fullScreen ? "none" : "200px",
+        overflow: "auto",
+        background: isDark ? "#1e1e1e" : "#f5f5f5",
       }}
       language={language}
-      lineNumberStyle={{
-        color: theme === "dark" ? "#555" : "#aaa",
-        paddingRight: "1rem",
-      }}
-      showLineNumbers={true}
-      style={theme === "dark" ? oneDark : oneLight}
+      style={isDark ? oneDark : oneLight}
     >
       {code}
     </SyntaxHighlighter>
