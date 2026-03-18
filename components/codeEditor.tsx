@@ -1,10 +1,10 @@
 import Editor from "@monaco-editor/react";
+import { useTheme } from "next-themes";
 
 export interface CodeEditorProps {
   language: string;
   code: string;
   onChange?: (_value: string) => void;
-  theme?: "light" | "dark";
   fullScreen?: boolean;
 }
 
@@ -12,9 +12,10 @@ export default function CodeEditor({
   language,
   code,
   onChange,
-  theme = "light",
   fullScreen = false,
 }: CodeEditorProps) {
+  const { resolvedTheme } = useTheme() as { resolvedTheme: "light" | "dark" };
+
   return (
     <Editor
       height={fullScreen ? "100%" : "200px"}
@@ -38,7 +39,7 @@ export default function CodeEditor({
         tabSize: 2,
         wordWrap: "on",
       }}
-      theme={theme === "dark" ? "vs-dark" : "vs-light"}
+      theme={resolvedTheme === "dark" ? "vs-dark" : "vs-light"}
       value={code}
       onChange={(val) => onChange && onChange(val ?? "")}
     />

@@ -3,10 +3,10 @@ import Image from "next/image";
 import Link from "next/link";
 
 import CodeBlock from "@/components/codeBlock";
-import CodeUser from "@/components/codeUser";
 import { CommentItem } from "@/components/comment";
 import DevitActions from "@/components/devitActions";
 import BackLink from "@/components/ui/backLink";
+import VScode from "@/components/vscodelayout";
 import { fetchDevit } from "@/firebase/devit";
 import { getUser } from "@/firebase/user";
 import getTimeAgo from "@/lib/utils";
@@ -99,12 +99,12 @@ export default async function DevitPage({ params }: Props) {
               </div>
 
               {/* Code */}
-              <CodeUser>
+              <VScode>
                 <CodeBlock
                   code={devit.code.content}
                   language={devit.code.language}
                 />
-              </CodeUser>
+              </VScode>
 
               {/* Content */}
               <p className="text-lg leading-relaxed whitespace-pre-wrap">

@@ -5,8 +5,8 @@ import Link from "next/link";
 import { isValidElement } from "react";
 
 import CodeBlock from "./codeBlock";
-import CodeUser from "./codeUser";
 import DevitActions from "./devitActions";
+import VScode from "./vscodelayout";
 
 import getTimeAgo from "@/lib/utils";
 
@@ -65,12 +65,12 @@ export function Post({ post, children }: PostProps) {
         </div>
 
         {post.devit.code && (
-          <CodeUser>
+          <VScode>
             <CodeBlock
               code={post.devit.code.content}
               language={post.devit.code.language}
             />
-          </CodeUser>
+          </VScode>
         )}
         <p className="mt-3 text-[17px] leading-relaxed text-zinc-800 dark:text-zinc-200 whitespace-pre-wrap">
           {post.devit.content}

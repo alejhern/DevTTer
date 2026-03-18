@@ -1,10 +1,11 @@
+"use client";
+import { useTheme } from "next-themes";
 import { use } from "react";
 import { codeToHtml } from "shiki";
 
 export interface CodeBlockProps {
   code: string;
   language: string;
-  theme?: "light" | "dark";
   fullScreen?: boolean;
 }
 
@@ -33,10 +34,10 @@ function getHighlightedHtml(
 export default function CodeBlock({
   code,
   language,
-  theme = "dark",
   fullScreen = false,
 }: CodeBlockProps) {
-  const html = use(getHighlightedHtml(code, language, theme));
+  const { resolvedTheme } = useTheme() as { resolvedTheme: "light" | "dark" };
+  const html = use(getHighlightedHtml(code, language, resolvedTheme));
 
   return (
     <div
@@ -50,7 +51,7 @@ export default function CodeBlock({
         maxHeight: fullScreen ? "none" : "200px",
         height: fullScreen ? "85vh" : "auto",
         overflow: "auto",
-        background: theme === "dark" ? "#1e1e1e" : "#f5f5f5",
+        background: "dark:#1e1e1e #f5f5f5",
       }}
     />
   );

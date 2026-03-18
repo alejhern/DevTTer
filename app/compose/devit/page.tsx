@@ -4,8 +4,8 @@ import { useSearchParams } from "next/navigation";
 
 import AutorizePage from "@/components/autorizePage";
 import CodeEditor from "@/components/codeEditor";
-import CodeUser from "@/components/codeUser";
 import DragAndDropFile from "@/components/dragAndDropFile";
+import VScode from "@/components/vscodelayout";
 import { useComposeDevit } from "@/hooks/useComposeDevit";
 
 export default function ComposeDevit() {
@@ -76,7 +76,7 @@ export default function ComposeDevit() {
                 <option value="java">Java</option>
               </select>
             </div>
-            <CodeUser>
+            <VScode>
               <CodeEditor
                 code={devit.code.content}
                 language={devit.code.language ?? "typescript"}
@@ -86,7 +86,7 @@ export default function ComposeDevit() {
                   handleCodeChange("content")(event);
                 }}
               />
-            </CodeUser>
+            </VScode>
           </div>
 
           {/* Image Upload */}

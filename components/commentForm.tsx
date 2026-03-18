@@ -6,8 +6,8 @@ import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 
 import CodeEditor from "@/components/codeEditor";
-import CodeUser from "@/components/codeUser";
 import { Button } from "@/components/ui/button";
+import VScode from "@/components/vscodelayout";
 import { commentOnDevit } from "@/firebase/devit";
 import { useUser } from "@/hooks/useUser";
 
@@ -185,13 +185,13 @@ export default function CommentForm({
                   <option value="java">Java</option>
                 </select>
               </div>
-              <CodeUser>
+              <VScode>
                 <CodeEditor
                   code={commentData.code?.content ?? ""}
                   language={commentData.code?.language ?? "typescript"}
                   onChange={(value) => handleCodeChange(value)}
                 />
-              </CodeUser>
+              </VScode>
             </div>
 
             {/* Submit */}

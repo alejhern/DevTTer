@@ -3,7 +3,6 @@ import type { CodeBlockProps } from "./codeBlock";
 import type { CodeEditorProps } from "./codeEditor";
 
 import { FullscreenIcon } from "lucide-react";
-import { useTheme } from "next-themes";
 import {
   ReactElement,
   cloneElement,
@@ -19,7 +18,7 @@ interface WindowVSCodeProps {
   children: ReactElement<CodeBlockProps | CodeEditorProps>;
 }
 
-function WindowVSCode({ children }: WindowVSCodeProps) {
+export default function WindowVSCode({ children }: WindowVSCodeProps) {
   const mounted = useMounted();
   const [copied, setCopied] = useState<boolean>(false);
   const [fullScreen, setFullScreen] = useState<boolean>(false);
@@ -48,6 +47,10 @@ function WindowVSCode({ children }: WindowVSCodeProps) {
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
   }, []);
+
+  if (!children) {
+    throw new Error("VScode requires a single React element as children");
+  }
 
   const props = children.props as CodeBlockProps | CodeEditorProps;
   const language = props.language;
@@ -99,26 +102,4 @@ function WindowVSCode({ children }: WindowVSCodeProps) {
       {childWithFullScreen}
     </div>
   );
-}
-
-interface CodeUserProps {
-  children: ReactElement<CodeBlockProps | CodeEditorProps>;
-  dissableActions?: boolean;
-}
-
-export default function CodeUser({ children }: CodeUserProps) {
-  const { resolvedTheme } = useTheme();
-
-  if (!children) {
-    throw new Error("CodeUser requires a single React element as children");
-  }
-
-  const childWithTheme = resolvedTheme
-    ? cloneElement(
-        children as React.ReactElement<CodeBlockProps | CodeEditorProps>,
-        { theme: resolvedTheme } as Partial<CodeBlockProps & CodeEditorProps>,
-      )
-    : children;
-
-  return <WindowVSCode>{childWithTheme}</WindowVSCode>;
 }

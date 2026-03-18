@@ -1,7 +1,7 @@
 import type { CodeSnippet, Comment, User } from "@/types";
 
 import CodeBlock from "./codeBlock";
-import CodeUser from "./codeUser";
+import VScode from "./vscodelayout";
 
 import getTimeAgo from "@/lib/utils";
 
@@ -41,9 +41,9 @@ export function CommentItem({
 
         {/* Code */}
         {code && (
-          <CodeUser>
+          <VScode>
             <CodeBlock code={code.content} language={code.language} />
-          </CodeUser>
+          </VScode>
         )}
       </div>
     </div>
