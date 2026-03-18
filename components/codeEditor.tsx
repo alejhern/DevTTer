@@ -1,12 +1,12 @@
 import Editor from "@monaco-editor/react";
 
-type CodeEditorProps = {
+export interface CodeEditorProps {
   language: string;
   code: string;
   onChange?: (_value: string) => void;
   theme?: "light" | "dark";
   fullScreen?: boolean;
-};
+}
 
 export default function CodeEditor({
   language,

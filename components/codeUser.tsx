@@ -1,9 +1,12 @@
 "use client";
+import type { CodeBlockProps } from "./codeBlock";
+import type { CodeEditorProps } from "./codeEditor";
+
 import { FullscreenIcon } from "lucide-react";
 import { useTheme } from "next-themes";
 import {
+  ReactElement,
   cloneElement,
-  isValidElement,
   useCallback,
   useEffect,
   useState,
@@ -13,11 +16,7 @@ import { Button } from "@/components/ui/button";
 import useMounted from "@/hooks/useMounted";
 
 interface WindowVSCodeProps {
-  children: React.ReactElement<{
-    code: string;
-    language: string;
-    theme?: "light" | "dark";
-  }>;
+  children: ReactElement<CodeBlockProps | CodeEditorProps>;
 }
 
 function WindowVSCode({ children }: WindowVSCodeProps) {
@@ -50,9 +49,15 @@ function WindowVSCode({ children }: WindowVSCodeProps) {
     setTimeout(() => setCopied(false), 1500);
   }, []);
 
-  const props = children.props as Record<string, unknown>;
-  const language = props.language as string;
-  const code = props.code as string;
+  const props = children.props as CodeBlockProps | CodeEditorProps;
+  const language = props.language;
+  const code = props.code;
+
+  const childWithFullScreen = fullScreen
+    ? cloneElement(children, { fullScreen: true } as Partial<
+        CodeBlockProps | CodeEditorProps
+      >)
+    : children;
 
   return (
     <div
@@ -91,39 +96,29 @@ function WindowVSCode({ children }: WindowVSCodeProps) {
         )}
       </div>
       {/* Código */}
-      {fullScreen
-        ? cloneElement(children, {
-            theme: "dark",
-            fullScreen: true,
-          } as Record<string, unknown>)
-        : children}
+      {childWithFullScreen}
     </div>
   );
 }
 
 interface CodeUserProps {
-  children: React.ReactElement<{
-    code: string;
-    language: string;
-    theme?: "light" | "dark";
-  }>;
+  children: ReactElement<CodeBlockProps | CodeEditorProps>;
   dissableActions?: boolean;
 }
 
 export default function CodeUser({ children }: CodeUserProps) {
   const { resolvedTheme } = useTheme();
 
-  if (!children || !isValidElement(children)) {
+  if (!children) {
     throw new Error("CodeUser requires a single React element as children");
   }
 
-  return (
-    <WindowVSCode>
-      {resolvedTheme
-        ? cloneElement(children, {
-            theme: resolvedTheme,
-          } as Record<string, unknown>)
-        : children}
-    </WindowVSCode>
-  );
+  const childWithTheme = resolvedTheme
+    ? cloneElement(
+        children as React.ReactElement<CodeBlockProps | CodeEditorProps>,
+        { theme: resolvedTheme } as Partial<CodeBlockProps & CodeEditorProps>,
+      )
+    : children;
+
+  return <WindowVSCode>{childWithTheme}</WindowVSCode>;
 }

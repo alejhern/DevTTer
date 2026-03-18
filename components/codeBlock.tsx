@@ -1,12 +1,12 @@
 import { use } from "react";
 import { codeToHtml } from "shiki";
 
-type CodeBlockProps = {
+export interface CodeBlockProps {
   code: string;
   language: string;
   theme?: "light" | "dark";
   fullScreen?: boolean;
-};
+}
 
 const highlightCache = new Map<string, Promise<string>>();
 
