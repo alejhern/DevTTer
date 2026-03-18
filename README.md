@@ -1,55 +1,146 @@
-# Next.js & HeroUI Template
+# 🚀 Devtter
 
-This is a template for creating applications using Next.js 14 (pages directory) and HeroUI (v2).
+> The platform for **42 students** to share knowledge, code, and progress — fast, clean, and distraction-free.
 
-[Try it on CodeSandbox](https://githubbox.com/heroui-inc/next-pages-template)
+---
 
-> Note: Since Next.js 14, the pages router is recommend migrating to the [new App Router](https://nextjs.org/docs/app) to leverage React's latest features
->
-> Read more: [Pages Router](https://nextjs.org/docs/pages)
+## 🧠 What is Devtter?
 
-## Technologies Used
+**Devtter** is a microblogging platform built specifically for students of **42 Network**.
 
-- [Next.js 14](https://nextjs.org/docs/getting-started)
-- [HeroUI](https://heroui.com)
-- [Tailwind CSS](https://tailwindcss.com)
-- [Tailwind Variants](https://tailwind-variants.org)
-- [TypeScript](https://www.typescriptlang.org)
-- [Framer Motion](https://www.framer.com/motion)
-- [next-themes](https://github.com/pacocoursey/next-themes)
+It’s designed to help you:
 
-## How to Use
+* Share what you're learning
+* Document your journey
+* Help other peers
+* Build your developer presence
 
-To create a new project based on this template using `create-next-app`, run the following command:
+All in a **simple, fast, and code-first environment**.
 
-```bash
-npx create-next-app -e https://github.com/heroui-inc/next-pages-template
-```
+---
 
-### Install dependencies
+## 🎯 Built for 42 Students
 
-You can use one of them `npm`, `yarn`, `pnpm`, `bun`, Example using `npm`:
+At **42**, learning is peer-to-peer. Devtter enhances that:
 
-```bash
+* 🤝 Share solutions, insights, and approaches
+* 🧩 Break down complex projects (libft, ft_printf, minishell…)
+* 📚 Learn from other students’ experiences
+* 🚀 Build a public portfolio effortlessly
+
+---
+
+## ✨ Why Devtter?
+
+* ⚡ **Fast & minimal** — no distractions, just content
+* 💻 **Code-native** — beautiful syntax highlighting with Shiki
+* 🧠 **Learning-focused** — optimized for readability and clarity
+* 🌙 **Clean UI** — designed for long study sessions
+* 🔐 **Your space** — build your dev identity from day one
+
+---
+
+## 🔥 Features
+
+* 🧵 Post short dev insights (*devits*)
+* 💬 Share code snippets and explanations
+* 🧠 Document your progress in real time
+* 🌗 Light / Dark mode
+* ⚙️ Customizable UI
+* 📱 Fully responsive
+
+---
+
+## 🛠️ Tech Stack
+
+* **Framework:** Next.js 16 (App Router)
+* **Language:** TypeScript
+* **Styling:** TailwindCSS + HeroUI
+* **Animations:** Framer Motion
+* **Code Highlighting:** Shiki
+* **Architecture:** SSR + modern rendering
+
+---
+
+## 📦 Get Started
+
+```bash id="6bg07y"
+git clone https://github.com/alejhern/devtter.git
+cd devtter
 npm install
-```
-
-### Run the development server
-
-```bash
 npm run dev
 ```
 
-### Setup pnpm (optional)
+👉 http://localhost:3000
 
-If you are using `pnpm`, you need to add the following code to your `.npmrc` file:
+---
 
-```bash
-public-hoist-pattern[]=*@heroui/*
+## 📈 Use Cases at 42
+
+* 📘 Explain your **libft** functions
+* 🖨️ Share tricks for **ft_printf**
+* 🐚 Document your **minishell** progress
+* 🧪 Post debugging insights
+* 🧠 Keep track of what you learn daily
+
+---
+
+## 💡 Philosophy
+
+> At 42, you don’t just learn — you teach.
+
+Devtter exists to make that easier:
+
+* Share knowledge instantly
+* Learn from peers faster
+* Build in public
+
+---
+
+## 🧩 Project Structure
+
+```id="gqg8g6"
+/app
+/components
+/context
+/lib
+/styles
 ```
 
-After modifying the `.npmrc` file, you need to run `pnpm install` again to ensure that the dependencies are installed correctly.
+---
 
-## License
+## 🤝 Contributing
 
-Licensed under the [MIT license](https://github.com/heroui-inc/next-pages-template/blob/main/LICENSE).
+Built by students, for students.
+
+1. Fork the repo
+2. Create a branch
+3. Push your changes
+4. Open a PR
+
+---
+
+## 📄 License
+
+MIT
+
+---
+
+## 👨‍💻 Author
+
+**Alejandro Hernández**
+
+---
+
+## ⚡ Final Pitch
+
+> You’re already learning at 42.
+> Now start **sharing like a real developer**.
+
+Devtter helps you:
+
+* Learn faster
+* Teach better
+* Stand out
+
+🚀 Build your dev presence from day one.
