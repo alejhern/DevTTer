@@ -29,21 +29,21 @@ export default async function Timeline() {
           </p>
         </header>
 
-        <div className="flex flex-col space-y-20">
-          {devits.length === 0 ? (
-            <p className="text-base text-zinc-400 text-center py-24">
-              No devits yet.
-            </p>
-          ) : (
-            <DevitsDisplayer devitsWithAuthors={posts}>
-              {posts.map((post) => (
+        <DevitsDisplayer devitsWithAuthors={posts}>
+          <div className="flex flex-col gap-10">
+            {devits.length === 0 ? (
+              <p className="text-base text-zinc-400 text-center py-24">
+                No devits yet.
+              </p>
+            ) : (
+              posts.map((post) => (
                 <Post key={post.devit.id} post={post}>
                   <DevitActions devit={post.devit} />
                 </Post>
-              ))}
-            </DevitsDisplayer>
-          )}
-        </div>
+              ))
+            )}
+          </div>
+        </DevitsDisplayer>
       </div>
     </section>
   );

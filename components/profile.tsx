@@ -3,6 +3,7 @@ import type { Devit, User } from "@/types";
 import Image from "next/image";
 
 import DevitActions from "./devitActions";
+import { DevitsDisplayer } from "./devitsDisplayer";
 import { Post } from "./post";
 import { Loading } from "./ui/loading";
 
@@ -32,25 +33,31 @@ export function Profile({
       </div>
       <div className="max-w-3xl mx-auto px-6 py-10">
         <h2 className="text-2xl font-semibold mb-6">My Devits</h2>
-        {devits == undefined ? (
-          <Loading />
-        ) : devits.length === 0 ? (
-          <p className="text-center text-zinc-500">No devits yet.</p>
-        ) : (
-          <div className="flex flex-col space-y-6">
-            {devits.length === 0 ? (
-              <p className="text-base text-zinc-400 text-center py-24">
-                No devits yet.
-              </p>
-            ) : (
-              devits.map((devit) => (
-                <Post key={devit.id} post={{ devit, author: user }}>
-                  <DevitActions devit={devit} />
-                </Post>
-              ))
-            )}
-          </div>
-        )}
+        <div className="flex flex-col gap-10">
+          {devits === undefined ? (
+            <Loading />
+          ) : (
+            <DevitsDisplayer
+              devitsWithAuthors={devits.map((devit) => ({
+                devit,
+                author: user,
+              }))}
+              user={user}
+            >
+              {devits.length === 0 ? (
+                <p className="text-base text-zinc-400 text-center py-24">
+                  No devits yet.
+                </p>
+              ) : (
+                devits.map((devit) => (
+                  <Post key={devit.id} post={{ devit, author: user }}>
+                    <DevitActions devit={devit} />
+                  </Post>
+                ))
+              )}
+            </DevitsDisplayer>
+          )}
+        </div>
       </div>
     </>
   );

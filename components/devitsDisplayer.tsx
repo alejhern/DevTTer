@@ -1,6 +1,6 @@
 "use client";
 
-import type { PostDevit } from "@/types";
+import type { PostDevit, User } from "@/types";
 
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
@@ -9,18 +9,20 @@ import DevitActions from "./devitActions";
 import { Post } from "./post";
 import { Loading } from "./ui/loading";
 
-import { getDevits } from "@/firebase/devits";
+import { getDevits, getUserDevits } from "@/firebase/devits";
 import { getUser } from "@/firebase/user";
 import useMounted from "@/hooks/useMounted";
 
 interface DevitsDisplayerProps {
   devitsWithAuthors: PostDevit[];
   children: React.ReactNode;
+  user?: User;
 }
 
 export function DevitsDisplayer({
   devitsWithAuthors,
   children,
+  user,
 }: DevitsDisplayerProps) {
   const mounted = useMounted();
   const [devits, setDevits] = useState<PostDevit[]>([]);
@@ -55,15 +57,17 @@ export function DevitsDisplayer({
     setIsUpdating(true);
 
     try {
-      const newDevits = await getDevits();
+      const newDevits = user ? await getUserDevits(user.id) : await getDevits();
 
-      const posts: PostDevit[] = await Promise.all(
-        newDevits.map(async (devit) => {
-          const author = await getUser(devit.author);
+      const posts: PostDevit[] = user
+        ? newDevits.map((devit) => ({ devit, author: user }))
+        : await Promise.all(
+            newDevits.map(async (devit) => {
+              const author = await getUser(devit.author);
 
-          return { devit, author };
-        }),
-      );
+              return { devit, author };
+            }),
+          );
 
       setDevits(posts);
     } catch (error) {
@@ -79,8 +83,16 @@ export function DevitsDisplayer({
 
   if (!mounted) return children;
 
+  if (devits.length === 0) {
+    return (
+      <div className="flex items-center justify-center py-24">
+        <p className="text-base text-zinc-400">No devits yet.</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-10">
       {isUpdating && <Loading />}
 
       <AnimatePresence>
