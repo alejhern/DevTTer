@@ -58,7 +58,7 @@ export const supportedLanguages = {
   },
   html: {
     name: "HTML",
-    type: "frontend",
+    type: "iframe",
   },
   python: {
     name: "Python",

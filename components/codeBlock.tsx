@@ -43,15 +43,14 @@ export default function CodeBlock({
     <div
       dangerouslySetInnerHTML={{ __html: html }}
       suppressHydrationWarning
+      className="dark:bg-[#282c34] bg-[#FAFAFA]"
       style={{
         margin: 0,
-        padding: "0.75rem 1rem",
-        borderRadius: "0.5rem",
-        fontSize: "0.875rem",
-        maxHeight: fullScreen ? "none" : "200px",
-        height: fullScreen ? "85vh" : "auto",
+        height: fullScreen ? "100%" : "200px",
+        maxHeight: fullScreen ? "100%" : "200px",
         overflow: "auto",
-        background: "dark:#1e1e1e #f5f5f5",
+        padding: "0.75rem 1rem",
+        fontSize: "0.875rem",
       }}
     />
   );
