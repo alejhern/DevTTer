@@ -2,7 +2,7 @@
 import type { CodeBlockProps } from "./codeBlock";
 import type { CodeEditorProps } from "./codeEditor";
 
-import { FullscreenIcon } from "lucide-react";
+import { CheckIcon, CopyIcon, FullscreenIcon } from "lucide-react";
 import {
   ReactElement,
   cloneElement,
@@ -11,11 +11,46 @@ import {
   useState,
 } from "react";
 
-import { Button } from "@/components/ui/button";
 import useMounted from "@/hooks/useMounted";
 
 interface WindowVSCodeProps {
   children: ReactElement<CodeBlockProps | CodeEditorProps>;
+}
+
+function IconButton({
+  onClick,
+  title,
+  children,
+  active,
+}: {
+  onClick: () => void;
+  title?: string;
+  children: React.ReactNode;
+  active?: boolean;
+}) {
+  return (
+    <button
+      className="flex items-center justify-center w-7 h-7 rounded transition-all duration-150"
+      style={{
+        color: active ? "#a0a0b8" : "#4a4a5a",
+        background: "transparent",
+      }}
+      title={title}
+      onClick={onClick}
+      onMouseEnter={(e) => {
+        (e.currentTarget as HTMLButtonElement).style.background = "#1e1e28";
+        (e.currentTarget as HTMLButtonElement).style.color = "#c8c8d8";
+      }}
+      onMouseLeave={(e) => {
+        (e.currentTarget as HTMLButtonElement).style.background = "transparent";
+        (e.currentTarget as HTMLButtonElement).style.color = active
+          ? "#a0a0b8"
+          : "#4a4a5a";
+      }}
+    >
+      {children}
+    </button>
+  );
 }
 
 export default function WindowVSCode({ children }: WindowVSCodeProps) {
@@ -78,23 +113,19 @@ export default function WindowVSCode({ children }: WindowVSCodeProps) {
         </div>
         {mounted && (
           <div className="flex items-center gap-2">
-            <Button
-              disabled={copied}
-              size="icon"
-              type="button"
-              variant="ghost"
+            <IconButton
+              active={copied}
+              title="yank"
               onClick={() => handlerCopy(code)}
             >
-              {copied ? "yanked!" : "yank"}
-            </Button>
-            <Button
-              size="icon"
-              type="button"
-              variant="ghost"
+              {copied ? <CheckIcon size={16} /> : <CopyIcon size={16} />}
+            </IconButton>
+            <IconButton
+              title="Toggle Full Screen"
               onClick={() => setFullScreen((prev) => !prev)}
             >
               <FullscreenIcon size={16} />
-            </Button>
+            </IconButton>
           </div>
         )}
       </div>

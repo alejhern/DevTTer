@@ -6,6 +6,7 @@ import AutorizePage from "@/components/autorizePage";
 import CodeEditor from "@/components/codeEditor";
 import DragAndDropFile from "@/components/dragAndDropFile";
 import VScode from "@/components/vscodelayout";
+import { supportedLanguages } from "@/config/site";
 import { useComposeDevit } from "@/hooks/useComposeDevit";
 
 export default function ComposeDevit() {
@@ -65,15 +66,11 @@ export default function ComposeDevit() {
                 value={devit.code.language ?? "typescript"}
                 onChange={handleCodeChange("language")}
               >
-                <option value="typescript">TypeScript</option>
-                <option value="javascript">JavaScript</option>
-                <option value="tsx">TSX</option>
-                <option value="python">Python</option>
-                <option value="css">CSS</option>
-                <option value="html">HTML</option>
-                <option value="c">C</option>
-                <option value="cpp">C++</option>
-                <option value="java">Java</option>
+                {Object.entries(supportedLanguages).map(([key, lang]) => (
+                  <option key={key} value={key}>
+                    {lang.name}
+                  </option>
+                ))}
               </select>
             </div>
             <VScode>

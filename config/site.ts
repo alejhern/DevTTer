@@ -46,3 +46,42 @@ export const siteConfig = {
   navMenuItems: navItems,
   accountLinks: accountLinks,
 };
+
+export const supportedLanguages = {
+  javascript: {
+    name: "JavaScript",
+    type: "frontend",
+  },
+  typescript: {
+    name: "TypeScript",
+    type: "frontend",
+  },
+  html: {
+    name: "HTML",
+    type: "frontend",
+  },
+  python: {
+    name: "Python",
+    type: "backend",
+  },
+  java: {
+    name: "Java",
+    type: "backend",
+  },
+  c: {
+    name: "C",
+    type: "backend",
+  },
+  cpp: {
+    name: "C++",
+    type: "backend",
+  },
+  ruby: {
+    name: "Ruby",
+    type: "backend",
+  },
+  php: {
+    name: "PHP",
+    type: "backend",
+  },
+};

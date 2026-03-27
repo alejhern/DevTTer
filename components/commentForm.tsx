@@ -8,6 +8,7 @@ import { useCallback, useState } from "react";
 import CodeEditor from "@/components/codeEditor";
 import { Button } from "@/components/ui/button";
 import VScode from "@/components/vscodelayout";
+import { supportedLanguages } from "@/config/site";
 import { commentOnDevit } from "@/firebase/devit";
 import { useUser } from "@/hooks/useUser";
 
@@ -174,15 +175,11 @@ export default function CommentForm({
                   value={commentData.code?.language ?? "typescript"}
                   onChange={handleLanguageChange}
                 >
-                  <option value="typescript">TypeScript</option>
-                  <option value="javascript">JavaScript</option>
-                  <option value="tsx">TSX</option>
-                  <option value="python">Python</option>
-                  <option value="css">CSS</option>
-                  <option value="html">HTML</option>
-                  <option value="c">C</option>
-                  <option value="cpp">C++</option>
-                  <option value="java">Java</option>
+                  {Object.entries(supportedLanguages).map(([key, lang]) => (
+                    <option key={key} value={key}>
+                      {lang.name}
+                    </option>
+                  ))}
                 </select>
               </div>
               <VScode>
