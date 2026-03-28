@@ -15,15 +15,16 @@ import {
 } from "@heroui/react";
 import { link as linkStyles } from "@heroui/theme";
 import clsx from "clsx";
+import Image from "next/image";
 import Link from "next/link";
 
-import { Logo } from "@/components/icons";
 import Login42 from "@/components/loginForm";
 import Searcher from "@/components/searcher";
 import { ThemeSwitch } from "@/components/theme-switch";
 import { siteConfig } from "@/config/site";
 import { useNavbar } from "@/hooks/useNavbar";
 import { useUser } from "@/hooks/useUser";
+import Logo from "@/public/Devtter.png";
 
 const links = siteConfig.navItems;
 const accountLinks = siteConfig.accountLinks;
@@ -168,8 +169,8 @@ export default function Navbar() {
         <NavbarContent className="basis-1/5 lg:basis-full" justify="start">
           <NavbarBrand className="gap-3 max-w-fit">
             <Link className="flex justify-start items-center gap-1" href="/">
-              <Logo />
-              <p className="font-bold text-inherit">DEVTTER</p>
+              <Image alt="Devtter Logo" height={60} src={Logo} width={60} />
+              <p className="font-bold text-3xl">DEVTTER</p>
             </Link>
           </NavbarBrand>
           <div className="hidden lg:flex gap-4 justify-start ml-2">

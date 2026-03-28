@@ -2,17 +2,19 @@
 
 import type { Devit, PostDevit, User } from "@/types";
 
+import Image from "next/image";
 import Link from "next/link";
 
 import Animated from "@/components/animationMotion";
 import { Post } from "@/components/post";
 import { useUser } from "@/hooks/useUser";
+import Logo from "@/public/Devtter.png";
 
 // --- Mock data ---
 const mockUser: User = {
-  id: "1",
+  id: "182317",
   name: "Alejandro Dev",
-  userName: "alejandrodev",
+  userName: "alejhern",
   email: "",
   avatar:
     "https://cdn.intra.42.fr/users/5a9663269348380a099b9a1c13cad54f/alejhern.png",
@@ -25,7 +27,7 @@ const mockPost: Devit = {
   createdAt: new Date("2026-01-01"),
   author: "1",
   code: {
-    content: `const devit = "Hello Devtter 🚀"`,
+    content: `const devit = "Hello Devtter 🚀"\nconsole.log(devit)`,
     language: "javascript",
   },
 };
@@ -77,7 +79,23 @@ export default function IndexPage() {
           initial={{ opacity: 0, y: 40 }}
           transition={{ duration: 0.8 }}
         >
-          <h1 className="text-5xl font-bold tracking-tight">Devtter</h1>
+          <div className="relative inline-block">
+            <h1 className="text-8xl font-bold tracking-tight">Devtter</h1>
+
+            <Image
+              alt="Devtter Logo"
+              className="
+                absolute
+                -top-10
+                -left-6
+                rotate-[-12deg]
+                pointer-events-none
+              "
+              height={90}
+              src={Logo}
+              width={90}
+            />
+          </div>
           <h2 className="text-xl text-zinc-500">
             The social network for developers
           </h2>
