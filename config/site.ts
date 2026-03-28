@@ -51,37 +51,51 @@ export const supportedLanguages = {
   javascript: {
     name: "JavaScript",
     type: "frontend",
+    color: "#f7df1e",
   },
   typescript: {
     name: "TypeScript",
     type: "frontend",
+    color: "#3178c6",
   },
   html: {
     name: "HTML",
     type: "iframe",
+    color: "#e34c26",
   },
   python: {
     name: "Python",
     type: "backend",
+    color: "#3572A5",
   },
   java: {
     name: "Java",
     type: "backend",
+    color: "#b07219",
+  },
+  bash: {
+    name: "Bash",
+    type: "backend",
+    color: "#89e051",
   },
   c: {
     name: "C",
     type: "backend",
+    color: "#555555",
   },
   cpp: {
     name: "C++",
     type: "backend",
+    color: "#f34b7d",
   },
   ruby: {
     name: "Ruby",
     type: "backend",
+    color: "#701516",
   },
   php: {
     name: "PHP",
     type: "backend",
+    color: "#4F5B9D",
   },
 };

@@ -46,7 +46,7 @@ export default function CodeBlock({
       className="dark:bg-[#282c34] bg-[#FAFAFA]"
       style={{
         margin: 0,
-        height: fullScreen ? "100%" : "200px",
+        height: fullScreen ? "100%" : "auto",
         maxHeight: fullScreen ? "100%" : "200px",
         overflow: "auto",
         padding: "0.75rem 1rem",

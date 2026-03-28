@@ -8,6 +8,7 @@ import {
   Copy,
   Loader2,
   Maximize2,
+  Minimize2,
   Terminal as TerminalIcon,
   X,
 } from "lucide-react";
@@ -31,20 +32,6 @@ interface Output {
 interface WindowVSCodeProps {
   children: ReactElement<CodeBlockProps | CodeEditorProps>;
 }
-
-/* ================= LANGUAGE DOT ================= */
-const languageColors: Record<string, string> = {
-  javascript: "#f7df1e",
-  typescript: "#3178c6",
-  python: "#3572A5",
-  html: "#e34c26",
-  css: "#563d7c",
-  java: "#b07219",
-  c: "#555555",
-  cpp: "#f34b7d",
-  rust: "#dea584",
-  go: "#00ADD8",
-};
 
 /* ================= TERMINAL ================= */
 function Terminal({ output }: { output: Output }) {
@@ -184,7 +171,6 @@ function IconButton({
 
 function Header({
   language,
-  dotColor,
   copied,
   running,
   fullScreen,
@@ -194,8 +180,7 @@ function Header({
   onToggleFullScreen,
   onCloseOutput,
 }: {
-  language: string;
-  dotColor: string;
+  language: (typeof supportedLanguages)[keyof typeof supportedLanguages];
   copied: boolean;
   running: boolean;
   fullScreen: boolean;
@@ -205,6 +190,9 @@ function Header({
   onToggleFullScreen: () => void;
   onCloseOutput: () => void;
 }) {
+  const languageName = language ? language.name : "Unknown";
+  const languageColor = language ? language.color : "#5c5c6e";
+
   return (
     <div
       className="
@@ -227,9 +215,9 @@ function Header({
         >
           <span
             className="inline-block w-2 h-2 rounded-full mr-1.5 align-middle"
-            style={{ background: dotColor }}
+            style={{ background: languageColor }}
           />
-          {language}
+          {languageName}
         </span>
       </div>
 
@@ -263,7 +251,7 @@ function Header({
           title={fullScreen ? "Exit fullscreen (Esc)" : "Fullscreen"}
           onClick={onToggleFullScreen}
         >
-          {fullScreen ? <X size={13} /> : <Maximize2 size={13} />}
+          {fullScreen ? <Minimize2 size={13} /> : <Maximize2 size={13} />}
         </IconButton>
       </div>
     </div>
@@ -339,7 +327,6 @@ export default function WindowVSCode({ children }: WindowVSCodeProps) {
   const language = props.language as keyof typeof supportedLanguages;
   const code = props.code;
   const config = supportedLanguages[language];
-  const dotColor = languageColors[language as string] ?? "#5c5c6e";
 
   /* ESC → exit fullscreen */
   useEffect(() => {
@@ -416,8 +403,7 @@ export default function WindowVSCode({ children }: WindowVSCodeProps) {
   };
 
   const headerProps = {
-    language: language as string,
-    dotColor,
+    language: config,
     copied,
     running,
     fullScreen,
