@@ -58,7 +58,7 @@ function Terminal({ output }: { output: Output }) {
         bg-[#0d0d0f] text-[#c8c8d4] border-[#1e1e24]
         dark:bg-[#f5f5f7] dark:text-[#111114] dark:border-[#d0d0d8]
       "
-      style={{ height: "14rem", minHeight: 0 }}
+      style={{ height: "auto", minHeight: 0 }}
     >
       {/* Top bar */}
       <div
@@ -209,7 +209,7 @@ function Header({
 
         <span
           className="
-            ml-3 text-xs font-medium uppercase tracking-wide
+            ml-3 text-sm font-medium uppercase tracking-wide flex items-center gap-1
             text-zinc-500 dark:text-[#5c5c6e]
           "
         >
