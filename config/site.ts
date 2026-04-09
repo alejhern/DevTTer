@@ -1,5 +1,3 @@
-export type SiteConfig = typeof siteConfig;
-
 import { Clock, Home, PlusSquare, Settings, User } from "lucide-react";
 
 const iconMap = {

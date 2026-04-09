@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 
 import useMounted from "@/hooks/useMounted";
 
@@ -9,10 +9,12 @@ export default function AnimatedMotion({
   transition,
   className,
 }: any) {
-  const mounted = useMounted();
+  const isMounted = useMounted();
+  const shouldReduceMotion = useReducedMotion();
 
   // SSR o JS desactivado: contenido visible plano
-  if (!mounted) return <div className={className}>{children}</div>;
+  if (!isMounted || shouldReduceMotion)
+    return <div className={className}>{children}</div>;
 
   // Cliente activo: Motion animando
   return (

@@ -2,7 +2,7 @@
 
 import type { PostDevit, User } from "@/types";
 
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 
 import DevitActions from "./devitActions";
@@ -24,7 +24,8 @@ export function DevitsDisplayer({
   children,
   user,
 }: DevitsDisplayerProps) {
-  const mounted = useMounted();
+  const isMounted = useMounted();
+  const shouldReduceMotion = useReducedMotion();
   const [devits, setDevits] = useState<PostDevit[]>([]);
   const [isUpdating, setIsUpdating] = useState(false);
 
@@ -81,7 +82,7 @@ export function DevitsDisplayer({
     setDevits((prev) => prev.filter((post) => post.devit.id !== id));
   };
 
-  if (!mounted) return children;
+  if (!isMounted || shouldReduceMotion) return children;
 
   if (devits.length === 0) {
     return (

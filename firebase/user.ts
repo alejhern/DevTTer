@@ -36,7 +36,7 @@ export const getUser = async (id: string): Promise<User> => {
   return user;
 };
 
-export const getCurrentUser = async (): Promise<User | null> => {
+const getCurrentUser = async (): Promise<User | null> => {
   const firebaseUser = auth.currentUser;
 
   if (!firebaseUser) return null;

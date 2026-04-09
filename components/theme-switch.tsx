@@ -8,7 +8,7 @@ import { FC } from "react";
 import { MoonFilledIcon, SunFilledIcon } from "@/components/icons";
 import useMounted from "@/hooks/useMounted";
 
-export interface ThemeSwitchProps {
+interface ThemeSwitchProps {
   className?: string;
   classNames?: SwitchProps["classNames"];
 }
