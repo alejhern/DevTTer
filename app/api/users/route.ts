@@ -22,6 +22,11 @@ export async function PUT(req: Request) {
         { status: 400 },
       );
     }
+
+    if (user.uid !== uid) {
+      return NextResponse.json({ message: "Forbidden" }, { status: 403 });
+    }
+
     await adminDb
       .collection("users")
       .doc(uid)
