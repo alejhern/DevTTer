@@ -1,14 +1,13 @@
 "use client";
-import type { Comment as DevitComment } from "@/types";
+import type { CodeSnippet, Comment as DevitComment } from "@/types";
 
 import { X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 
-import CodeEditor from "@/components/codeEditor";
+import { CodeInput } from "./codeInput";
+
 import { Button } from "@/components/ui/button";
-import VScode from "@/components/vscodelayout";
-import { supportedLanguages } from "@/config/site";
 import { commentOnDevit } from "@/firebase/devit";
 import { useUser } from "@/hooks/useUser";
 
@@ -26,48 +25,15 @@ export default function CommentForm({
   const user = useUser();
   const router = useRouter();
 
-  const [commentData, setCommentData] = useState<
-    Omit<DevitComment, "id" | "author" | "createdAt">
-  >({
-    comment: "",
-    code: undefined,
-  });
+  const [comment, setComment] = useState<string>("");
+
+  const codeSnipetRef = useRef<CodeSnippet | undefined>(undefined);
 
   const [isPosting, setIsPosting] = useState<boolean>(false);
 
   const handleCommentChange = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-      setCommentData((prev) => ({
-        ...prev,
-        comment: e.target.value,
-      }));
-    },
-    [],
-  );
-
-  const handleCodeChange = useCallback((value: string | undefined) => {
-    setCommentData((prev) => ({
-      ...prev,
-      code: value
-        ? {
-            language: prev.code?.language ?? "typescript",
-            content: value,
-          }
-        : undefined,
-    }));
-  }, []);
-
-  const handleLanguageChange = useCallback(
-    (e: React.ChangeEvent<HTMLSelectElement>) => {
-      const language = e.target.value;
-
-      setCommentData((prev) => ({
-        ...prev,
-        code: {
-          language,
-          content: prev.code?.content ?? "",
-        },
-      }));
+      setComment(e.target.value);
     },
     [],
   );
@@ -75,14 +41,15 @@ export default function CommentForm({
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
-      if (!commentData.comment.trim()) return;
+      if (!comment.trim()) return;
       setIsPosting(true);
       try {
+        const commentData: Omit<DevitComment, "id" | "author" | "createdAt"> = {
+          comment: comment.trim(),
+          code: codeSnipetRef.current,
+        };
+
         await commentOnDevit(devitId, commentData);
-        setCommentData({
-          comment: "",
-          code: undefined,
-        });
         router.push(`/devits/${devitId}`);
         closeForm();
       } catch (error) {
@@ -91,7 +58,7 @@ export default function CommentForm({
         setIsPosting(false);
       }
     },
-    [commentData, devitId, user],
+    [comment, devitId, user],
   );
 
   if (!user || user === undefined) return null;
@@ -161,34 +128,14 @@ export default function CommentForm({
               leading-relaxed
               "
               placeholder="Write your comment..."
-              value={commentData.comment}
+              value={comment}
               onChange={handleCommentChange}
             />
 
             {/* Code Section */}
             <div>
-              <div className="flex gap-4 items-center mb-3">
-                <span className="text-xs text-zinc-500">Optional code</span>
-
-                <select
-                  className="text-xs border rounded-md px-2 py-1 dark:bg-zinc-800 dark:border-zinc-700"
-                  value={commentData.code?.language ?? "typescript"}
-                  onChange={handleLanguageChange}
-                >
-                  {Object.entries(supportedLanguages).map(([key, lang]) => (
-                    <option key={key} value={key}>
-                      {lang.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <VScode>
-                <CodeEditor
-                  code={commentData.code?.content ?? ""}
-                  language={commentData.code?.language ?? "typescript"}
-                  onChange={(value) => handleCodeChange(value)}
-                />
-              </VScode>
+              <span className="text-xs text-zinc-500">Optional code</span>
+              <CodeInput codeSnipetRef={codeSnipetRef} />
             </div>
 
             {/* Submit */}

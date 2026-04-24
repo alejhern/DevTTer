@@ -6,7 +6,7 @@ import CodeBlock from "@/components/codeBlock";
 import { CommentItem } from "@/components/comment";
 import DevitActions from "@/components/devitActions";
 import BackLink from "@/components/ui/backLink";
-import VScode from "@/components/vscodelayout";
+import VScode from "@/context/vscode";
 import { fetchDevit } from "@/firebase/devit";
 import { getUser } from "@/firebase/user";
 import getTimeAgo from "@/lib/utils";
@@ -99,11 +99,8 @@ export default async function DevitPage({ params }: Props) {
               </div>
 
               {/* Code */}
-              <VScode>
-                <CodeBlock
-                  code={devit.code.content}
-                  language={devit.code.language}
-                />
+              <VScode codeSnippet={devit.code}>
+                <CodeBlock codeSnippet={devit.code} />
               </VScode>
 
               {/* Content */}

@@ -1,25 +1,26 @@
-import type { CodeSnippet, Comment, User } from "@/types";
+import type { Comment, User } from "@/types";
+
+import { memo } from "react";
 
 import CodeBlock from "./codeBlock";
-import VScode from "./vscodelayout";
 
+import VScode from "@/context/vscode";
 import getTimeAgo from "@/lib/utils";
 
-export function CommentItem({
+export const CommentItem = memo(function CommentItem({
   comment,
   author,
 }: {
   comment: Comment;
   author: User;
 }) {
-  const code: CodeSnippet | undefined = comment.code as CodeSnippet | undefined;
-
   return (
     <div className="flex gap-3 mt-4">
       {/* Avatar */}
       <img
         alt={`${author.userName}'s avatar`}
         className="w-10 h-10 rounded-full object-cover"
+        loading="lazy"
         src={author.avatar}
       />
 
@@ -40,12 +41,12 @@ export function CommentItem({
         </p>
 
         {/* Code */}
-        {code && (
-          <VScode>
-            <CodeBlock code={code.content} language={code.language} />
+        {comment.code && (
+          <VScode codeSnippet={comment.code}>
+            <CodeBlock />
           </VScode>
         )}
       </div>
     </div>
   );
-}
+});

@@ -3,13 +3,13 @@ import type { PostDevit } from "@/types";
 import Image from "next/image";
 import Link from "next/link";
 import { isValidElement } from "react";
+import { v4 as uuidv4 } from "uuid";
 
 import CodeBlock from "./codeBlock";
 import DevitActions from "./devitActions";
-import VScode from "./vscodelayout";
 
+import VScode from "@/context/vscode";
 import getTimeAgo from "@/lib/utils";
-
 interface PostProps {
   post: PostDevit;
   children?: React.ReactElement<{ devit: PostDevit["devit"] }>;
@@ -65,11 +65,8 @@ export function Post({ post, children }: PostProps) {
         </div>
 
         {post.devit.code && (
-          <VScode>
-            <CodeBlock
-              code={post.devit.code.content}
-              language={post.devit.code.language}
-            />
+          <VScode key={uuidv4()} codeSnippet={post.devit.code}>
+            <CodeBlock />
           </VScode>
         )}
         <p className="mt-3 text-[17px] leading-relaxed text-zinc-800 dark:text-zinc-200 whitespace-pre-wrap">

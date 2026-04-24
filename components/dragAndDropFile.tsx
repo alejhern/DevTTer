@@ -4,44 +4,40 @@ import { useEffect, useState } from "react";
 
 import { Button } from "./ui/button";
 
-interface DragAndDropFileProps {
-  file: File | null | undefined;
-  handlerOnchange: (_file: File | null) => void;
-  devitImg?: string; // URL de imagen existente (Firebase)
-}
-
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
-export default function DragAndDropFile({
-  file,
-  handlerOnchange,
-  devitImg,
-}: DragAndDropFileProps) {
-  const [preview, setPreview] = useState<string | null>(devitImg || null);
+type Props = {
+  fileRef: React.MutableRefObject<File | null | string | undefined>;
+  initialFile?: string;
+};
+
+export default function DragAndDropFile({ fileRef, initialFile }: Props) {
+  const [preview, setPreview] = useState<string | null>(() => {
+    if (initialFile) return initialFile;
+
+    return null;
+  });
   const [dragActive, setDragActive] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (file === null) return setPreview(null);
-    if (file) {
-      // Imagen local seleccionada
-      const objectUrl = URL.createObjectURL(file);
+    const file = fileRef.current;
 
-      setPreview(objectUrl);
+    if (!file || typeof file === "string")
+      return setPreview(initialFile ?? null);
+    const objectUrl = URL.createObjectURL(file);
 
-      return () => URL.revokeObjectURL(objectUrl);
-    }
+    setPreview(objectUrl);
 
-    // Si no hay archivo local, mostrar imagen existente
-    if (!file && devitImg) {
-      setPreview(devitImg);
+    return () => URL.revokeObjectURL(objectUrl);
+  }, []);
 
-      return;
-    }
-
-    // Si no hay nada
-    setPreview(null);
-  }, [file, devitImg]);
+  // Sincroniza preview cuando initialFile llega tarde (fetch en el padre)
+  useEffect(() => {
+    if (!initialFile) return;
+    setPreview(initialFile);
+    fileRef.current = initialFile;
+  }, [initialFile, fileRef]);
 
   const validateFile = (file: File) => {
     if (!file.type.startsWith("image/")) {
@@ -49,22 +45,28 @@ export default function DragAndDropFile({
 
       return false;
     }
-
     if (file.size > MAX_FILE_SIZE) {
       setError("File size must be less than 5MB.");
 
       return false;
     }
-
     setError(null);
 
     return true;
   };
 
   const handleFile = (file: File) => {
-    if (validateFile(file)) {
-      handlerOnchange(file);
-    }
+    if (!validateFile(file)) return;
+    fileRef.current = file;
+    const objectUrl = URL.createObjectURL(file);
+
+    setPreview(objectUrl);
+  };
+
+  const removeFile = () => {
+    fileRef.current = null;
+    setPreview(null);
+    setError(null);
   };
 
   return (
@@ -85,17 +87,17 @@ export default function DragAndDropFile({
         onDrop={(e) => {
           e.preventDefault();
           setDragActive(false);
+          const file = e.dataTransfer.files?.[0];
 
-          if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-            handleFile(e.dataTransfer.files[0]);
-          }
+          if (file) handleFile(file);
         }}
       >
-        {!file && !preview ? (
+        {!preview ? (
           <>
             <p className="text-sm text-zinc-500 mb-3">
               Drag & drop your image here (max 5MB)
             </p>
+
             <Button
               color="primary"
               type="button"
@@ -104,15 +106,16 @@ export default function DragAndDropFile({
             >
               Select Image
             </Button>
+
             <input
               accept="image/*"
               className="hidden"
               id="imageUpload"
               type="file"
               onChange={(e) => {
-                if (e.target.files && e.target.files[0]) {
-                  handleFile(e.target.files[0]);
-                }
+                const file = e.target.files?.[0];
+
+                if (file) handleFile(file);
               }}
             />
           </>
@@ -120,33 +123,31 @@ export default function DragAndDropFile({
           <div className="flex flex-col items-center gap-3">
             {/* PREVIEW */}
             <div className="relative">
-              {preview && (
-                <img
-                  alt="Preview"
-                  className="w-32 h-32 object-cover rounded-xl shadow-lg border"
-                  src={preview}
-                />
-              )}
+              <img
+                alt="Preview"
+                className="w-32 h-32 object-cover rounded-xl shadow-lg border"
+                src={preview}
+              />
+
               {/* REMOVE BUTTON */}
               <button
                 className="absolute -top-2 -right-2 bg-red-500 text-white w-6 h-6 rounded-full text-xs flex items-center justify-center shadow hover:scale-110 transition"
                 type="button"
-                onClick={() => {
-                  handlerOnchange(null);
-                  setPreview(null);
-                }}
+                onClick={removeFile}
               >
                 ✕
               </button>
             </div>
-            {file && (
+
+            {fileRef.current && typeof fileRef.current !== "string" && (
               <p className="text-sm text-green-500 font-medium">
-                ✓ {file.name}
+                ✓ {fileRef.current.name}
               </p>
             )}
-            {!file && preview && (
+
+            {fileRef.current && typeof fileRef.current === "string" && (
               <p className="text-sm text-blue-500 font-medium">
-                {preview.split("/").pop()} (existing image)
+                existing image
               </p>
             )}
           </div>

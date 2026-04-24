@@ -1,25 +1,26 @@
 "use client";
+
 import { Button } from "@heroui/button";
 import { useSearchParams } from "next/navigation";
 
 import AutorizePage from "@/components/autorizePage";
-import CodeEditor from "@/components/codeEditor";
+import { CodeInput } from "@/components/codeInput";
 import DragAndDropFile from "@/components/dragAndDropFile";
-import VScode from "@/components/vscodelayout";
-import { supportedLanguages } from "@/config/site";
 import { useComposeDevit } from "@/hooks/useComposeDevit";
 
 export default function ComposeDevit() {
   const searchParams = useSearchParams();
   const idDevit = searchParams.get("edit") || undefined;
+
   const {
-    devit,
+    content,
     handleContentChange,
-    handleCodeChange,
     handleSubmit,
-    file,
-    handlerOnchangeFile,
+    fileRef,
     isPosting,
+    codeSnippetRef,
+    initialCode,
+    initialFile,
   } = useComposeDevit(idDevit);
 
   return (
@@ -27,16 +28,18 @@ export default function ComposeDevit() {
       <div className="w-full">
         <form
           className="
-          border border-zinc-200 dark:border-zinc-800
-          rounded-2xl
-          shadow-sm
-          p-10
+            border border-zinc-200 dark:border-zinc-800
+            rounded-2xl
+            shadow-sm
+            p-10
           "
           onSubmit={handleSubmit}
         >
           {/* Header */}
           <div className="flex justify-between items-center mb-10">
-            <h1 className="text-2xl font-semibold">Create new Devit</h1>
+            <h1 className="text-2xl font-semibold">
+              {idDevit ? "Edit Devit" : "Create new Devit"}
+            </h1>
 
             <Button
               color="primary"
@@ -48,50 +51,26 @@ export default function ComposeDevit() {
               {isPosting ? "Posting..." : "Post"}
             </Button>
           </div>
+
           {/* Content */}
           <textarea
             className="w-full min-h-[200px] text-lg bg-transparent outline-none resize-none mb-8 leading-relaxed"
             placeholder="Write your thoughts..."
-            value={devit.content}
-            onChange={(e) => handleContentChange(e)}
+            value={content}
+            onChange={handleContentChange}
           />
 
           {/* Code Section */}
           <div className="mb-8">
-            <div className="flex gap-4 items-center mb-3">
-              <h1 className="text-sm text-zinc-500">Code</h1>
-
-              <select
-                className="text-sm border rounded-md px-2 py-1 dark:bg-zinc-800 dark:border-zinc-700"
-                value={devit.code.language ?? "typescript"}
-                onChange={handleCodeChange("language")}
-              >
-                {Object.entries(supportedLanguages).map(([key, lang]) => (
-                  <option key={key} value={key}>
-                    {lang.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <VScode>
-              <CodeEditor
-                code={devit.code.content}
-                language={devit.code.language ?? "typescript"}
-                onChange={(value) => {
-                  const event = { target: { value } } as any;
-
-                  handleCodeChange("content")(event);
-                }}
-              />
-            </VScode>
+            <h1 className="text-sm text-zinc-500">Code</h1>
+            <CodeInput
+              codeSnipetRef={codeSnippetRef}
+              initialCode={initialCode}
+            />
           </div>
 
           {/* Image Upload */}
-          <DragAndDropFile
-            devitImg={devit.imageUrl}
-            file={file}
-            handlerOnchange={handlerOnchangeFile}
-          />
+          <DragAndDropFile fileRef={fileRef} initialFile={initialFile} />
         </form>
       </div>
     </AutorizePage>

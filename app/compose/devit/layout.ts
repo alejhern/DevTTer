@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "DevTTer | Add Devit",
+  title: "DevTTer | Compose Devit",
 };
 
 export default function FormDevitLayout({

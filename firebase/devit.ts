@@ -4,7 +4,7 @@ import { auth } from "./app";
 
 export const postDevit = async (
   devit: Omit<Devit, "id" | "author" | "createdAt">,
-  file: File | null | undefined,
+  file?: File,
 ) => {
   const user = auth.currentUser;
 
@@ -39,7 +39,7 @@ export const postDevit = async (
 export const putDevit = async (
   devitId: string,
   devit: Omit<Devit, "id" | "author" | "createdAt">,
-  file: File | null | undefined,
+  file?: File | null,
 ) => {
   const user = auth.currentUser;
 

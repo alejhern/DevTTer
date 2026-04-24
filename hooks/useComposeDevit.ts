@@ -1,38 +1,40 @@
-import type { Devit } from "@/types";
+import type { CodeSnippet, Devit } from "@/types";
 
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { fetchDevit, postDevit, putDevit } from "@/firebase/devit";
 
 export function useComposeDevit(idDevit?: string) {
-  const [id, setId] = useState<string | null>(null);
-  const [devit, setDevit] = useState<
-    Omit<Devit, "id" | "author" | "createdAt">
-  >({
-    content: "",
-    code: {
-      language: "typescript",
-      content: "",
-    },
-  });
-  const [file, setFile] = useState<File | null | undefined>(undefined);
+  const [content, setContent] = useState<string>("");
   const [isPosting, setIsPosting] = useState(false);
+  const [initialCode, setInitialCode] = useState<CodeSnippet | undefined>(
+    undefined,
+  );
+  const [initialFile, setInitialFile] = useState<string | undefined>(undefined);
+
+  const fileRef = useRef<File | null | string | undefined>(undefined);
+  const codeSnippetRef = useRef<CodeSnippet | undefined>(undefined);
+
   const route = useRouter();
 
   useEffect(() => {
-    if (idDevit === undefined) return;
+    if (!idDevit) return;
 
     const loadDevit = async () => {
       try {
         const devitDB = await fetchDevit(idDevit);
 
-        setDevit({
-          content: devitDB.content,
-          code: devitDB.code,
-          imageUrl: devitDB.imageUrl,
-        });
-        setId(devitDB.id);
+        const imageUrl = devitDB.imageUrl as string | undefined;
+        const code = devitDB.code as CodeSnippet | undefined;
+
+        codeSnippetRef.current = code;
+        fileRef.current = imageUrl;
+
+        // Actualizar estado para que los componentes se re-rendericen con los valores iniciales
+        setInitialFile(imageUrl);
+        setInitialCode(code);
+        setContent(devitDB.content);
       } catch (error) {
         console.error("Error fetching devit:", error);
       }
@@ -43,27 +45,8 @@ export function useComposeDevit(idDevit?: string) {
 
   const handleContentChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      setDevit((prev) => ({ ...prev, content: e.target.value }));
+      setContent(e.target.value);
     },
-    [],
-  );
-
-  const handleCodeChange = useCallback(
-    (field: "language" | "content") =>
-      (
-        e: React.ChangeEvent<
-          HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-        >,
-      ) => {
-        setDevit((prev) => ({
-          ...prev,
-          code: {
-            language: prev.code?.language ?? "typescript",
-            content: prev.code?.content ?? "",
-            [field]: e.target.value,
-          },
-        }));
-      },
     [],
   );
 
@@ -71,40 +54,55 @@ export function useComposeDevit(idDevit?: string) {
     async (e: React.FormEvent) => {
       if (isPosting) return;
       e.preventDefault();
-      if (!devit.content.trim() || !devit.code.content.trim()) return;
+
+      const code = codeSnippetRef.current;
+
+      if (!code) return;
 
       setIsPosting(true);
-      try {
-        let res;
 
-        if (id) {
-          res = await putDevit(id, devit, file);
-        } else {
-          res = await postDevit(devit, file);
-        }
-        const idDevit = res.id;
+      const devitData: Omit<Devit, "id" | "author" | "createdAt"> = {
+        content: content.trim(),
+        code,
+      };
+
+      const file =
+        typeof fileRef.current === "string" ? undefined : fileRef.current;
+
+      try {
+        const res = idDevit
+          ? await putDevit(idDevit, devitData, file)
+          : await postDevit(devitData, file as File | undefined);
 
         console.log("Devit posted successfully");
-        route.push("/devits/" + idDevit);
+
+        route.push("/devits/" + res.id);
       } catch (error) {
         console.error("Error posting devit:", error);
         setIsPosting(false);
       }
     },
-    [devit, file, route],
+    [content, idDevit, isPosting, route],
   );
 
   const handlerOnchangeFile = useCallback((file: File | null | undefined) => {
-    setFile(file);
+    fileRef.current = file;
+  }, []);
+
+  const handleCodeChange = useCallback((code?: CodeSnippet) => {
+    codeSnippetRef.current = code;
   }, []);
 
   return {
-    devit,
+    content,
     handleContentChange,
     handleCodeChange,
     handleSubmit,
-    file,
+    fileRef,
     handlerOnchangeFile,
     isPosting,
+    codeSnippetRef,
+    initialCode,
+    initialFile,
   };
 }
