@@ -11,7 +11,7 @@ import { Loading } from "./ui/loading";
 
 import { getDevits, getUserDevits } from "@/firebase/devits";
 import { getUser } from "@/firebase/user";
-import useMounted from "@/hooks/useMounted";
+import { useMounted } from "@/hooks/useMounted";
 
 interface DevitsDisplayerProps {
   devitsWithAuthors: PostDevit[];

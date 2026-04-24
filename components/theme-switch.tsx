@@ -6,7 +6,7 @@ import { useTheme } from "next-themes";
 import { FC } from "react";
 
 import { MoonFilledIcon, SunFilledIcon } from "@/components/icons";
-import useMounted from "@/hooks/useMounted";
+import { useMounted } from "@/hooks/useMounted";
 
 interface ThemeSwitchProps {
   className?: string;

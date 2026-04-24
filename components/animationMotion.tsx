@@ -1,6 +1,6 @@
 import { motion, useReducedMotion } from "framer-motion";
 
-import useMounted from "@/hooks/useMounted";
+import { useMounted } from "@/hooks/useMounted";
 
 export default function AnimatedMotion({
   children,
