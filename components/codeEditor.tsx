@@ -1,26 +1,25 @@
 import Editor from "@monaco-editor/react";
 import { useTheme } from "next-themes";
 
+import { useVSCode } from "@/context/vscode";
+
 export interface CodeEditorProps {
-  language: string;
-  code: string;
-  onChange?: (_value: string) => void;
-  fullScreen?: boolean;
+  onChange: (_value: string) => void;
 }
 
-export default function CodeEditor({
-  language,
-  code,
-  onChange,
-  fullScreen = false,
-}: CodeEditorProps) {
+export default function CodeEditor({ onChange }: CodeEditorProps) {
   const { resolvedTheme } = useTheme() as { resolvedTheme: "light" | "dark" };
+  const ctx = useVSCode();
+
+  // ✅ prioridad: context > props
+  const codeSnippet = ctx?.codeSnippet;
+  const fullScreen = ctx?.state?.fullScreen ?? false;
 
   return (
     <div style={{ height: fullScreen ? "100%" : "200px", width: "100%" }}>
       <Editor
         height="100%"
-        language={language}
+        language={codeSnippet?.language}
         options={{
           automaticLayout: true,
           bracketPairColorization: { enabled: true },
@@ -41,7 +40,7 @@ export default function CodeEditor({
           wordWrap: "on",
         }}
         theme={resolvedTheme === "dark" ? "vs-dark" : "vs-light"}
-        value={code}
+        value={codeSnippet?.content ?? ""}
         width="100%"
         onChange={(val) => onChange && onChange(val ?? "")}
       />

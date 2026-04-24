@@ -1,5 +1,9 @@
 import { SVGProps } from "react";
 
+import { supportedLanguages } from "@/config/site";
+
+export type LanguagesKey = keyof typeof supportedLanguages;
+
 export type IconSvgProps = SVGProps<SVGSVGElement> & {
   size?: number;
 };
@@ -14,7 +18,7 @@ export interface User {
 }
 
 export interface CodeSnippet {
-  language: string;
+  language: LanguagesKey;
   content: string;
 }
 
@@ -42,3 +46,23 @@ export interface PostDevit {
   devit: Devit;
   author: User;
 }
+
+type Status = "idle" | "running" | "done" | "error";
+
+export interface UIState {
+  copied: boolean;
+  fullScreen: boolean;
+  output: string;
+  status: Status;
+  showOutput: boolean;
+}
+
+export type UIAction =
+  | { type: "COPY_START" }
+  | { type: "COPY_RESET" }
+  | { type: "FULLSCREEN_TOGGLE" }
+  | { type: "FULLSCREEN_EXIT" }
+  | { type: "RUN_START" }
+  | { type: "RUN_DONE"; payload: string }
+  | { type: "RUN_ERROR"; payload: string }
+  | { type: "OUTPUT_CLOSE" };

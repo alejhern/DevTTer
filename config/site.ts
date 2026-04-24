@@ -1,9 +1,17 @@
-import { Clock, Home, PlusSquare, Settings, User } from "lucide-react";
+import {
+  Clock,
+  Home,
+  MessageSquareCode,
+  PlusSquare,
+  Settings,
+  User,
+} from "lucide-react";
 
 const iconMap = {
   home: Home,
   timeline: Clock,
   profile: User,
+  chats: MessageSquareCode,
   add: PlusSquare,
   settings: Settings,
 };
@@ -31,6 +39,11 @@ const accountLinks = [
     label: "Add Devit",
     href: "/compose/devit",
     icon: iconMap.add,
+  },
+  {
+    label: "Chat",
+    href: "/chats",
+    icon: iconMap.chats,
   },
   {
     label: "Settings",

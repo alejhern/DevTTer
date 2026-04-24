@@ -1,43 +1,47 @@
 "use client";
+
+import type { CodeSnippet } from "@/types";
+
 import { useTheme } from "next-themes";
-import { use } from "react";
+import { useEffect, useState } from "react";
 import { codeToHtml } from "shiki";
 
-export interface CodeBlockProps {
-  code: string;
-  language: string;
-  fullScreen?: boolean;
-}
-
-const highlightCache = new Map<string, Promise<string>>();
-
-function getHighlightedHtml(
-  code: string,
-  language: string,
-  theme: "light" | "dark",
-) {
-  const key = `${code}:${language}:${theme}`;
-
-  if (!highlightCache.has(key)) {
-    highlightCache.set(
-      key,
-      codeToHtml(code, {
-        lang: language,
-        theme: theme === "dark" ? "one-dark-pro" : "one-light",
-      }),
-    );
-  }
-
-  return highlightCache.get(key)!;
-}
+import { useVSCode } from "@/context/vscode";
 
 export default function CodeBlock({
-  code,
-  language,
-  fullScreen = false,
-}: CodeBlockProps) {
-  const { resolvedTheme } = useTheme() as { resolvedTheme: "light" | "dark" };
-  const html = use(getHighlightedHtml(code, language, resolvedTheme));
+  codeSnippet: propSnippet,
+}: {
+  codeSnippet?: CodeSnippet;
+}) {
+  const ctx = useVSCode?.();
+
+  const codeSnippet = ctx?.codeSnippet ?? propSnippet;
+  const fullScreen = ctx?.state?.fullScreen ?? false;
+
+  const { resolvedTheme } = useTheme() as {
+    resolvedTheme?: "light" | "dark";
+  };
+
+  const [html, setHtml] = useState<string>(codeSnippet.content);
+
+  useEffect(() => {
+    if (!codeSnippet) return;
+
+    const theme = resolvedTheme ?? "light";
+
+    const run = async () => {
+      const result = await codeToHtml(codeSnippet.content, {
+        lang: codeSnippet.language,
+        theme: theme === "dark" ? "one-dark-pro" : "one-light",
+      });
+
+      setHtml(result);
+    };
+
+    run();
+  }, [codeSnippet, resolvedTheme]);
+
+  if (!codeSnippet) return null;
 
   return (
     <div
