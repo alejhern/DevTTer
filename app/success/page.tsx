@@ -27,8 +27,11 @@ export default function SuccessPage() {
         }
 
         await signInWithCustomToken(auth, token);
-        await saveUser();
-
+        try {
+          await saveUser();
+        } catch (err) {
+          console.error("Error saving user data:", err);
+        }
         // 🔥 una vez logueado → redirigir
         router.replace("/profile");
       } catch (err) {
