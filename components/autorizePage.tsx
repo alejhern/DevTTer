@@ -1,3 +1,4 @@
+"use client";
 import { Loading } from "./ui/loading";
 
 import { useUser } from "@/hooks/useUser";

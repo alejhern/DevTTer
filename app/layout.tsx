@@ -36,9 +36,7 @@ export default function RootLayout({
           <HeroUIProvider>
             <UserProvider>
               <Navbar />
-              <main className="container mx-auto w-full px-6 flex-grow pt-16">
-                {children}
-              </main>
+              <main className="container mx-auto w-full">{children}</main>
             </UserProvider>
           </HeroUIProvider>
         </NextThemesProvider>

@@ -47,6 +47,20 @@ export interface PostDevit {
   author: User;
 }
 
+export interface Message {
+  id: string;
+  sender: string;
+  receiver: string;
+  content: string;
+  code?: CodeSnippet;
+  createdAt: Date;
+}
+
+export interface Conversation {
+  receiver: string;
+  lastMessage: Message;
+}
+
 type Status = "idle" | "running" | "done" | "error";
 
 export interface UIState {

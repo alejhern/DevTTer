@@ -50,15 +50,13 @@ export async function POST(req: Request) {
     const decodedToken = await adminAuth.verifyIdToken(idToken);
 
     const imageFile = formData.get("image");
-    let imageUrl: string | null = null;
-
-    if (imageFile instanceof File) {
-      imageUrl = await uploadImage(imageFile, uuidv4());
-    }
+    const imageUrl =
+      imageFile instanceof File
+        ? await uploadImage(imageFile, uuidv4())
+        : undefined;
 
     const devitToSave = {
       ...devitData,
-      id: uuidv4(),
       author: decodedToken.uid,
       imageUrl,
       createdAt: FieldValue.serverTimestamp(),

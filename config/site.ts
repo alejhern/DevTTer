@@ -41,8 +41,8 @@ const accountLinks = [
     icon: iconMap.add,
   },
   {
-    label: "Chat",
-    href: "/chats",
+    label: "Messenger",
+    href: "/messenger",
     icon: iconMap.chats,
   },
   {
