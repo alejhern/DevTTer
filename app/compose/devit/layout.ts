@@ -4,7 +4,7 @@ export const metadata: Metadata = {
   title: "DevTTer | Compose Devit",
 };
 
-export default function FormDevitLayout({
+export default function ComposeDevitLayout({
   children,
 }: {
   children: React.ReactNode;

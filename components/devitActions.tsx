@@ -109,7 +109,7 @@ export default function DevitActions({
               <div className="absolute bottom-full right-0 mb-2 w-36 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white/90 dark:bg-zinc-900/90 backdrop-blur shadow-xl overflow-hidden animate-in fade-in zoom-in-95">
                 <Link
                   className="flex w-full items-center gap-2 px-4 py-2 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800"
-                  href={`/compose/devit?edit=${devit.id}`}
+                  href={`/compose/devit/${devit.id}`}
                 >
                   <Edit size={16} />
                   Editar
