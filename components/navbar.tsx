@@ -169,7 +169,14 @@ export default function Navbar() {
         <NavbarContent className="basis-1/5 lg:basis-full" justify="start">
           <NavbarBrand className="gap-3 max-w-fit">
             <Link className="flex justify-start items-center gap-1" href="/">
-              <Image alt="Devtter Logo" height={60} src={Logo} width={60} />
+              <Image
+                priority
+                alt="Devtter Logo"
+                className="w-[60px] h-[60px]"
+                height={60}
+                src={Logo}
+                width={60}
+              />
               <p className="font-bold text-3xl">DEVTTER</p>
             </Link>
           </NavbarBrand>

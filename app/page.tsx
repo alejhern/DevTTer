@@ -81,8 +81,8 @@ export default function IndexPage() {
         >
           <div className="relative inline-block">
             <h1 className="text-8xl font-bold tracking-tight">Devtter</h1>
-
             <Image
+              priority
               alt="Devtter Logo"
               className="
                 absolute
@@ -90,6 +90,8 @@ export default function IndexPage() {
                 -left-6
                 rotate-[-12deg]
                 pointer-events-none
+                w-[90px]
+                h-[90px]
               "
               height={90}
               src={Logo}
