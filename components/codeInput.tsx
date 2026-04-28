@@ -24,10 +24,12 @@ export function CodeInput({
     () => initialCode ?? DEFAULT_SNIPPET,
   );
 
-  // Sincronizar ref en el montaje inicial
   useEffect(() => {
-    codeSnipetRef.current = codeSnippet;
-  }, []);
+    if (codeSnippet) {
+      codeSnipetRef.current = codeSnippet;
+      setCodeSnippet(codeSnippet);
+    }
+  }, [initialCode]);
 
   // Si initialCode llega tarde (fetch), actualizar estado y ref
   useEffect(() => {

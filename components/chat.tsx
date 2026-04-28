@@ -1,6 +1,12 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type FormEvent,
+} from "react";
 import { Socket } from "socket.io-client";
 
 import CodeBlock from "./codeBlock";
@@ -23,32 +29,36 @@ export function Chat({
   const [input, setInput] = useState("");
 
   const codeSnippetRef = useRef<CodeSnippet | undefined>(undefined);
-  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const [code, setCode] = useState<CodeSnippet | undefined>(undefined);
 
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const firstLoad = useRef(true);
 
-  // 🔌 SOCKET LISTENERS
+  // 🔌 JOIN CHAT (solo cuando hay datos válidos)
   useEffect(() => {
     if (!socket || !user?.id || !receiver) return;
 
     socket.emit("join_chat", receiver);
 
-    const handleMessage = (data: Message, serverOffset: number) => {
-      setMessages((prev) => [...prev, data]);
+    return () => {
+      socket.emit("leave_chat", receiver);
+    };
+  }, [socket, user?.id, receiver]);
 
-      socket.auth = {
-        ...(typeof socket.auth === "object" ? socket.auth : {}),
-        serverOffset,
-      };
+  // 🔌 SOCKET LISTENER (independiente del join)
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleMessage = (data: Message) => {
+      setMessages((prev) => [...prev, data]);
     };
 
     socket.on("message", handleMessage);
 
     return () => {
-      socket.emit("leave_chat", receiver);
       socket.off("message", handleMessage);
     };
-  }, [socket, user?.id, receiver]);
+  }, [socket]);
 
   // 📥 HISTORIAL
   useEffect(() => {
@@ -76,26 +86,31 @@ export function Chat({
     firstLoad.current = false;
   }, [messages]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim() || !socket) return;
+  // 📤 SEND MESSAGE
+  const handleSubmit = useCallback(
+    (e: FormEvent) => {
+      e.preventDefault();
+      if (!input.trim() || !socket) return;
 
-    const body: Omit<Message, "id" | "sender" | "receiver" | "createdAt"> = {
-      content: input,
-      code:
-        codeSnippetRef.current && codeSnippetRef.current.content.trim()
-          ? {
-              content: codeSnippetRef.current.content,
-              language: codeSnippetRef.current.language,
-            }
-          : undefined,
-    };
+      const body: Omit<Message, "id" | "sender" | "receiver" | "createdAt"> = {
+        content: input,
+        code:
+          codeSnippetRef.current && codeSnippetRef.current.content.trim()
+            ? {
+                content: codeSnippetRef.current.content,
+                language: codeSnippetRef.current.language,
+              }
+            : undefined,
+      };
 
-    socket.emit("message", body, receiver);
+      socket.emit("message", body, receiver);
 
-    setInput("");
-    codeSnippetRef.current = undefined;
-  };
+      setInput("");
+      setCode({ content: "", language: code?.language ?? "typescript" });
+      codeSnippetRef.current = undefined;
+    },
+    [socket, receiver, input],
+  );
 
   return (
     <div className="flex flex-col h-full bg-background text-foreground transition-colors">
@@ -158,7 +173,7 @@ export function Chat({
         />
 
         <div className="rounded-md border border-border overflow-hidden">
-          <CodeInput codeSnipetRef={codeSnippetRef} />
+          <CodeInput codeSnipetRef={codeSnippetRef} initialCode={code} />
         </div>
 
         <div className="flex justify-end">

@@ -3,7 +3,7 @@
 import type { Message } from "@/types";
 
 import { Avatar, Badge, Button } from "@heroui/react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { io, Socket } from "socket.io-client";
 
 import { Chat } from "@/components/chat";
@@ -78,7 +78,7 @@ export function Messenger() {
   }, [user?.id]);
 
   // Limpia el badge al abrir un chat
-  const handleOpenChat = (otherUserId: string) => {
+  const handleOpenChat = useCallback((otherUserId: string) => {
     setChatSelected(otherUserId);
     setUnread((prev) => {
       const next = new Set(prev);
@@ -87,7 +87,7 @@ export function Messenger() {
 
       return next;
     });
-  };
+  }, []);
 
   return (
     <div className="flex h-[92dvh] w-full overflow-hidden bg-background text-foreground">
@@ -109,7 +109,7 @@ export function Messenger() {
                 key={otherUserId}
                 className="w-full justify-start px-4 py-3 h-auto border-b border-border/50"
                 variant="light"
-                onClick={() => handleOpenChat(otherUserId)}
+                onPress={() => handleOpenChat(otherUserId)}
               >
                 <div className="flex items-center gap-3 w-full">
                   {/* Avatar + unread */}
