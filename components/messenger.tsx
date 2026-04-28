@@ -3,6 +3,7 @@
 import type { Message } from "@/types";
 
 import { Avatar, Badge, Button } from "@heroui/react";
+import { getAuth } from "firebase/auth";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { io, Socket } from "socket.io-client";
 
@@ -10,74 +11,107 @@ import { Chat } from "@/components/chat";
 import { useUser } from "@/hooks/useUser";
 
 const URL = "http://localhost:3001";
+const MAX_RETRIES = 2;
 
 export function Messenger() {
   const [chatSelected, setChatSelected] = useState<string | null>(null);
   const [chats, setChats] = useState<Message[]>([]);
-  const [unread, setUnread] = useState<Set<string>>(new Set()); // 👈 nuevo
+  const [unread, setUnread] = useState<Set<string>>(new Set());
+
   const user = useUser();
   const socketRef = useRef<Socket | null>(null);
 
   useEffect(() => {
     if (!user?.id) return;
 
-    fetch(`${URL}/chats/${user.id}`, {
-      headers: { "Cache-Control": "no-cache" },
-    })
-      .then((res) => res.json())
-      .then((data: Message[]) => {
-        setChats(data);
+    let retryCount = 0;
+    let retryTimer: ReturnType<typeof setTimeout>;
+    let socket: Socket | null = null;
+    let token: string | null = null;
 
-        // Marca como no leído si el último mensaje no es tuyo
-        const newUnread = new Set<string>();
+    const fetchChatsFallback = async () => {
+      if (!token) return;
 
-        data.forEach((chat) => {
-          const otherUserId =
-            chat.sender === user.id ? chat.receiver : chat.sender;
-
-          if (chat.sender !== user.id) {
-            newUnread.add(otherUserId);
-          }
+      try {
+        const res = await fetch(`${URL}/chats/${user.id}`, {
+          headers: { Authorization: `Bearer ${token}` },
         });
-        setUnread(newUnread);
-      })
-      .catch((err) => {
-        console.error("Error fetching chats:", err);
-      });
-  }, [user?.id]);
 
-  useEffect(() => {
-    if (!user?.id) return;
-
-    const socket = io(URL, { auth: { userId: user.id } });
-
-    socketRef.current = socket;
-
-    socket.on("chats_list", (data: Message[]) => {
-      setChats(data);
-    });
-
-    // 👇 El servidor debe enviarte el senderId en la notificación
-    socket.on("new_message_notification", (data: { senderId?: string }) => {
-      socket.emit("get_chats");
-
-      // Marca como no leído si el mensaje viene de otro usuario
-      if (data?.senderId && data.senderId !== user.id) {
-        setUnread((prev) => new Set(prev).add(data.senderId!));
+        if (res.ok) setChats(await res.json());
+        else console.error("Fallback fetch failed:", res.statusText);
+      } catch (err) {
+        console.error("Fallback fetch error:", err);
       }
-    });
+    };
 
-    socket.on("connect_error", (err) => {
-      console.error("Socket error:", err.message);
-    });
+    const connectSocket = (authToken: string) => {
+      if (socket) {
+        socket.removeAllListeners();
+        socket.disconnect();
+      }
+
+      socket = io(URL, {
+        auth: { token: authToken },
+        transports: ["websocket"], // evita polling y el tráfico constante
+      });
+
+      socketRef.current = socket;
+
+      socket.on("connect", () => {
+        retryCount = 0;
+        socket!.emit("get_chats");
+      });
+
+      socket.on("chats_list", (data: Message[]) => {
+        setChats(data);
+      });
+
+      socket.on("new_message_notification", (data: { senderId?: string }) => {
+        socket!.emit("get_chats");
+        const senderId = data?.senderId;
+
+        if (senderId && senderId !== user.id) {
+          setUnread((prev) => new Set(prev).add(senderId));
+        }
+      });
+
+      socket.on("connect_error", (err) => {
+        console.error(
+          `Socket error (intento ${retryCount + 1}/${MAX_RETRIES}):`,
+          err.message,
+        );
+
+        if (retryCount < MAX_RETRIES) {
+          retryCount++;
+          const delay = retryCount * 1000;
+
+          retryTimer = setTimeout(() => connectSocket(authToken), delay);
+        } else {
+          console.warn("Máx. reintentos alcanzados, usando fallback HTTP");
+          fetchChatsFallback();
+        }
+      });
+    };
+
+    const initSocket = async () => {
+      const currentUser = getAuth().currentUser;
+
+      if (!currentUser) return;
+
+      token = await currentUser.getIdToken(true);
+      connectSocket(token);
+    };
+
+    initSocket();
 
     return () => {
-      socket.disconnect();
+      clearTimeout(retryTimer);
+      socket?.removeAllListeners();
+      socket?.disconnect();
       socketRef.current = null;
     };
   }, [user?.id]);
 
-  // Limpia el badge al abrir un chat
   const handleOpenChat = useCallback((otherUserId: string) => {
     setChatSelected(otherUserId);
     setUnread((prev) => {
@@ -91,7 +125,7 @@ export function Messenger() {
 
   return (
     <div className="flex h-[92dvh] w-full overflow-hidden bg-background text-foreground">
-      {/* 📋 LEFT */}
+      {/* LEFT */}
       <aside className="w-[40%] min-w-[280px] border-r border-border bg-card flex flex-col">
         <div className="p-4 border-b border-border font-medium">
           Conversations
@@ -100,9 +134,11 @@ export function Messenger() {
         <div className="flex-1 overflow-y-auto">
           {chats.map((chat) => {
             if (!user) return null;
+
             const otherUserId =
-              chat.sender === user?.id ? chat.receiver : chat.sender;
-            const hasUnread = unread.has(otherUserId); // 👈
+              chat.sender === user.id ? chat.receiver : chat.sender;
+
+            const hasUnread = unread.has(otherUserId);
 
             return (
               <Button
@@ -112,7 +148,6 @@ export function Messenger() {
                 onPress={() => handleOpenChat(otherUserId)}
               >
                 <div className="flex items-center gap-3 w-full">
-                  {/* Avatar + unread */}
                   <Badge
                     color="danger"
                     content=""
@@ -120,22 +155,17 @@ export function Messenger() {
                     placement="top-right"
                     size="sm"
                   >
-                    <Avatar className="shrink-0" name={`User ${otherUserId}`} />
+                    <Avatar name={`User ${otherUserId}`} />
                   </Badge>
 
-                  {/* Content */}
                   <div className="flex-1 min-w-0 text-left">
-                    <div className="flex items-center justify-between gap-2">
-                      <p
-                        className={`font-medium truncate ${
-                          hasUnread
-                            ? "text-foreground"
-                            : "text-muted-foreground"
-                        }`}
-                      >
-                        User {otherUserId}
-                      </p>
-                    </div>
+                    <p
+                      className={`font-medium truncate ${
+                        hasUnread ? "text-foreground" : "text-muted-foreground"
+                      }`}
+                    >
+                      User {otherUserId}
+                    </p>
 
                     <p
                       className={`text-xs truncate ${
@@ -154,7 +184,7 @@ export function Messenger() {
         </div>
       </aside>
 
-      {/* 💬 RIGHT */}
+      {/* RIGHT */}
       <main className="flex-1 flex flex-col min-w-0 bg-background">
         {chatSelected && (
           <Chat receiver={chatSelected} socket={socketRef.current} />

@@ -1,5 +1,6 @@
 "use client";
 
+import { getAuth } from "firebase/auth";
 import {
   useCallback,
   useEffect,
@@ -15,6 +16,8 @@ import { CodeInput } from "./codeInput";
 import VSCode from "@/context/vscode";
 import { useUser } from "@/hooks/useUser";
 import { CodeSnippet, type Message } from "@/types";
+
+const API_URL = "http://localhost:3001";
 
 export function Chat({
   receiver,
@@ -32,9 +35,9 @@ export function Chat({
   const [code, setCode] = useState<CodeSnippet | undefined>(undefined);
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
-  const firstLoad = useRef(true);
+  const historyLoadedRef = useRef(false);
 
-  // 🔌 JOIN CHAT (solo cuando hay datos válidos)
+  // 🔌 JOIN CHAT
   useEffect(() => {
     if (!socket || !user?.id || !receiver) return;
 
@@ -45,7 +48,7 @@ export function Chat({
     };
   }, [socket, user?.id, receiver]);
 
-  // 🔌 SOCKET LISTENER (independiente del join)
+  // 🔌 SOCKET LISTENER (SOLO UNA FUENTE DE MENSAJES)
   useEffect(() => {
     if (!socket) return;
 
@@ -64,49 +67,110 @@ export function Chat({
   useEffect(() => {
     if (!user?.id || !receiver) return;
 
-    fetch(`http://localhost:3001/chats/${user.id}/${receiver}`, {
-      headers: { "Cache-Control": "no-cache" },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        const msgs = Array.isArray(data) ? data : (data.messages ?? []);
+    setMessages([]);
+    historyLoadedRef.current = false;
+
+    const fetchHistory = async () => {
+      try {
+        const currentUser = getAuth().currentUser;
+        const token = await currentUser?.getIdToken();
+
+        const res = await fetch(`${API_URL}/chats/${user.id}/${receiver}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Cache-Control": "no-cache",
+          },
+        });
+
+        if (!res.ok) return;
+
+        const data = await res.json();
+
+        const msgs: Message[] = Array.isArray(data)
+          ? data
+          : (data.messages ?? []);
 
         setMessages(msgs);
-        firstLoad.current = false;
-      })
-      .catch(console.error);
+        historyLoadedRef.current = true;
+      } catch (err) {
+        console.error("Error fetching history:", err);
+      }
+    };
+
+    fetchHistory();
   }, [user?.id, receiver]);
 
   // 🔽 AUTO SCROLL
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({
-      behavior: firstLoad.current ? "auto" : "smooth",
-    });
+    if (!messages.length) return;
 
-    firstLoad.current = false;
+    messagesEndRef.current?.scrollIntoView({
+      behavior: historyLoadedRef.current ? "smooth" : "auto",
+    });
   }, [messages]);
 
   // 📤 SEND MESSAGE
   const handleSubmit = useCallback(
-    (e: FormEvent) => {
+    async (e: FormEvent) => {
       e.preventDefault();
-      if (!input.trim() || !socket) return;
+
+      if (!input.trim()) return;
+
+      const snippet = codeSnippetRef.current;
 
       const body: Omit<Message, "id" | "sender" | "receiver" | "createdAt"> = {
         content: input,
-        code:
-          codeSnippetRef.current && codeSnippetRef.current.content.trim()
-            ? {
-                content: codeSnippetRef.current.content,
-                language: codeSnippetRef.current.language,
-              }
-            : undefined,
+        code: snippet?.content?.trim()
+          ? {
+              content: snippet.content,
+              language: snippet.language,
+            }
+          : undefined,
       };
 
-      socket.emit("message", body, receiver);
+      const sendViaHTTP = async () => {
+        try {
+          const firebaseUser = getAuth().currentUser;
 
+          if (!firebaseUser) return;
+
+          const token = await firebaseUser.getIdToken();
+
+          await fetch(`${API_URL}/chats/${receiver}`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(body),
+          });
+        } catch (err) {
+          throw new Error("Failed to send message via HTTP: " + err);
+        }
+      };
+
+      // 🔥 SOCKET (única fuente de verdad)
+      if (socket?.connected) {
+        socket.emit("message", body, receiver);
+      } else {
+        console.warn("Socket not connected → using HTTP");
+        try {
+          await sendViaHTTP();
+        } catch (err) {
+          console.error("Error sending message via HTTP:", err);
+        }
+      }
+
+      // UI reset
       setInput("");
-      setCode({ content: "", language: code?.language ?? "typescript" });
+
+      const prevLang = codeSnippetRef.current?.language || "typescript";
+
+      setCode({
+        content: "",
+        language: prevLang,
+      });
+
       codeSnippetRef.current = undefined;
     },
     [socket, receiver, input],
