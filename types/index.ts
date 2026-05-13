@@ -12,8 +12,8 @@ export interface User {
   id: string;
   userName: string;
   name: string;
-  email: string;
   avatar: string;
+  email?: string;
   lastLogin?: Date | string;
 }
 
@@ -49,15 +49,15 @@ export interface PostDevit {
 
 export interface Message {
   id: string;
-  sender: string;
-  receiver: string;
   content: string;
   code?: CodeSnippet;
+  sender?: User;
+  receiver?: User;
   createdAt: Date;
 }
 
 export interface Conversation {
-  receiver: string;
+  receiver: User;
   lastMessage: Message;
 }
 

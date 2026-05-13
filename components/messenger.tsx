@@ -1,6 +1,6 @@
 "use client";
 
-import type { Message } from "@/types";
+import type { Conversation } from "@/types";
 
 import { Avatar, Badge, Button } from "@heroui/react";
 import { getAuth } from "firebase/auth";
@@ -15,7 +15,7 @@ const MAX_RETRIES = 2;
 
 export function Messenger({ receiver }: { receiver?: string }) {
   const [chatSelected, setChatSelected] = useState<string | null>(null);
-  const [chats, setChats] = useState<Message[]>([]);
+  const [chats, setChats] = useState<Conversation[]>([]);
   const [unread, setUnread] = useState<Set<string>>(new Set());
 
   const user = useUser();
@@ -66,7 +66,7 @@ export function Messenger({ receiver }: { receiver?: string }) {
         socket!.emit("get_chats");
       });
 
-      socket.on("chats_list", (data: Message[]) => {
+      socket.on("chats_list", (data: any[]) => {
         setChats(data);
       });
 
@@ -139,8 +139,7 @@ export function Messenger({ receiver }: { receiver?: string }) {
           {chats.map((chat) => {
             if (!user) return null;
 
-            const otherUserId =
-              chat.sender === user.id ? chat.receiver : chat.sender;
+            const otherUserId = chat.receiver.id;
 
             const hasUnread = unread.has(otherUserId);
 
@@ -159,7 +158,10 @@ export function Messenger({ receiver }: { receiver?: string }) {
                     placement="top-right"
                     size="sm"
                   >
-                    <Avatar name={`User ${otherUserId}`} />
+                    <Avatar
+                      name={`${otherUserId}`}
+                      src={chat.receiver.avatar}
+                    />
                   </Badge>
 
                   <div className="flex-1 min-w-0 text-left">
@@ -178,7 +180,7 @@ export function Messenger({ receiver }: { receiver?: string }) {
                           : "text-muted-foreground"
                       }`}
                     >
-                      {chat.content ?? "No messages yet"}
+                      {chat.lastMessage?.content ?? "No messages yet"}
                     </p>
                   </div>
                 </div>
