@@ -6,6 +6,7 @@ import DevitActions from "./devitActions";
 import { DevitsDisplayer } from "./devitsDisplayer";
 import { Post } from "./post";
 import { Loading } from "./ui/loading";
+import MessageButton from "./ui/messageButton";
 
 export function Profile({
   user,
@@ -30,6 +31,7 @@ export function Profile({
         <h1 className="text-4xl font-semibold">@{user.userName}</h1>
         <h1 className="text-2xl font-bold">{user.name}</h1>
         <p className="text-muted-foreground">{user.email}</p>
+        <MessageButton idUser={user.id} />
       </div>
       <div className="max-w-3xl mx-auto px-6 py-10">
         <h2 className="text-2xl font-semibold mb-6">My Devits</h2>

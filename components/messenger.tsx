@@ -13,13 +13,17 @@ import { useUser } from "@/hooks/useUser";
 const URL = "http://localhost:3001";
 const MAX_RETRIES = 2;
 
-export function Messenger() {
+export function Messenger({ receiver }: { receiver?: string }) {
   const [chatSelected, setChatSelected] = useState<string | null>(null);
   const [chats, setChats] = useState<Message[]>([]);
   const [unread, setUnread] = useState<Set<string>>(new Set());
 
   const user = useUser();
   const socketRef = useRef<Socket | null>(null);
+
+  useEffect(() => {
+    if (receiver) setChatSelected(receiver);
+  }, [receiver]);
 
   useEffect(() => {
     if (!user?.id) return;
