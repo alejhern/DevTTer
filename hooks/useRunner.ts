@@ -50,7 +50,10 @@ export function useRunner(
         const res = await fetch(`${baseUrl}/run`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(codeSnippet),
+          body: JSON.stringify({
+            language: codeSnippet.language,
+            code: codeSnippet.content,
+          }),
           signal: abortRef.current.signal,
         });
         const data = await res.json();
