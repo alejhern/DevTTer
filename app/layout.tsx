@@ -1,12 +1,9 @@
 import "@/styles/globals.css";
 import type { Metadata, Viewport } from "next";
 
-import { HeroUIProvider } from "@heroui/system";
-import { ThemeProvider as NextThemesProvider } from "next-themes";
-
 import Navbar from "@/components/navbar";
 import { fontSans } from "@/config/fonts";
-import { UserProvider } from "@/context/user";
+import RootProviders from "@/context/root.provider";
 
 export const metadata: Metadata = {
   title: "DevTTer",
@@ -28,18 +25,10 @@ export default function RootLayout({
   return (
     <html suppressHydrationWarning className={fontSans.variable} lang="en">
       <body className="min-h-screen bg-background font-sans antialiased">
-        <NextThemesProvider
-          attribute="class"
-          defaultTheme="light"
-          enableSystem={false}
-        >
-          <HeroUIProvider>
-            <UserProvider>
-              <Navbar />
-              <main className="container mx-auto w-full">{children}</main>
-            </UserProvider>
-          </HeroUIProvider>
-        </NextThemesProvider>
+        <RootProviders>
+          <Navbar />
+          <main className="container mx-auto w-full">{children}</main>
+        </RootProviders>
       </body>
     </html>
   );
