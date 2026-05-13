@@ -1,17 +1,16 @@
 "use client";
 
-import type { PostDevit, User } from "@/types";
-
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import DevitActions from "./devitActions";
 import { Post } from "./post";
 import { Loading } from "./ui/loading";
 
 import { getDevits, getUserDevits } from "@/firebase/devits";
-import { getUser } from "@/firebase/user";
 import { useMounted } from "@/hooks/useMounted";
+import { getUsersByIds } from "@/services/user";
+import { UKNOWN_USER, type PostDevit, type User } from "@/types";
 
 interface DevitsDisplayerProps {
   devitsWithAuthors: PostDevit[];
@@ -54,21 +53,26 @@ export function DevitsDisplayer({
     return () => window.removeEventListener("scroll", handleScroll);
   }, [isUpdating]);
 
-  const updateDevits = async () => {
+  const updateDevits = useCallback(async () => {
     setIsUpdating(true);
 
     try {
       const newDevits = user ? await getUserDevits(user.id) : await getDevits();
 
-      const posts: PostDevit[] = user
-        ? newDevits.map((devit) => ({ devit, author: user }))
-        : await Promise.all(
-            newDevits.map(async (devit) => {
-              const author = await getUser(devit.author);
+      const authorsIds = Array.from(new Set(newDevits.map((d) => d.author)));
 
-              return { devit, author };
-            }),
-          );
+      const authors = user ? [user] : await getUsersByIds(authorsIds);
+
+      const posts: PostDevit[] = newDevits.map((devit) => {
+        const author = authors
+          ? authors.find((a) => a.id === devit.author)
+          : null;
+
+        return {
+          devit,
+          author: author || UKNOWN_USER,
+        };
+      });
 
       setDevits(posts);
     } catch (error) {
@@ -76,11 +80,11 @@ export function DevitsDisplayer({
     } finally {
       setIsUpdating(false);
     }
-  };
+  }, [user]);
 
-  const devitRemovedEffect = (id: string) => {
+  const devitRemovedEffect = useCallback((id: string) => {
     setDevits((prev) => prev.filter((post) => post.devit.id !== id));
-  };
+  }, []);
 
   if (!isMounted || shouldReduceMotion) return children;
 

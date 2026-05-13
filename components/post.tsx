@@ -32,10 +32,10 @@ export function Post({ post, children }: PostProps) {
   return (
     <article className="flex gap-8 p-7 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl w-full">
       <Image
-        alt={`Avatar de ${post.author.name}`}
+        alt={`Avatar de ${post.author?.name}`}
         className="w-13 h-13 rounded-full object-cover shrink-0"
         height={48}
-        src={post.author.avatar}
+        src={post.author?.avatar}
         width={48}
       />
 

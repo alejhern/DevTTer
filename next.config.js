@@ -10,9 +10,13 @@ const nextConfig = {
       {
         protocol: "https",
         hostname: "cdn.intra.42.fr",
-      }
+      },
+      {
+        protocol: "https",
+        hostname: "api.dicebear.com",
+      },
     ],
   },
-}
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;

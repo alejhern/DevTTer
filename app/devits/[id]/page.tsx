@@ -8,8 +8,9 @@ import DevitActions from "@/components/devitActions";
 import BackLink from "@/components/ui/backLink";
 import VScode from "@/context/vscode";
 import { fetchDevit } from "@/firebase/devit";
-import { getUser } from "@/firebase/user";
 import getTimeAgo from "@/lib/utils";
+import { getUser, getUsersByIds } from "@/services/user";
+import { UKNOWN_USER } from "@/types";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -49,16 +50,26 @@ export default async function DevitPage({ params }: Props) {
   const devit = await fetchDevit(id);
 
   if (!devit) return <DevitNotFound />;
-  const author = await getUser(devit.author);
-  const comments = await Promise.all(
-    devit.comments && Array.isArray(devit.comments)
-      ? devit.comments.map(async (comment) => {
-          const commentAuthor = await getUser(comment.author);
-
-          return { comment, author: commentAuthor };
-        })
-      : [],
+  const author = (await getUser(devit.author)) || UKNOWN_USER;
+  const coments_authorsIds = Array.from(
+    new Set(
+      devit.comments && Array.isArray(devit.comments)
+        ? devit.comments.map((c: any) => c.author)
+        : [],
+    ),
   );
+  const coments_authors = await getUsersByIds(coments_authorsIds);
+  const comments =
+    devit.comments && Array.isArray(devit.comments)
+      ? devit.comments.map((comment: any) => {
+          const author = coments_authors?.find((a) => a.id === comment.author);
+
+          return {
+            comment,
+            author: author || UKNOWN_USER,
+          };
+        })
+      : [];
 
   return (
     <>

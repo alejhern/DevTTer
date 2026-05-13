@@ -80,3 +80,11 @@ export type UIAction =
   | { type: "RUN_DONE"; payload: string }
   | { type: "RUN_ERROR"; payload: string }
   | { type: "OUTPUT_CLOSE" };
+
+export const UKNOWN_USER: User = {
+  id: "unknown",
+  userName: "unknown",
+  name: "Unknown User",
+  email: "",
+  avatar: "https://api.dicebear.com/9.x/bottts/png?seed=Unknown",
+};

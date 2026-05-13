@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState } from "react";
 
-import { logout } from "@/firebase/user";
+import { logout } from "@/services/auth";
 
 export function useNavbar() {
   const [isLoggingOpen, setIsLoggingOpen] = useState<boolean>(false);

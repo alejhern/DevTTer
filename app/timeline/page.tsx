@@ -1,21 +1,25 @@
-import type { Devit, PostDevit } from "@/types";
-
 import DevitActions from "@/components/devitActions";
 import { DevitsDisplayer } from "@/components/devitsDisplayer";
 import { Post } from "@/components/post";
 import { getDevits } from "@/firebase/devits";
-import { getUser } from "@/firebase/user";
+import { getUsersByIds } from "@/services/user";
+import { UKNOWN_USER, type Devit, type PostDevit } from "@/types";
 
 export default async function Timeline() {
   const devits: Devit[] = await getDevits();
 
-  const posts: PostDevit[] = await Promise.all(
-    devits.map(async (devit) => {
-      const author = await getUser(devit.author);
+  const authorsIds = Array.from(new Set(devits.map((d) => d.author)));
 
-      return { devit, author };
-    }),
-  );
+  const authors = await getUsersByIds(authorsIds);
+
+  const posts: PostDevit[] = devits.map((devit) => {
+    const author = authors ? authors.find((a) => a.id === devit.author) : null;
+
+    return {
+      devit,
+      author: author || UKNOWN_USER,
+    };
+  });
 
   return (
     <section className="bg-transparent">

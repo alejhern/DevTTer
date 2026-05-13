@@ -3,7 +3,8 @@ import Link from "next/link";
 
 import { Profile } from "@/components/profile";
 import { getUserDevits } from "@/firebase/devits";
-import { getUser } from "@/firebase/user";
+import { getUser } from "@/services/user";
+import { UKNOWN_USER } from "@/types";
 
 function UserNotFound() {
   return (
@@ -32,7 +33,7 @@ function UserNotFound() {
 
 export default async function UserPage({ params }: { params: { id: string } }) {
   const { id } = await params;
-  const user = await getUser(id);
+  const user = (await getUser(id)) || UKNOWN_USER;
   const devits = await getUserDevits(id);
 
   if (!user) return <UserNotFound />;

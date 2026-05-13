@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { SearchIcon } from "@/components/icons";
-import { searchUsers } from "@/firebase/user";
+import { searchUsers } from "@/services/user";
 
 export default function Searcher() {
   const inputRef = useRef<HTMLInputElement>(null);

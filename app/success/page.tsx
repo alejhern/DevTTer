@@ -1,48 +1,38 @@
 "use client";
 
 import { signInWithCustomToken } from "firebase/auth";
+import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { auth } from "@/firebase/app";
-import { saveUser } from "@/firebase/user";
+import { saveUser } from "@/services/user";
 
 export default function SuccessPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const initAuth = async () => {
+    const firebaseToken = Cookies.get("firebase_custom_token");
+
+    if (!firebaseToken) {
+      router.replace("/home");
+
+      return;
+    }
+
+    (async () => {
       try {
-        const res = await fetch("/api/auth/token");
-
-        if (!res.ok) {
-          throw new Error("No se pudo obtener el token");
-        }
-
-        const { token } = await res.json();
-
-        if (!token) {
-          throw new Error("Token vacío");
-        }
-
-        await signInWithCustomToken(auth, token);
-        try {
-          await saveUser();
-        } catch (err) {
-          console.error("Error saving user data:", err);
-        }
-        // 🔥 una vez logueado → redirigir
+        await signInWithCustomToken(auth, firebaseToken);
+        await saveUser();
         router.replace("/profile");
       } catch (err) {
-        console.error("Error en success auth:", err);
-        router.replace("/"); // fallback
+        console.error("Error in success auth:", err);
+        router.replace("/home");
       } finally {
         setLoading(false);
       }
-    };
-
-    initAuth();
+    })();
   }, [router]);
 
   return (
