@@ -9,12 +9,10 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ message: "Code is required" }, { status: 400 });
   }
 
-  // 1️⃣ Intercambiar code por access_token (FORM URL ENCODED)
+  // 1️⃣ Exchange code for access_token
   const tokenRes = await fetch("https://api.intra.42.fr/oauth/token", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({
       grant_type: "authorization_code",
       client_id: process.env.FT_CLIENT_ID!,
@@ -27,31 +25,29 @@ export async function GET(req: NextRequest) {
   const tokenData = await tokenRes.json();
 
   if (!tokenData.access_token) {
-    console.error("Error obteniendo access token:", tokenData);
+    console.error("Error getting access token:", tokenData);
 
     return NextResponse.json(
-      { error: "No se pudo obtener access token de 42" },
+      { error: "Failed to obtain access token from 42" },
       { status: 500 },
     );
   }
 
-  // 2️⃣ Obtener usuario de 42
+  // 2️⃣ Fetch 42 user
   const userRes = await fetch("https://api.intra.42.fr/v2/me", {
-    headers: {
-      Authorization: `Bearer ${tokenData.access_token}`,
-    },
+    headers: { Authorization: `Bearer ${tokenData.access_token}` },
   });
 
   const user42 = await userRes.json();
 
   if (!user42?.id) {
     return NextResponse.json(
-      { error: "No se pudo obtener usuario de 42" },
+      { error: "Failed to obtain user from 42" },
       { status: 500 },
     );
   }
 
-  // 3️⃣ Crear custom token Firebase
+  // 3️⃣ Create Firebase custom token (Admin SDK — server only ✅)
   const firebaseToken = await adminAuth.createCustomToken(
     user42.id.toString(),
     {
@@ -59,29 +55,30 @@ export async function GET(req: NextRequest) {
       email: user42.email,
     },
   );
+
   const baseUrl = process.env.NEXT_PUBLIC_FT_PUBLIC_APP_URL;
+
+  // 4️⃣ Redirect to /success — client will pick up the cookie and sign in
   const response = NextResponse.redirect(`${baseUrl}/success`);
 
-  // 🔐 Cookie Firebase
   response.cookies.set({
     name: "firebase_custom_token",
     value: firebaseToken,
-    httpOnly: true,
+    httpOnly: false, // ⚠️ Must be false so client JS can read it
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
-    maxAge: 60 * 60,
+    maxAge: 60, // Short-lived — consumed immediately by the client
   });
 
-  // 🔐 Cookie Intra 42 access token
   response.cookies.set({
     name: "intra_access_token",
     value: tokenData.access_token,
-    httpOnly: true,
+    httpOnly: false, // ⚠️ Must be false so client JS can read it
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
-    maxAge: tokenData.expires_in || 60 * 60, // usar expires_in si está disponible
+    maxAge: 60, // Short-lived — consumed immediately by the client
   });
 
   return response;

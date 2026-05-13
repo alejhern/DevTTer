@@ -1,7 +1,6 @@
-import admin from "firebase-admin";
 import { NextResponse } from "next/server";
 
-import { adminAuth, adminDb } from "@/firebase/admin";
+import { adminAuth } from "@/firebase/admin";
 
 export async function DELETE(request: Request) {
   try {
@@ -16,9 +15,6 @@ export async function DELETE(request: Request) {
     const uid = dekodedToken.uid;
 
     await adminAuth.revokeRefreshTokens(uid);
-    await adminDb.collection("users").doc(uid).update({
-      lastActive: admin.firestore.FieldValue.serverTimestamp(),
-    });
     const response = NextResponse.json({ message: "Logged out" });
 
     response.cookies.delete("intra_access_token");
