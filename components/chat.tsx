@@ -1,6 +1,9 @@
 "use client";
 
+import { Avatar } from "@heroui/react";
+import clsx from "clsx";
 import { getAuth } from "firebase/auth";
+import Image from "next/image";
 import {
   useCallback,
   useEffect,
@@ -13,9 +16,14 @@ import { Socket } from "socket.io-client";
 import CodeBlock from "./codeBlock";
 import { CodeInput } from "./codeInput";
 
-import VSCode from "@/context/vscode";
+import WindowVSCode from "@/context/vscode";
 import { useUser } from "@/hooks/useUser";
-import { CodeSnippet, type Message } from "@/types";
+import {
+  UKNOWN_USER,
+  type CodeSnippet,
+  type Message,
+  type User,
+} from "@/types";
 
 const API_URL = "http://localhost:3001";
 
@@ -23,7 +31,7 @@ export function Chat({
   receiver,
   socket,
 }: {
-  receiver: string;
+  receiver: User;
   socket: Socket | null;
 }) {
   const user = useUser();
@@ -32,23 +40,25 @@ export function Chat({
   const [input, setInput] = useState("");
 
   const codeSnippetRef = useRef<CodeSnippet | undefined>(undefined);
+
   const [code, setCode] = useState<CodeSnippet | undefined>(undefined);
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
   const historyLoadedRef = useRef(false);
 
-  // 🔌 JOIN CHAT
+  // JOIN CHAT
   useEffect(() => {
-    if (!socket || !user?.id || !receiver) return;
+    if (!socket || !user?.id) return;
 
-    socket.emit("join_chat", receiver);
+    socket.emit("join_chat", receiver.id);
 
     return () => {
-      socket.emit("leave_chat", receiver);
+      socket.emit("leave_chat", receiver.id);
     };
-  }, [socket, user?.id, receiver]);
+  }, [socket, user?.id, receiver.id]);
 
-  // 🔌 SOCKET LISTENER (SOLO UNA FUENTE DE MENSAJES)
+  // SOCKET
   useEffect(() => {
     if (!socket) return;
 
@@ -63,22 +73,21 @@ export function Chat({
     };
   }, [socket]);
 
-  // 📥 HISTORIAL
+  // HISTORY
   useEffect(() => {
-    if (!user?.id || !receiver) return;
+    if (!user?.id) return;
 
     setMessages([]);
-    historyLoadedRef.current = false;
 
     const fetchHistory = async () => {
       try {
         const currentUser = getAuth().currentUser;
+
         const token = await currentUser?.getIdToken();
 
-        const res = await fetch(`${API_URL}/chats/${user.id}/${receiver}`, {
+        const res = await fetch(`${API_URL}/chats/${user.id}/${receiver.id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
-            "Cache-Control": "no-cache",
           },
         });
 
@@ -86,30 +95,25 @@ export function Chat({
 
         const data = await res.json();
 
-        const msgs: Message[] = Array.isArray(data)
-          ? data
-          : (data.messages ?? []);
+        setMessages(data.messages ?? data);
 
-        setMessages(msgs);
         historyLoadedRef.current = true;
       } catch (err) {
-        console.error("Error fetching history:", err);
+        console.error(err);
       }
     };
 
     fetchHistory();
-  }, [user?.id, receiver]);
+  }, [receiver.id, user?.id]);
 
-  // 🔽 AUTO SCROLL
+  // AUTO SCROLL
   useEffect(() => {
-    if (!messages.length) return;
-
     messagesEndRef.current?.scrollIntoView({
       behavior: historyLoadedRef.current ? "smooth" : "auto",
     });
   }, [messages]);
 
-  // 📤 SEND MESSAGE
+  // SEND
   const handleSubmit = useCallback(
     async (e: FormEvent) => {
       e.preventDefault();
@@ -118,7 +122,7 @@ export function Chat({
 
       const snippet = codeSnippetRef.current;
 
-      const body: Omit<Message, "id" | "sender" | "receiver" | "createdAt"> = {
+      const body = {
         content: input,
         code: snippet?.content?.trim()
           ? {
@@ -128,95 +132,121 @@ export function Chat({
           : undefined,
       };
 
-      const sendViaHTTP = async () => {
-        try {
-          const firebaseUser = getAuth().currentUser;
-
-          if (!firebaseUser) return;
-
-          const token = await firebaseUser.getIdToken();
-
-          await fetch(`${API_URL}/chats/${receiver}`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify(body),
-          });
-        } catch (err) {
-          throw new Error("Failed to send message via HTTP: " + err);
-        }
-      };
-
-      // 🔥 SOCKET (única fuente de verdad)
       if (socket?.connected) {
-        socket.emit("message", body, receiver);
-      } else {
-        console.warn("Socket not connected → using HTTP");
-        try {
-          await sendViaHTTP();
-        } catch (err) {
-          console.error("Error sending message via HTTP:", err);
-        }
+        socket.emit("message", body, receiver.id);
       }
 
-      // UI reset
       setInput("");
-
-      const prevLang = codeSnippetRef.current?.language || "typescript";
 
       setCode({
         content: "",
-        language: prevLang,
+        language: snippet?.language || "typescript",
       });
 
       codeSnippetRef.current = undefined;
     },
-    [socket, receiver, input],
+    [input, receiver.id, socket],
   );
 
   return (
-    <div className="flex flex-col h-full bg-background text-foreground transition-colors">
-      <div className="px-4 py-3 border-b border-border bg-card/60 backdrop-blur-md font-medium">
-        Chat
-      </div>
+    <div className="flex h-dvh flex-col overflow-hidden bg-background text-foreground">
+      {/* HEADER */}
+      <header className="flex h-16 min-h-16 items-center border-b border-border bg-card px-4">
+        <div className="flex min-w-0 items-center gap-3">
+          <div className="relative shrink-0">
+            <Image
+              alt={receiver.name}
+              className="rounded-full object-cover"
+              height={40}
+              src={receiver.avatar}
+              width={40}
+            />
 
-      <div className="flex-1 overflow-y-auto">
-        <div className="max-w-2xl mx-auto px-4 py-4 flex flex-col gap-4">
-          {messages.map((msg) => {
-            const isMe = msg.sender === user?.id;
+            {/* <div className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-background bg-green-500" /> */}
+          </div>
+
+          <div className="min-w-0">
+            <h2 className="truncate text-sm font-semibold sm:text-base">
+              {receiver.name}
+            </h2>
+
+            {/* <p className="text-xs text-muted-foreground">Online</p> */}
+          </div>
+        </div>
+      </header>
+
+      {/* MESSAGES */}
+      <div className="flex-1 overflow-y-auto bg-background px-3 py-4 sm:px-5 sm:py-6">
+        <div className="space-y-1">
+          {messages.map((message, index) => {
+            const isOwn = message.sender === user?.id;
+
+            const prevMessage = messages[index - 1];
+            const sender = isOwn ? user || UKNOWN_USER : receiver;
+
+            const showAvatar =
+              !prevMessage || prevMessage.sender !== message.sender;
 
             return (
               <div
-                key={msg.id}
-                className={`flex gap-3 ${
-                  isMe ? "justify-end" : "justify-start"
-                }`}
+                key={message.id}
+                className={clsx(
+                  "group flex gap-3 rounded-2xl px-2 py-2 transition-colors",
+                  "hover:bg-content2/40",
+                )}
               >
-                {!isMe && <div className="w-8 h-8 rounded-full bg-muted" />}
+                {/* AVATAR */}
+                <div className="w-10 shrink-0">
+                  {showAvatar ? (
+                    <Avatar
+                      className="h-10 w-10"
+                      name={sender.name}
+                      src={sender.avatar}
+                    />
+                  ) : (
+                    <div className="h-10 w-10" />
+                  )}
+                </div>
 
-                <div className="flex flex-col max-w-[75%]">
+                {/* CONTENT */}
+                <div className="min-w-0 flex-1">
+                  {showAvatar && (
+                    <div className="mb-5 flex items-center gap-2">
+                      <span
+                        className={clsx(
+                          "text-sm font-semibold",
+                          isOwn ? "text-primary" : "text-foreground",
+                        )}
+                      >
+                        {isOwn ? "You" : sender.name}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* MESSAGE BUBBLE */}
                   <div
-                    className={`px-4 py-2 rounded-2xl text-sm border ${
-                      isMe
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-muted text-foreground"
-                    }`}
+                    className={clsx(
+                      "max-w-[90%] rounded-2xl border px-4 py-3 shadow-sm",
+                      isOwn
+                        ? ["border-primary/20", "bg-primary/10"]
+                        : ["border-border", "bg-card"],
+                    )}
                   >
-                    <p className="whitespace-pre-wrap break-words">
-                      {msg.content}
+                    {/* TEXT */}
+                    <p className="break-words whitespace-pre-wrap text-sm leading-relaxed text-foreground/90">
+                      {message.content}
                     </p>
 
-                    {msg.code && (
-                      <VSCode codeSnippet={msg.code}>
-                        <CodeBlock />
-                      </VSCode>
+                    {/* CODE */}
+                    {message.code && (
+                      <div className="mt-3 overflow-hidden rounded-xl border border-border bg-background">
+                        <WindowVSCode codeSnippet={message.code}>
+                          <CodeBlock />
+                        </WindowVSCode>
+                      </div>
                     )}
                   </div>
                 </div>
-
-                {isMe && <div className="w-8 h-8 rounded-full bg-primary" />}
               </div>
             );
           })}
@@ -225,28 +255,38 @@ export function Chat({
         </div>
       </div>
 
+      {/* INPUT */}
       <form
-        className="p-4 border-t border-border bg-card/60 flex flex-col gap-2"
+        className="border-t border-border bg-card p-3 sm:p-4"
         onSubmit={handleSubmit}
       >
-        <input
-          className="p-2 rounded-md border border-border"
-          placeholder="Type a message..."
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-        />
+        <div className="rounded-2xl border border-border bg-content1 p-3 shadow-sm">
+          <input
+            className={clsx(
+              "w-full bg-transparent px-1 py-2 text-sm outline-none",
+              "text-foreground placeholder:text-muted-foreground",
+            )}
+            placeholder={`Mensaje a ${receiver.name}`}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+          />
 
-        <div className="rounded-md border border-border overflow-hidden">
-          <CodeInput codeSnipetRef={codeSnippetRef} initialCode={code} />
-        </div>
+          <div className="mt-3 overflow-hidden rounded-xl border border-border bg-background">
+            <CodeInput codeSnipetRef={codeSnippetRef} initialCode={code} />
+          </div>
 
-        <div className="flex justify-end">
-          <button
-            className="bg-primary text-primary-foreground px-4 py-2 rounded-md"
-            type="submit"
-          >
-            Send
-          </button>
+          <div className="mt-3 flex justify-end">
+            <button
+              className={clsx(
+                "w-full rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-all",
+                "hover:opacity-90 active:scale-[0.98]",
+                "sm:w-auto",
+              )}
+              type="submit"
+            >
+              Send
+            </button>
+          </div>
         </div>
       </form>
     </div>

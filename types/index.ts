@@ -51,8 +51,8 @@ export interface Message {
   id: string;
   content: string;
   code?: CodeSnippet;
-  sender?: User;
-  receiver?: User;
+  sender?: string;
+  receiver?: string;
   createdAt: Date;
 }
 

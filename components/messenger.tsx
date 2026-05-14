@@ -1,6 +1,6 @@
 "use client";
 
-import type { Conversation } from "@/types";
+import type { Conversation, User } from "@/types";
 
 import { Avatar, Badge, Button } from "@heroui/react";
 import { getAuth } from "firebase/auth";
@@ -9,12 +9,13 @@ import { io, Socket } from "socket.io-client";
 
 import { Chat } from "@/components/chat";
 import { useUser } from "@/hooks/useUser";
+import { getUser } from "@/services/user";
 
 const URL = "http://localhost:3001";
 const MAX_RETRIES = 2;
 
 export function Messenger({ receiver }: { receiver?: string }) {
-  const [chatSelected, setChatSelected] = useState<string | null>(null);
+  const [chatSelected, setChatSelected] = useState<User | null>(null);
   const [chats, setChats] = useState<Conversation[]>([]);
   const [unread, setUnread] = useState<Set<string>>(new Set());
 
@@ -22,7 +23,15 @@ export function Messenger({ receiver }: { receiver?: string }) {
   const socketRef = useRef<Socket | null>(null);
 
   useEffect(() => {
-    if (receiver) setChatSelected(receiver);
+    if (receiver) {
+      getUser(receiver)
+        .then((data) => {
+          if (data) setChatSelected(data);
+        })
+        .catch((err) => {
+          console.error("Error fetching user:", err);
+        });
+    }
   }, [receiver]);
 
   useEffect(() => {
@@ -116,12 +125,12 @@ export function Messenger({ receiver }: { receiver?: string }) {
     };
   }, [user?.id]);
 
-  const handleOpenChat = useCallback((otherUserId: string) => {
-    setChatSelected(otherUserId);
+  const handleOpenChat = useCallback((user: User) => {
+    setChatSelected(user);
     setUnread((prev) => {
       const next = new Set(prev);
 
-      next.delete(otherUserId);
+      next.delete(user.id);
 
       return next;
     });
@@ -148,7 +157,7 @@ export function Messenger({ receiver }: { receiver?: string }) {
                 key={otherUserId}
                 className="w-full justify-start px-4 py-3 h-auto border-b border-border/50"
                 variant="light"
-                onPress={() => handleOpenChat(otherUserId)}
+                onPress={() => handleOpenChat(chat.receiver)}
               >
                 <div className="flex items-center gap-3 w-full">
                   <Badge
@@ -159,7 +168,7 @@ export function Messenger({ receiver }: { receiver?: string }) {
                     size="sm"
                   >
                     <Avatar
-                      name={`${otherUserId}`}
+                      name={chat.receiver.name}
                       src={chat.receiver.avatar}
                     />
                   </Badge>
@@ -170,7 +179,7 @@ export function Messenger({ receiver }: { receiver?: string }) {
                         hasUnread ? "text-foreground" : "text-muted-foreground"
                       }`}
                     >
-                      User {otherUserId}
+                      {chat.receiver.name}
                     </p>
 
                     <p
