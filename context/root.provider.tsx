@@ -3,6 +3,7 @@
 import { HeroUIProvider } from "@heroui/react";
 import { ThemeProvider } from "next-themes";
 
+import { SocketProvider } from "./socket";
 import { UserProvider } from "./user";
 
 export default function RootProviders({
@@ -18,7 +19,9 @@ export default function RootProviders({
       enableSystem={false}
     >
       <HeroUIProvider>
-        <UserProvider>{children}</UserProvider>
+        <UserProvider>
+          <SocketProvider>{children}</SocketProvider>
+        </UserProvider>
       </HeroUIProvider>
     </ThemeProvider>
   );
