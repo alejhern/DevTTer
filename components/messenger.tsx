@@ -3,16 +3,13 @@
 import type { Conversation, User } from "@/types";
 
 import { Avatar, Badge, Button } from "@heroui/react";
-import { getAuth } from "firebase/auth";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { io, Socket } from "socket.io-client";
+import { useCallback, useEffect, useState } from "react";
 
 import { Chat } from "@/components/chat";
-import { useUser } from "@/hooks/useUser";
+import { useSocket } from "@/context/socket"; // 👈 NUEVO
+import { useUser } from "@/context/user";
+import { fetchChats } from "@/services/messenger";
 import { getUser } from "@/services/user";
-
-const URL = "http://localhost:3001";
-const MAX_RETRIES = 2;
 
 export function Messenger({ receiver }: { receiver?: string }) {
   const [chatSelected, setChatSelected] = useState<User | null>(null);
@@ -20,7 +17,7 @@ export function Messenger({ receiver }: { receiver?: string }) {
   const [unread, setUnread] = useState<Set<string>>(new Set());
 
   const user = useUser();
-  const socketRef = useRef<Socket | null>(null);
+  const { socket, isConnected } = useSocket(); // 👈 SOCKET GLOBAL
 
   useEffect(() => {
     if (receiver) {
@@ -34,99 +31,64 @@ export function Messenger({ receiver }: { receiver?: string }) {
     }
   }, [receiver]);
 
+  // 👉 SOCKET LISTENERS (SOLO UI LOGIC)
   useEffect(() => {
-    if (!user?.id) return;
+    if (!socket || !isConnected || !user?.id) return;
 
-    let retryCount = 0;
-    let retryTimer: ReturnType<typeof setTimeout>;
-    let socket: Socket | null = null;
-    let token: string | null = null;
+    const handleNotification = (data: { senderId?: string }) => {
+      socket.emit("get_chats");
 
-    const fetchChatsFallback = async () => {
-      if (!token) return;
+      const senderId = data?.senderId;
 
-      try {
-        const res = await fetch(`${URL}/chats/${user.id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        if (res.ok) setChats(await res.json());
-        else console.error("Fallback fetch failed:", res.statusText);
-      } catch (err) {
-        console.error("Fallback fetch error:", err);
+      if (senderId && senderId !== user.id) {
+        setUnread((prev) => new Set(prev).add(senderId));
       }
     };
 
-    const connectSocket = (authToken: string) => {
-      if (socket) {
-        socket.removeAllListeners();
-        socket.disconnect();
-      }
+    socket.on("chats_list", handleChats);
+    socket.on("new_message_notification", handleNotification);
 
-      socket = io(URL, {
-        auth: { token: authToken },
-        transports: ["websocket"], // evita polling y el tráfico constante
-      });
-
-      socketRef.current = socket;
-
-      socket.on("connect", () => {
-        retryCount = 0;
-        socket!.emit("get_chats");
-      });
-
-      socket.on("chats_list", (data: any[]) => {
-        setChats(data);
-      });
-
-      socket.on("new_message_notification", (data: { senderId?: string }) => {
-        socket!.emit("get_chats");
-        const senderId = data?.senderId;
-
-        if (senderId && senderId !== user.id) {
-          setUnread((prev) => new Set(prev).add(senderId));
-        }
-      });
-
-      socket.on("connect_error", (err) => {
-        console.error(
-          `Socket error (intento ${retryCount + 1}/${MAX_RETRIES}):`,
-          err.message,
-        );
-
-        if (retryCount < MAX_RETRIES) {
-          retryCount++;
-          const delay = retryCount * 1000;
-
-          retryTimer = setTimeout(() => connectSocket(authToken), delay);
-        } else {
-          console.warn("Máx. reintentos alcanzados, usando fallback HTTP");
-          fetchChatsFallback();
-        }
-      });
-    };
-
-    const initSocket = async () => {
-      const currentUser = getAuth().currentUser;
-
-      if (!currentUser) return;
-
-      token = await currentUser.getIdToken(true);
-      connectSocket(token);
-    };
-
-    initSocket();
+    // pedir chats iniciales
+    socket.emit("get_chats");
 
     return () => {
-      clearTimeout(retryTimer);
-      socket?.removeAllListeners();
-      socket?.disconnect();
-      socketRef.current = null;
+      socket.off("chats_list", handleChats);
+      socket.off("new_message_notification", handleNotification);
     };
-  }, [user?.id]);
+  }, [socket, user?.id]);
+
+  useEffect(() => {
+    if (isConnected) return;
+    (async () => {
+      try {
+        const conversations = await fetchChats(user?.id ?? "");
+
+        setChats(conversations);
+      } catch (error) {
+        console.error("Error fetching chats:", error);
+      }
+    })();
+  }, [socket, user?.id]);
+
+  useEffect(() => {
+    if (chatSelected) {
+      setUnread((prev) => {
+        const next = new Set(prev);
+
+        next.delete(chatSelected.id);
+
+        return next;
+      });
+    }
+  }, [chatSelected]);
+
+  const handleChats = useCallback((data: Conversation[]) => {
+    setChats(data);
+  }, []);
 
   const handleOpenChat = useCallback((user: User) => {
     setChatSelected(user);
+
     setUnread((prev) => {
       const next = new Set(prev);
 
@@ -149,7 +111,6 @@ export function Messenger({ receiver }: { receiver?: string }) {
             if (!user) return null;
 
             const otherUserId = chat.receiver.id;
-
             const hasUnread = unread.has(otherUserId);
 
             return (
@@ -201,9 +162,7 @@ export function Messenger({ receiver }: { receiver?: string }) {
 
       {/* RIGHT */}
       <main className="flex-1 flex flex-col min-w-0 bg-background">
-        {chatSelected && (
-          <Chat receiver={chatSelected} socket={socketRef.current} />
-        )}
+        {chatSelected && <Chat receiver={chatSelected} />}
       </main>
     </div>
   );

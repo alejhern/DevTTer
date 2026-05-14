@@ -2,7 +2,6 @@
 
 import { Avatar } from "@heroui/react";
 import clsx from "clsx";
-import { getAuth } from "firebase/auth";
 import Image from "next/image";
 import {
   useCallback,
@@ -11,13 +10,14 @@ import {
   useState,
   type FormEvent,
 } from "react";
-import { Socket } from "socket.io-client";
 
 import CodeBlock from "./codeBlock";
 import { CodeInput } from "./codeInput";
 
+import { useSocket } from "@/context/socket";
+import { useUser } from "@/context/user";
 import WindowVSCode from "@/context/vscode";
-import { useUser } from "@/hooks/useUser";
+import { fetchMessages, sendMessage } from "@/services/messenger";
 import {
   UKNOWN_USER,
   type CodeSnippet,
@@ -25,15 +25,8 @@ import {
   type User,
 } from "@/types";
 
-const API_URL = "http://localhost:3001";
-
-export function Chat({
-  receiver,
-  socket,
-}: {
-  receiver: User;
-  socket: Socket | null;
-}) {
+export function Chat({ receiver }: { receiver: User }) {
+  const { socket, isConnected } = useSocket();
   const user = useUser();
 
   const [messages, setMessages] = useState<Message[]>([]);
@@ -49,7 +42,7 @@ export function Chat({
 
   // JOIN CHAT
   useEffect(() => {
-    if (!socket || !user?.id) return;
+    if (!socket || !isConnected || !user?.id) return;
 
     socket.emit("join_chat", receiver.id);
 
@@ -58,13 +51,13 @@ export function Chat({
     };
   }, [socket, user?.id, receiver.id]);
 
+  const handleMessage = useCallback((data: Message) => {
+    setMessages((prev) => [...prev, data]);
+  }, []);
+
   // SOCKET
   useEffect(() => {
-    if (!socket) return;
-
-    const handleMessage = (data: Message) => {
-      setMessages((prev) => [...prev, data]);
-    };
+    if (!socket || !isConnected) return;
 
     socket.on("message", handleMessage);
 
@@ -75,35 +68,18 @@ export function Chat({
 
   // HISTORY
   useEffect(() => {
-    if (!user?.id) return;
-
-    setMessages([]);
-
-    const fetchHistory = async () => {
+    if (!user) return;
+    (async () => {
       try {
-        const currentUser = getAuth().currentUser;
+        const messages = await fetchMessages(user.id, receiver.id);
 
-        const token = await currentUser?.getIdToken();
-
-        const res = await fetch(`${API_URL}/chats/${user.id}/${receiver.id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (!res.ok) return;
-
-        const data = await res.json();
-
-        setMessages(data.messages ?? data);
-
-        historyLoadedRef.current = true;
+        setMessages(messages);
       } catch (err) {
-        console.error(err);
+        console.error("Error fetching chat history:", err);
+      } finally {
+        historyLoadedRef.current = true;
       }
-    };
-
-    fetchHistory();
+    })();
   }, [receiver.id, user?.id]);
 
   // AUTO SCROLL
@@ -122,7 +98,7 @@ export function Chat({
 
       const snippet = codeSnippetRef.current;
 
-      const body = {
+      const body: Omit<Message, "id"> = {
         content: input,
         code: snippet?.content?.trim()
           ? {
@@ -132,8 +108,20 @@ export function Chat({
           : undefined,
       };
 
-      if (socket?.connected) {
-        socket.emit("message", body, receiver.id);
+      if (socket && isConnected) socket.emit("message", body, receiver.id);
+      else {
+        try {
+          await sendMessage(body, receiver.id);
+          handleMessage({
+            ...body,
+            id: crypto.randomUUID(),
+            sender: user?.id,
+            receiver: receiver.id,
+            createdAt: new Date(),
+          });
+        } catch (err) {
+          console.error("Error sending message:", err);
+        }
       }
 
       setInput("");
@@ -145,7 +133,7 @@ export function Chat({
 
       codeSnippetRef.current = undefined;
     },
-    [input, receiver.id, socket],
+    [input, receiver.id, socket, isConnected, user?.id, handleMessage],
   );
 
   return (

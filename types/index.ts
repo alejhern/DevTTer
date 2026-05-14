@@ -53,7 +53,7 @@ export interface Message {
   code?: CodeSnippet;
   sender?: string;
   receiver?: string;
-  createdAt: Date;
+  createdAt?: Date;
 }
 
 export interface Conversation {
