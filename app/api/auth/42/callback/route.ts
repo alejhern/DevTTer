@@ -68,7 +68,7 @@ export async function GET(req: NextRequest) {
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
-    maxAge: 60, // Short-lived — consumed immediately by the client
+    maxAge: 60 * 60 * 24, // 1 day
   });
 
   response.cookies.set({
@@ -78,7 +78,7 @@ export async function GET(req: NextRequest) {
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
-    maxAge: 60, // Short-lived — consumed immediately by the client
+    maxAge: 60 * 60 * 24, // 1 day
   });
 
   return response;
