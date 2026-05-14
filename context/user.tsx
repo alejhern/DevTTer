@@ -1,7 +1,13 @@
 "use client";
 import type { User } from "@/types";
 
-import { createContext, ReactNode, useEffect, useState } from "react";
+import {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 
 import { onAuthStateChanged } from "@/firebase/user";
 
@@ -9,9 +15,7 @@ type UserContextType = {
   user?: User | null;
 };
 
-export const UserContext = createContext<UserContextType | undefined>(
-  undefined,
-);
+const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export function UserProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null | undefined>(undefined);
@@ -25,4 +29,14 @@ export function UserProvider({ children }: { children: ReactNode }) {
   return (
     <UserContext.Provider value={{ user }}>{children}</UserContext.Provider>
   );
+}
+
+export function useUser(): User | null | undefined {
+  const context = useContext(UserContext);
+
+  if (!context) {
+    throw new Error("useUser must be used within a UserProvider");
+  }
+
+  return context.user;
 }

@@ -7,7 +7,7 @@ import Link from "next/link";
 
 import Animated from "@/components/animationMotion";
 import { Post } from "@/components/post";
-import { useUser } from "@/hooks/useUser";
+import { useUser } from "@/context/user";
 import Logo from "@/public/Devtter.png";
 
 // --- Mock data ---

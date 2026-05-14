@@ -22,8 +22,8 @@ import Login42 from "@/components/loginForm";
 import Searcher from "@/components/searcher";
 import { ThemeSwitch } from "@/components/theme-switch";
 import { siteConfig } from "@/config/site";
+import { useUser } from "@/context/user";
 import { useNavbar } from "@/hooks/useNavbar";
-import { useUser } from "@/hooks/useUser";
 import Logo from "@/public/Devtter.png";
 
 const links = siteConfig.navItems;

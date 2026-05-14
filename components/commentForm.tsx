@@ -8,8 +8,8 @@ import { useCallback, useRef, useState } from "react";
 import { CodeInput } from "./codeInput";
 
 import { Button } from "@/components/ui/button";
+import { useUser } from "@/context/user";
 import { commentOnDevit } from "@/firebase/devit";
-import { useUser } from "@/hooks/useUser";
 
 interface CommentFormProps {
   devitId: string;

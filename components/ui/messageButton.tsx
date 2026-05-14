@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 
 import { Button } from "./button";
 
-import { useUser } from "@/hooks/useUser";
+import { useUser } from "@/context/user";
 
 export default function MessageButton({ idUser }: { idUser: string }) {
   const user = useUser();

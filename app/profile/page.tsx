@@ -5,8 +5,8 @@ import { useEffect, useState } from "react";
 
 import AutorizePage from "@/components/autorizePage";
 import { Profile } from "@/components/profile";
+import { useUser } from "@/context/user";
 import { getUserDevits } from "@/firebase/devits";
-import { useUser } from "@/hooks/useUser";
 
 export default function ProfilePage() {
   const user = useUser();

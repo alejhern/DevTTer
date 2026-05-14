@@ -2,8 +2,8 @@ import type { Devit } from "@/types";
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { useUser } from "@/context/user";
 import { deleteDevit, likeDevit } from "@/firebase/devit";
-import { useUser } from "@/hooks/useUser";
 
 export function useDevitActions(devit: Devit) {
   const user = useUser();
