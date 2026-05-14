@@ -1,8 +1,9 @@
 "use client";
 
+import type { CodeSnippet, Message, User } from "@/types";
+
 import { Avatar } from "@heroui/react";
 import clsx from "clsx";
-import Image from "next/image";
 import {
   useCallback,
   useEffect,
@@ -13,17 +14,13 @@ import {
 
 import CodeBlock from "./codeBlock";
 import { CodeInput } from "./codeInput";
+import { AvatarUser } from "./ui/avatarUser";
 
 import { useSocket } from "@/context/socket";
 import { useUser } from "@/context/user";
 import WindowVSCode from "@/context/vscode";
 import { fetchMessages, sendMessage } from "@/services/messenger";
-import {
-  UKNOWN_USER,
-  type CodeSnippet,
-  type Message,
-  type User,
-} from "@/types";
+import { UKNOWN_USER } from "@/types";
 
 export function Chat({ receiver }: { receiver: User }) {
   const { socket, isConnected } = useSocket();
@@ -142,15 +139,7 @@ export function Chat({ receiver }: { receiver: User }) {
       <header className="flex h-16 min-h-16 items-center border-b border-border bg-card px-4">
         <div className="flex min-w-0 items-center gap-3">
           <div className="relative shrink-0">
-            <Image
-              alt={receiver.name}
-              className="rounded-full object-cover"
-              height={40}
-              src={receiver.avatar}
-              width={40}
-            />
-
-            {/* <div className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-background bg-green-500" /> */}
+            <AvatarUser height={40} user={receiver} width={40} />
           </div>
 
           <div className="min-w-0">
@@ -186,11 +175,7 @@ export function Chat({ receiver }: { receiver: User }) {
                 {/* AVATAR */}
                 <div className="w-10 shrink-0">
                   {showAvatar ? (
-                    <Avatar
-                      className="h-10 w-10"
-                      name={sender.name}
-                      src={sender.avatar}
-                    />
+                    <Avatar name={sender.name} src={sender.avatar} />
                   ) : (
                     <div className="h-10 w-10" />
                   )}

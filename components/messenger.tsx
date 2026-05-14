@@ -2,11 +2,13 @@
 
 import type { Conversation, User } from "@/types";
 
-import { Avatar, Badge, Button } from "@heroui/react";
+import { Badge, Button } from "@heroui/react";
 import { useCallback, useEffect, useState } from "react";
 
+import { AvatarUser } from "./ui/avatarUser";
+
 import { Chat } from "@/components/chat";
-import { useSocket } from "@/context/socket"; // 👈 NUEVO
+import { useSocket } from "@/context/socket";
 import { useUser } from "@/context/user";
 import { fetchChats } from "@/services/messenger";
 import { getUser } from "@/services/user";
@@ -17,7 +19,7 @@ export function Messenger({ receiver }: { receiver?: string }) {
   const [unread, setUnread] = useState<Set<string>>(new Set());
 
   const user = useUser();
-  const { socket, isConnected } = useSocket(); // 👈 SOCKET GLOBAL
+  const { socket, isConnected } = useSocket();
 
   useEffect(() => {
     if (receiver) {
@@ -128,10 +130,7 @@ export function Messenger({ receiver }: { receiver?: string }) {
                     placement="top-right"
                     size="sm"
                   >
-                    <Avatar
-                      name={chat.receiver.name}
-                      src={chat.receiver.avatar}
-                    />
+                    <AvatarUser user={chat.receiver} />
                   </Badge>
 
                   <div className="flex-1 min-w-0 text-left">
