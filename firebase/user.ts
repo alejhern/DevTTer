@@ -4,17 +4,15 @@ import { onAuthStateChanged as firebaseOnAuthStateChanged } from "firebase/auth"
 
 import { auth } from "./app";
 
+import { getMe } from "@/services/auth";
+import { UKNOWN_USER } from "@/types";
+
 const getCurrentUser = async (): Promise<User | null> => {
   const firebaseUser = auth.currentUser;
 
   if (!firebaseUser) return null;
-  const res = await fetch("/api/auth/42/intra/token", {
-    method: "GET",
-    credentials: "include",
-  }); // devuelve datos de usuario desde token en cookie
-
-  if (res.ok) {
-    const intraUser = await res.json();
+  try {
+    const intraUser = await getMe();
 
     return {
       id: firebaseUser.uid,
@@ -25,9 +23,17 @@ const getCurrentUser = async (): Promise<User | null> => {
       email: firebaseUser.email || intraUser.email,
       avatar: firebaseUser.photoURL || intraUser.image?.link,
     };
-  }
+  } catch (error) {
+    console.error("Error fetching user data:", error);
 
-  return null;
+    return {
+      id: firebaseUser.uid,
+      userName: firebaseUser.displayName || UKNOWN_USER.userName,
+      name: firebaseUser.displayName || UKNOWN_USER.name,
+      email: firebaseUser.email || UKNOWN_USER.email,
+      avatar: firebaseUser.photoURL || UKNOWN_USER.avatar,
+    };
+  }
 };
 
 // ON AUTH STATE CHANGED

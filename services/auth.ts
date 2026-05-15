@@ -36,7 +36,7 @@ export const logout = async (): Promise<void> => {
  * 🔹 Usuario actual (backend)
  */
 export const getMe = async (): Promise<any> => {
-  const response = await fetch("/api/auth/42/intra/token", {
+  const response = await fetch("/api/auth/42/intra/me", {
     method: "GET",
     credentials: "include",
   });

@@ -74,7 +74,7 @@ export async function GET(req: NextRequest) {
   response.cookies.set({
     name: "intra_access_token",
     value: tokenData.access_token,
-    httpOnly: false, // ⚠️ Must be false so client JS can read it
+    httpOnly: true, // ⚠️ Must be false so client JS can read it
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
