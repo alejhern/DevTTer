@@ -3,9 +3,8 @@
 import type { User } from "@/types";
 
 import { Avatar } from "@heroui/react";
-import { useEffect, useState } from "react";
 
-import { useSocket } from "@/context/socket";
+import { useUserStatus } from "@/context/userStatus";
 
 export function AvatarUser({
   user,
@@ -16,37 +15,7 @@ export function AvatarUser({
   width?: number;
   height?: number;
 }) {
-  const { socket, isConnected } = useSocket();
-
-  const [online, setOnline] = useState(false);
-
-  useEffect(() => {
-    if (!socket || !isConnected) return;
-
-    // estado inicial
-    socket.emit("user:get_status", user.id, (isOnline: boolean) => {
-      setOnline(isOnline);
-    });
-
-    // realtime updates
-    const handleStatusChanged = ({
-      userId,
-      online,
-    }: {
-      userId: string;
-      online: boolean;
-    }) => {
-      if (userId === user.id) {
-        setOnline(online);
-      }
-    };
-
-    socket.on("user_status_changed", handleStatusChanged);
-
-    return () => {
-      socket.off("user_status_changed", handleStatusChanged);
-    };
-  }, [socket, isConnected, user.id]);
+  const online = useUserStatus(user.id);
 
   return (
     <div className="relative">

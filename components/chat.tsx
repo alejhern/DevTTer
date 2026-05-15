@@ -18,6 +18,7 @@ import { AvatarUser } from "./ui/avatarUser";
 
 import { useSocket } from "@/context/socket";
 import { useUser } from "@/context/user";
+import { useUserStatus } from "@/context/userStatus";
 import WindowVSCode from "@/context/vscode";
 import { fetchMessages, sendMessage } from "@/services/messenger";
 import { UKNOWN_USER } from "@/types";
@@ -25,6 +26,7 @@ import { UKNOWN_USER } from "@/types";
 export function Chat({ receiver }: { receiver: User }) {
   const { socket, isConnected } = useSocket();
   const user = useUser();
+  const online = useUserStatus(receiver.id);
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
@@ -147,7 +149,7 @@ export function Chat({ receiver }: { receiver: User }) {
               {receiver.name}
             </h2>
 
-            {/* <p className="text-xs text-muted-foreground">Online</p> */}
+            {online && <p className="text-xs text-muted-foreground">Online</p>}
           </div>
         </div>
       </header>

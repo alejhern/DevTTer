@@ -5,6 +5,7 @@ import { ThemeProvider } from "next-themes";
 
 import { SocketProvider } from "./socket";
 import { UserProvider } from "./user";
+import { UserStatusProvider } from "./userStatus";
 
 export default function RootProviders({
   children,
@@ -20,7 +21,9 @@ export default function RootProviders({
     >
       <HeroUIProvider>
         <UserProvider>
-          <SocketProvider>{children}</SocketProvider>
+          <SocketProvider>
+            <UserStatusProvider>{children}</UserStatusProvider>
+          </SocketProvider>
         </UserProvider>
       </HeroUIProvider>
     </ThemeProvider>
