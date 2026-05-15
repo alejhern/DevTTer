@@ -90,7 +90,7 @@ function AccountActions({
           </DropdownTrigger>
           <DropdownMenu
             aria-label="User Menu"
-            className={hiddenOnMobile + " bg-white dark:bg-black rounded-md "}
+            className={hiddenOnMobile + " bg-white dark:bg-black rounded-md"}
             variant="flat"
           >
             <DropdownItem
@@ -101,32 +101,30 @@ function AccountActions({
               <p className="font-semibold">Signed in as</p>
               <p className="font-semibold">{user.email}</p>
             </DropdownItem>
-            <>
-              {accountLinks.map((item) => (
+
+            {
+              accountLinks.map((item) => (
                 <DropdownItem
                   key={item.label}
                   className={clsx(
                     linkStyles({ color: "foreground" }),
-                    "h-12",
+                    "h-12 p-0",
                     "data-[active=true]:bg-default-100 data-[active=true]:text-primary",
                   )}
                   textValue={item.label}
                   onClick={handlerClickOutside}
                 >
                   <Link
-                    className={clsx(
-                      linkStyles({ color: "foreground" }),
-                      "w-full h-full",
-                    )}
-                    color="foreground"
+                    className="flex items-center gap-2 w-full h-full px-4 py-2"
                     href={item.href}
                   >
-                    {<item.icon className="mr-2" size={18} />}
+                    <item.icon size={18} />
                     {item.label}
                   </Link>
                 </DropdownItem>
-              ))}
-            </>
+              )) as unknown as any
+            }
+
             <DropdownItem
               key="logout"
               className={clsx(
